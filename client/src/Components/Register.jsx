@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 const Register = () => {
     const [form, setForm] = useState({
         name: '',
@@ -19,6 +20,32 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(form);
+        axios.post('http://localhost:3001/register', {
+            name: form.name,
+            email: form.email,
+            password: form.password,
+            accountNumber: form.accountNumber,
+            panNumber: form.panNumber,
+            address: form.address,
+            phoneNumber: form.phoneNumber
+        })
+            .then((res) => {
+                console.log(res);
+                setForm({
+                    name: '',
+                    email: '',
+                    password: '',
+                    accountNumber: '',
+                    panNumber: '',
+                    address: '',
+                    phoneNumber: '',
+                });
+
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
     };
 
     return (
@@ -37,6 +64,7 @@ const Register = () => {
                         placeholder="Name"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <input
                         type="email"
@@ -44,6 +72,7 @@ const Register = () => {
                         placeholder="Email"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <input
                         type="password"
@@ -51,6 +80,7 @@ const Register = () => {
                         placeholder="Password"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <input
                         type="text"
@@ -58,6 +88,7 @@ const Register = () => {
                         placeholder="Account Number"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <input
                         type="text"
@@ -65,6 +96,7 @@ const Register = () => {
                         placeholder="PAN Number"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <input
                         type="text"
@@ -72,6 +104,7 @@ const Register = () => {
                         placeholder="Address"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <input
                         type="tel"
@@ -79,6 +112,7 @@ const Register = () => {
                         placeholder="Phone Number"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
+                        required
                     />
                     <button
                         type="submit"
