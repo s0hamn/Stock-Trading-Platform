@@ -1,14 +1,18 @@
 import { useState } from 'react'
-import './App.css'
 import Register from './Components/Register'
 import Login from './Components/Login'
-import "./index.css"
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import './index.css'
 function App() {
 
   return (
-    <>
-      <Register />
-    </>
+    <BrowserRouter>
+      <Routes>
+
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
