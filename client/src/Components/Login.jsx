@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
     const [form, setForm] = useState({
@@ -24,7 +25,7 @@ const Login = () => {
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md"
                 >
-                    <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+                    <h1 className="text-2xl font-semibold mb-4 text-center">Login</h1>
                     <input
                         type="text"
                         name="username"
@@ -32,7 +33,7 @@ const Login = () => {
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
                     />
-                   
+
                     <input
                         type="password"
                         name="password"
@@ -40,13 +41,14 @@ const Login = () => {
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
                     />
-                   
+
                     <button
                         type="submit"
                         className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
                         Login
                     </button>
+                    <Link to="/register"><p className="text-center text-blue-500 hover:underline">Don't have an account? Register Instead</p></Link>
                 </form>
             </div>
         </>

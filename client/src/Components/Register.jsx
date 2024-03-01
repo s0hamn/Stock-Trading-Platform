@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
-
+import { Link } from 'react-router-dom';
 const Register = () => {
     const [form, setForm] = useState({
         name: '',
@@ -29,7 +29,7 @@ const Register = () => {
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md w-1/2"
                 >
-                    <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
+                    <h1 className="text-2xl font-semibold mb-4 text-center">Register</h1>
 
                     <input
                         type="text"
@@ -86,6 +86,8 @@ const Register = () => {
                     >
                         Register
                     </button>
+                    <Link to="/login"><p className="text-center text-blue-500 hover:underline">Already have an account? Login Instead</p></Link>
+
                 </form>
             </div>
         </>
