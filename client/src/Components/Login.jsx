@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const Login = () => {
     const [form, setForm] = useState({
         username: '',
         password: ''
     });
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,7 +16,22 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(form);
+        axios.post('http://localhost:3001/login', {
+            email: form.email,
+            password: form.password
+        })
+            .then((res) => {
+                console.log(res);
+                if (res.data === "Success") {
+                    navigate('/');
+                }
+                else {
+                    alert(res.data);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     return (
@@ -27,9 +44,9 @@ const Login = () => {
                 >
                     <h1 className="text-2xl font-semibold mb-4 text-center">Login</h1>
                     <input
-                        type="text"
-                        name="username"
-                        placeholder="Username"
+                        type="email"
+                        name="email"
+                        placeholder="Email"
                         onChange={handleChange}
                         className="p-2 border border-gray-300 rounded"
                     />

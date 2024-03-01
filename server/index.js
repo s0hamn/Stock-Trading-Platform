@@ -30,6 +30,31 @@ app.post('/register', async (req, res) => {
 
 });
 
+app.post('/login', async (req, res) => {
+    console.log(req.body);
+    TraderModel.findOne({
+        email: req.body.email,
+        password: req.body.password
+    })
+        .then((traders) => {
+            if (traders) {
+                if (traders.password === req.body.password) {
+                    res.json("Success");
+                }
+                else {
+                    res.json("Wrong password");
+                }
+            }
+            else {
+                res.json("User not found");
+            }
+
+        })
+        .catch((err) => {
+            res.json(err);
+        });
+});
+
 
 
 app.listen(3001, () => {

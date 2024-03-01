@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const Register = () => {
     const [form, setForm] = useState({
         name: '',
@@ -12,6 +13,7 @@ const Register = () => {
         address: '',
         phoneNumber: '',
     });
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,16 +33,7 @@ const Register = () => {
         })
             .then((res) => {
                 console.log(res);
-                setForm({
-                    name: '',
-                    email: '',
-                    password: '',
-                    accountNumber: '',
-                    panNumber: '',
-                    address: '',
-                    phoneNumber: '',
-                });
-
+                navigate('/login');
             })
             .catch((err) => {
                 console.log(err);
