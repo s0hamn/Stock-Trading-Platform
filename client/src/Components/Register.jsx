@@ -27,8 +27,10 @@ const Register = () => {
             <div className="flex justify-center items-center h-screen bg-gray-200">
                 <form
                     onSubmit={handleSubmit}
-                    className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md"
+                    className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md w-1/2"
                 >
+                    <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
+
                     <input
                         type="text"
                         name="name"
