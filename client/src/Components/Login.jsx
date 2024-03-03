@@ -14,16 +14,19 @@ const Login = () => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    // axios.defaults.withCredentials = true;
+
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post('http://localhost:3001/login', {
             email: form.email,
-            password: form.password
+            password: form.password,
         })
             .then((res) => {
                 console.log(res);
                 if (res.data === "Success") {
-                    navigate('/');
+                    // navigate.push('/');
+                    alert("Login Successful");
                 }
                 else {
                     alert(res.data);
@@ -37,7 +40,7 @@ const Login = () => {
     return (
         <>
             <Navbar />
-            <div className="flex justify-center items-center h-screen bg-gray-100 overflow-hidden">
+            <div className="flex justify-center items-center h-screen bg-gray-200">
                 <form
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md"
@@ -65,7 +68,7 @@ const Login = () => {
                     >
                         Login
                     </button>
-                    <Link to="/register"><p className="text-center text-blue-500 hover:underline text-sm ">Don't have an account? Register Instead</p></Link>
+                    <Link to="/register"><p className="text-center text-blue-500 hover:underline">Don't have an account? Register Instead</p></Link>
                 </form>
             </div>
         </>

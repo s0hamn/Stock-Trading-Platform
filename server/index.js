@@ -3,8 +3,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const TraderModel = require('./models/Trader');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+
 const app = express();
-app.use(cors());
+app.use(cors({
+    credentials: true,
+}));
 app.use(express.json());
 
 mongoose.connect('mongodb+srv://sohamnaigaonkar:soham123@cluster0.c2rronj.mongodb.net/Database?retryWrites=true&w=majority&appName=Cluster0')
@@ -67,30 +72,37 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     console.log(req.body);
-    TraderModel.findOne({
+
+    const trader = await TraderModel.findOne({
         email: req.body.email
-    })
-        .then(async (traders) => {
-            if (traders) {
-                const compare = await comparePassword(req.body.password, traders.password)
-                if (compare) {
-                    console.log("Login successful");
-                    res.json("Success");
+    });
 
-                }
-                else {
-                    res.json("Wrong password");
-                }
-            }
-            else {
-                res.json("User not found");
-            }
+    if (trader) {
+        const compare = await comparePassword(req.body.password, trader.password);
 
-        })
-        .catch((err) => {
-            res.json(err);
+        const token = await trader.generateAuthToken();
+        console.log("Token", token);
+        res.cookie("jwtoken", token, {
+            expires: new Date(Date.now() + 300000),
+            httpOnly: true
         });
+
+        if (compare) {
+            console.log("Login successful");
+            res.json("Success");
+
+        }
+        else {
+            res.json("Wrong password");
+        }
+    }
+    else {
+        res.json("User not found");
+    }
 });
+
+
+
 
 
 

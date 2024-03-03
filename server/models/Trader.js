@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const TraderSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -32,7 +33,13 @@ const TraderSchema = new mongoose.Schema({
     funds: {
         type: Number,
         default: 0
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
 
 TraderSchema.pre('save', async function (next) {
@@ -44,6 +51,19 @@ TraderSchema.pre('save', async function (next) {
     next();
 
 });
+
+//generating auth token (jwt)
+TraderSchema.methods.generateAuthToken = async function () {
+    try {
+        const token = jwt.sign({ _id: this._id }, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
+        this.tokens = this.tokens.concat({ token });
+        await this.save();
+        return token;
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
 
 const TraderModel = mongoose.model('Trader', TraderSchema);
 
