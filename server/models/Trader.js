@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const TraderSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -32,6 +33,16 @@ const TraderSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }
+});
+
+TraderSchema.pre('save', async function (next) {
+    if (this.isModified('password')) {
+        const hash = await bcrypt.hash(this.password, 8)
+        this.password = hash;
+    }
+
+    next();
+
 });
 
 const TraderModel = mongoose.model('Trader', TraderSchema);

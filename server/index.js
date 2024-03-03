@@ -2,14 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const TraderModel = require('./models/Trader');
-
+const bcrypt = require('bcrypt');
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 mongoose.connect('mongodb+srv://sohamnaigaonkar:soham123@cluster0.c2rronj.mongodb.net/Database?retryWrites=true&w=majority&appName=Cluster0')
-.then(() => { console.log("connected to the database\n")})
-.catch((err) => { console.log(err); })
+    .then(() => { console.log("connected to the database\n") })
+    .catch((err) => { console.log(err); })
+
+
+async function comparePassword(password, hash) {
+    const result = await bcrypt.compareSync(password, hash);
+    // console.log("login result brrrrrrrrrrrr", result);
+    return result;
+}
 
 
 app.post('/register', async (req, res) => {
@@ -61,13 +68,15 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     console.log(req.body);
     TraderModel.findOne({
-        email: req.body.email,
-        password: req.body.password
+        email: req.body.email
     })
-        .then((traders) => {
+        .then(async (traders) => {
             if (traders) {
-                if (traders.password === req.body.password) {
+                const compare = await comparePassword(req.body.password, traders.password)
+                if (compare) {
+                    console.log("Login successful");
                     res.json("Success");
+
                 }
                 else {
                     res.json("Wrong password");
