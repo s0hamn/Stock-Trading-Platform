@@ -14,6 +14,32 @@ mongoose.connect('mongodb+srv://sohamnaigaonkar:soham123@cluster0.c2rronj.mongod
 
 app.post('/register', async (req, res) => {
     console.log(req.body);
+    if (req.body.password !== req.body.confirmPassword) {
+        const error = {
+            errorType: 'ValidationError',
+            errorMessage: 'Passwords do not match'
+        };
+        return res.status(400).json(error);
+    }
+
+    // Check if email, phone number, account number, and PAN number already exist
+    const existingTrader = await TraderModel.findOne({
+        $or: [
+            { email: req.body.email },
+            { phoneNumber: req.body.phoneNumber },
+            { accountNumber: req.body.accountNumber },
+            { panNumber: req.body.panNumber }
+        ]
+    });
+
+    if (existingTrader) {
+        const error = {
+            errorType: 'ValidationError',
+            errorMessage: 'Trader with one of the provided details already exists'
+        };
+        return res.status(400).json(error);
+    }
+
     TraderModel.create({
         name: req.body.name,
         email: req.body.email,

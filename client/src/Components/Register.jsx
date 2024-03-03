@@ -8,12 +8,14 @@ const Register = () => {
         name: '',
         email: '',
         password: '',
+        confirmPassword: '',
         accountNumber: '',
         panNumber: '',
         address: '',
         phoneNumber: '',
     });
     const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,6 +28,7 @@ const Register = () => {
             name: form.name,
             email: form.email,
             password: form.password,
+            confirmPassword: form.confirmPassword,
             accountNumber: form.accountNumber,
             panNumber: form.panNumber,
             address: form.address,
@@ -33,10 +36,12 @@ const Register = () => {
         })
             .then((res) => {
                 console.log(res);
+                setError(''); 
                 navigate('/login');
             })
             .catch((err) => {
                 console.log(err);
+                setError(err.response.data.errorMessage || 'Registration failed');
             });
 
     };
@@ -44,13 +49,14 @@ const Register = () => {
     return (
         <>
             <Navbar />
-            <div className="flex justify-center items-center h-screen bg-gray-100">
+            <div className="flex justify-center items-center h-120 bg-gray-100 p-12 ">
                 <form
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md w-1/2"
                 >
                     <h1 className="text-2xl font-semibold mb-4 text-center">Register</h1>
 
+                    {error && <p className="text-red-500 text-center m-10">{error}</p>}
                     <input
                         type="text"
                         name="name"
@@ -75,6 +81,16 @@ const Register = () => {
                         className="p-2 border border-gray-300 rounded"
                         required
                     />
+
+                    <input
+                        type="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        onChange={handleChange}
+                        className="p-2 border border-gray-300 rounded"
+                        required
+                    />
+
                     <input
                         type="text"
                         name="accountNumber"

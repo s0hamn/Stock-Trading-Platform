@@ -89,9 +89,9 @@ function MainPage() {
             <footer className="bg-gray-800 text-white py-4 mt-24">
                 <div className="container mx-auto flex flex-col md:flex-row md:justify-between">
                     {/* About Section */}
-                    <div className="mb-4 md:mb-0">
+                    <div className="mb-4 md:mb-0 w-56">
                         <h3 className="text-lg font-semibold mb-2">Stock Trading App</h3>
-                        <p>A platform for all your trading needs</p>
+                        <span>A platform for all your trading needs, Empower your investment journey with our stock trading platform. Seamlessly trade stocks, track portfolios, and stay informed with real-time market updates. Experience the convenience of intuitive tools.</span>
                     </div>
 
                     {/* Links Section */}
@@ -108,9 +108,12 @@ function MainPage() {
                     {/* Copyright Section */}
                     <div>
                         <p>&copy; 2024 Stock Trading App. All rights reserved.</p>
-                    </div>
+                        <p>© 2024 StockTrader Inc. All rights reserved.</p>
+                        <p>Icons made by John Doe from www.flaticon.com</p>
+                        <p>Licensed under the MIT License, https://opensource.org/licenses/MIT</p>
                 </div>
-            </footer>
+            </div>
+        </footer >
 
 
         </>

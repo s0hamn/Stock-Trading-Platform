@@ -27,6 +27,10 @@ const TraderSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: true
+    },
+    funds: {
+        type: Number,
+        default: 0
     }
 });
 
