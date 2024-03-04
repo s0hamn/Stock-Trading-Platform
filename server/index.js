@@ -2,15 +2,53 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const TraderModel = require('./models/Trader');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const nodemailer = require('nodemailer');
+const OTP = require('./models/OTP');
 
 const app = express();
 app.use(cors({
     credentials: true,
 }));
 app.use(express.json());
+
+
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'seprojectsem6stocktrading@gmail.com',
+        pass: 'ydecjkbocsmjnpkk',
+    },
+    });
+     
+
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Function to send OTP via email
+function sendOTP(email, otp) {
+    const mailOptions = {
+        from: 'seprojectsem6stocktrading@gmail.com', // Your Gmail email address
+        to: email,
+        subject: 'OTP for Login',
+        text: `Your OTP for login is: ${otp}`
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Error sending email:', error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+}
+
 
 mongoose.connect('mongodb+srv://sohamnaigaonkar:soham123@cluster0.c2rronj.mongodb.net/Database?retryWrites=true&w=majority&appName=Cluster0')
     .then(() => { console.log("connected to the database\n") })
@@ -87,20 +125,42 @@ app.post('/login', async (req, res) => {
             httpOnly: true
         });
 
-        if (compare) {
-            console.log("Login successful");
-            res.json("Success");
-
-        }
-        else {
+        if (!compare) {
             res.json("Wrong password");
         }
+
+        const otp = generateOTP();
+        const email = req.body.email;
+        
+
+        await OTP.create({ email, otp });
+
+        sendOTP(email, otp);
+        res.send('OTP');
+
     }
     else {
         res.json("User not found");
     }
 });
 
+app.post('/verifyOTP', async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+        // Check if the provided OTP matches the stored OTP for the user
+        const otpRecord = await OTP.findOne({ email, otp });
+        if (otpRecord) {
+            // Clear the OTP after successful verification
+            await OTP.deleteOne({ email, otp });
+            res.send('Success');
+        } else {
+            res.status(401).send('Invalid OTP');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 
