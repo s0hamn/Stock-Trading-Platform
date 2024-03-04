@@ -11,7 +11,7 @@ const Login = () => {
         showOTPField: false,
     });
 
-    
+
 
     const navigate = useNavigate();
 
@@ -37,7 +37,7 @@ const Login = () => {
                 } else {
                     alert(res.data);
                 }
-    
+
             })
             .catch((err) => {
                 console.log(err);
@@ -50,18 +50,19 @@ const Login = () => {
             email: form.email,
             otp: form.otp,
         })
-        .then((res) => {
-            console.log(res);
-            if (res.data === "Success") {
-                alert("OTP Verified. Login Successful");
-                navigate('/');
-            } else {
-                alert("Invalid OTP");
-            }
-        })
-        .catch((err) => {
-            console.error('Error:', err);
-        });
+            .then((res) => {
+                console.log(res);
+                if (res.data === "Success") {
+                    alert("OTP Verified. Login Successful");
+                    setForm({ ...form, showOTPField: false });
+                    navigate('/');
+                } else {
+                    alert("Invalid OTP");
+                }
+            })
+            .catch((err) => {
+                console.error('Error:', err);
+            });
     };
 
 
@@ -73,41 +74,36 @@ const Login = () => {
                     onSubmit={!form.showOTPField ? handleSubmit : handleOTPSubmit}
                     className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md"
                 >
-                    {form.showOTPField && (
-                        <h1 className="text-2xl font-semibold mb-4 text-center">Enter OTP</h1>
+                    {form.showOTPField ? (
+                        <>
+                            <h1 className="text-2xl font-semibold mb-4 text-center">Enter OTP</h1>
+                            <input
+                                type="text"
+                                name="otp"
+                                placeholder="Enter OTP"
+                                onChange={handleChange}
+                                className="p-2 border border-gray-300 rounded"
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <h1 className="text-2xl font-semibold mb-4 text-center">Login</h1>
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                onChange={handleChange}
+                                className="p-2 border border-gray-300 rounded"
+                            />
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                onChange={handleChange}
+                                className="p-2 border border-gray-300 rounded"
+                            />
+                        </>
                     )}
-                    {!form.showOTPField && (
-                        <h1 className="text-2xl font-semibold mb-4 text-center">Login</h1>
-                    )}
-
-                    <h1 className="text-2xl font-semibold mb-4 text-center">Login</h1>
-                    { !form.showOTPField && (<input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        onChange={handleChange}
-                        className="p-2 border border-gray-300 rounded"
-                    />)}
-
-                    { !form.showOTPField && (<input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        onChange={handleChange}
-                        className="p-2 border border-gray-300 rounded"
-                    />)}
-
-                    {form.showOTPField && (
-                        <input
-                            type="text"
-                            name="otp"
-                            placeholder="Enter OTP"
-                            onChange={handleChange}
-                            className="p-2 border border-gray-300 rounded"
-                        />
-                    )}
-
-
                     <button
                         type="submit"
                         className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -118,6 +114,7 @@ const Login = () => {
                 </form>
             </div>
         </>
+
     );
 };
 
