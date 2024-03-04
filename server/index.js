@@ -90,21 +90,18 @@ app.post('/register', async (req, res) => {
         return res.status(400).json(error);
     }
 
-    TraderModel.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        accountNumber: req.body.accountNumber,
-        panNumber: req.body.panNumber,
-        address: req.body.address,
-        phoneNumber: req.body.phoneNumber
-    })
-        .then((traders) => {
-            res.json(traders);
-        })
-        .catch((err) => {
-            res.json(err);
-        });
+    const otp = generateOTP();
+    const email = req.body.email;
+        
+
+    await OTP.create({ email, otp });
+
+    sendOTP(email, otp);
+    const response = {
+        type:'OTP',
+        data: req.body
+    }
+    res.send(response);
 
 });
 
@@ -128,15 +125,10 @@ app.post('/login', async (req, res) => {
         if (!compare) {
             res.json("Wrong password");
         }
+        else{
+            res.send('Success');
+        }
 
-        const otp = generateOTP();
-        const email = req.body.email;
-        
-
-        await OTP.create({ email, otp });
-
-        sendOTP(email, otp);
-        res.send('OTP');
 
     }
     else {
@@ -145,15 +137,32 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/verifyOTP', async (req, res) => {
-    const { email, otp } = req.body;
+    const email = req.body.email;
+    const otp = req.body.otp;
     try {
         // Check if the provided OTP matches the stored OTP for the user
         const otpRecord = await OTP.findOne({ email, otp });
         if (otpRecord) {
             // Clear the OTP after successful verification
             await OTP.deleteOne({ email, otp });
-            res.send('Success');
-        } else {
+            TraderModel.create({
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                accountNumber: req.body.accountNumber,
+                panNumber: req.body.panNumber,
+                address: req.body.address,
+                phoneNumber: req.body.phoneNumber
+            })
+            .then((traders) => {
+                res.send('Success');
+            })
+            .catch((err) => {
+                res.json(err);
+            });
+            
+        } 
+        else {
             res.status(401).send('Invalid OTP');
         }
     } catch (error) {
