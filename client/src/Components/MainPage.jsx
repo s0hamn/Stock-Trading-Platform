@@ -111,9 +111,9 @@ function MainPage() {
                         <p>© 2024 StockTrader Inc. All rights reserved.</p>
                         <p>Icons made by John Doe from www.flaticon.com</p>
                         <p>Licensed under the MIT License, https://opensource.org/licenses/MIT</p>
+                    </div>
                 </div>
-            </div>
-        </footer >
+            </footer >
 
 
         </>
