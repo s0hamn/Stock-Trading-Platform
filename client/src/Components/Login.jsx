@@ -34,7 +34,7 @@ const Login = () => {
                     alert("Login Successful");
                     // console.log(res.data.token);
                     cookies.set('jwtoken', res.data.token, { path: '/' });
-                    navigate('/');
+                    navigate('/dashboard');
                 }
                 else {
                     alert(res.data.result);

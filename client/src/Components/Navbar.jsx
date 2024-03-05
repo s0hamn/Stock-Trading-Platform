@@ -1,13 +1,14 @@
 import React from 'react';
 import LogoImage from '../media/logo.svg';
 import { FaRegChartBar } from "react-icons/fa";
+import Logo from '../media/logo.png';
 
 
 const Navbar = () => {
     return (
-        <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6 sticky top-0">
+        <nav className="flex items-center justify-between flex-wrap bg-blue-900 p-6 sticky top-0">
             <div className="flex items-center flex-shrink-0 text-white mr-6 ml-12">
-                <FaRegChartBar className="text-3xl" />
+                <img src={Logo} alt="logo" className='h-10 w-10' />
             </div>
             <div className="block lg:hidden">
                 <button className="flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white">
