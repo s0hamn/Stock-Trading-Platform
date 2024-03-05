@@ -24,8 +24,8 @@ const transporter = nodemailer.createTransport({
         user: 'seprojectsem6stocktrading@gmail.com',
         pass: 'ydecjkbocsmjnpkk',
     },
-    });
-     
+});
+
 
 
 function generateOTP() {
@@ -92,13 +92,13 @@ app.post('/register', async (req, res) => {
 
     const otp = generateOTP();
     const email = req.body.email;
-        
+
 
     await OTP.create({ email, otp });
 
     sendOTP(email, otp);
     const response = {
-        type:'OTP',
+        type: 'OTP',
         data: req.body
     }
     res.send(response);
@@ -123,16 +123,16 @@ app.post('/login', async (req, res) => {
         });
 
         if (!compare) {
-            res.json("Wrong password");
+            res.json({ result: "Wrong password" });
         }
-        else{
-            res.send('Success');
+        else {
+            res.send({ result: 'Success', token: token });
         }
 
 
     }
     else {
-        res.json("User not found");
+        res.json({ result: "User not found" });
     }
 });
 
@@ -154,14 +154,14 @@ app.post('/verifyOTP', async (req, res) => {
                 address: req.body.address,
                 phoneNumber: req.body.phoneNumber
             })
-            .then((traders) => {
-                res.send('Success');
-            })
-            .catch((err) => {
-                res.json(err);
-            });
-            
-        } 
+                .then((traders) => {
+                    res.send('Success');
+                })
+                .catch((err) => {
+                    res.json(err);
+                });
+
+        }
         else {
             res.status(401).send('Invalid OTP');
         }

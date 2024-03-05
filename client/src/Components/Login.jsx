@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 const Login = () => {
     const [form, setForm] = useState({
         username: '',
@@ -18,6 +19,8 @@ const Login = () => {
     };
 
     // axios.defaults.withCredentials = true;
+    const cookies = new Cookies();
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -27,12 +30,14 @@ const Login = () => {
         })
             .then((res) => {
                 console.log(res);
-                if (res.data === "Success") {
+                if (res.data.result === "Success") {
                     alert("Login Successful");
+                    // console.log(res.data.token);
+                    cookies.set('jwtoken', res.data.token, { path: '/' });
                     navigate('/');
                 }
                 else {
-                    alert(res.data);
+                    alert(res.data.result);
                 }
 
             })
