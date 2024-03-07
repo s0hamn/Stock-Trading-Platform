@@ -16,7 +16,7 @@ const Register = () => {
         address: '',
         phoneNumber: '',
         otp: '',
-        showOTPField: true,
+        showOTPField: fale,
     });
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -191,13 +191,6 @@ const Register = () => {
                         form.showOTPField && (
                             <div className="flex justify-center items-center mt-4">
                                 <p className="mr-2">Didn't receive the OTP?</p>
-                                <button
-                                    type="button"
-                                    onClick={handleResendOTP}
-                                    className="p-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:bg-blue-600"
-                                >
-                                    Resend OTP
-                                </button>
                             </div>
                         )
                     }
