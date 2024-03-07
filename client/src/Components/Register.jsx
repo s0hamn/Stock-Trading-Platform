@@ -28,18 +28,6 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(form);
-
-        // useEffect(() => {
-        //     if (timer > 0) {
-        //         const intervalId = setInterval(() => {
-        //             setTimer(timer => timer - 1);
-        //         }, 1000);
-        //         return () => clearInterval(intervalId); // This clears the interval when the component unmounts
-        //     } else {
-        //         alert('Time out!');
-        //     }
-        // }, [timer]);
-
         axios.post('http://localhost:3001/register', {
             name: form.name,
             email: form.email,
@@ -198,13 +186,6 @@ const Register = () => {
                     >
                         {!form.showOTPField ? "Register" : "Submit OTP"}
                     </button>
-                    {
-                        form.showOTPField && (
-                            <div className="flex justify-center items-center mt-4">
-                                <p className="mr-2">Didn't receive the OTP?</p>
-                            </div>
-                        )
-                    }
                     <Link to="/login"><p className="text-center text-blue-500 hover:underline">Already have an account? Login Instead</p></Link>
                 </form>
             </div>
