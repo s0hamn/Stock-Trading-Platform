@@ -16,7 +16,7 @@ const Register = () => {
         address: '',
         phoneNumber: '',
         otp: '',
-        showOTPField: fale,
+        showOTPField: false,
     });
     const navigate = useNavigate();
     const [error, setError] = useState('');
