@@ -9,15 +9,15 @@ const stockSchema = new mongoose.Schema({
     previousClose: {type: Number, required: true},
     priceHistory: [
         {
-            date: { type: Date, required: true },
-            closingPrice: { type: Number, required: true }
+            date: { type: Date},
+            closingPrice: { type: Number}
         }
     ],
     dailyPrices: [
         {
-            date: { type: Date, required: true },
-            timestamps: [{ type: Date, required: true }],
-            prices: [{ type: Number, required: true }]
+            date: { type: Date},
+            timestamps: [{ type: Date}],
+            prices: [{ type: Number}]
         }
     ]
 });
