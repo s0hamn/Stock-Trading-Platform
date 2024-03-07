@@ -12,8 +12,9 @@ import Logo from '../media/logo.png';
 function MainPage() {
     return (
         <>
-            <div className='bg-gray-200'>
-                <Navbar />
+            <Navbar />
+            <div className='bg-gray-200 max-w-screen-lg m-auto'>
+
 
                 {/* Big space for photo */}
                 <img src={MainImage} className='h-96 w-100 flex items-center justify-center m-auto  mt-8 mb-8' />
@@ -30,7 +31,7 @@ function MainPage() {
                 {/* Quote related to investing */}
                 <div className="text-center mt-8 gap-9 mb-8">
                     <p className="text-3xl font-semibold  p-3">Investing is the art of making money work for you.</p>
-                    <p className="text-3xl p-3">The stock market is a device for transferring money from the impatient to the patient.</p>
+                    <p className="text-2xl p-3">The stock market is a device for transferring money from the impatient to the patient.</p>
                 </div>
 
                 <div className="flex justify-center mt-8 mb-8">

@@ -6,13 +6,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const OTP = require('./models/OTP');
+const authenticate = require('./middleware/authenticate');
+var cookies = require("cookie-parser");
+
+
 
 const app = express();
-app.use(cors({
-    credentials: true,
-}));
+app.use(cors(
+    {
+        origin: true,
+        credentials: true
+    }
+));
 app.use(express.json());
-
+app.use(cookies());
 
 
 const transporter = nodemailer.createTransport({
@@ -170,6 +177,12 @@ app.post('/verifyOTP', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.get('/dashboard', (req, res) => {
+    console.log(req.cookies);
+    res.send(req.trader);
+});
+
 
 
 
