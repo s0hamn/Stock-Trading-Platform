@@ -20,16 +20,6 @@ const Register = () => {
     });
     const navigate = useNavigate();
     const [error, setError] = useState('');
-    const [timer, setTimer] = useState(60);
-
-
-    setInterval(() => {
-        if (timer > 0) {
-            setTimer(timer - 1);
-        } else {
-            alert('Time out!');
-        }
-    }, 1000);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,17 +28,6 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(form);
-
-        // useEffect(() => {
-        //     if (timer > 0) {
-        //         const intervalId = setInterval(() => {
-        //             setTimer(timer => timer - 1);
-        //         }, 1000);
-        //         return () => clearInterval(intervalId); // This clears the interval when the component unmounts
-        //     } else {
-        //         alert('Time out!');
-        //     }
-        // }, [timer]);
 
         axios.post('http://localhost:3001/register', {
             name: form.name,
@@ -104,10 +83,6 @@ const Register = () => {
                 alert(err);
             });
     };
-
-    const handleResendOTP = () => {
-
-    }
 
 
 
@@ -223,7 +198,6 @@ const Register = () => {
                                 >
                                     Resend OTP
                                 </button>
-                                <span>{timer}</span>
                             </div>
                         )
                     }
