@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const OTP = require('./models/OTP');
 var cookies = require("cookie-parser");
-
+const Stock = require('./models/Stock');
 
 
 const app = express();
@@ -195,7 +195,19 @@ app.post('/dashboard', async (req, res) => {
     }
 });
 
-
+app.get('/getStockInfo', async (req, res) => {
+    try {
+      const symbol = req.query.symbol;
+      const stock = await Stock.findOne({ symbol: symbol });
+      if (!stock) {
+        return res.status(404).json({ message: 'Stock not found' });
+      }
+      res.status(200).json(stock);
+    } catch (error) {
+      console.error('Error fetching stock:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 
 
 
