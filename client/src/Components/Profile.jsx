@@ -10,7 +10,7 @@ const Profile = () => {
 
     useEffect(() => {
         try {
-            axios.post('http://localhost:3001/dashboard', {
+            axios.post('http://localhost:3001/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data === "No User Signed In" || res.data === "User not found") {
