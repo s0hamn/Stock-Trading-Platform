@@ -7,6 +7,7 @@ import './index.css'
 import MainPage from './Components/MainPage'
 import Dashboard from './Components/Dashboard'
 import ListOfStocks from './Components/ListOfStocks'
+import Profile from './Components/Profile'
 function App() {
 
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/stocks" element={<ListOfStocks />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
