@@ -6,12 +6,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const OTP = require('./models/OTP');
-const authenticate = require('./middleware/authenticate');
 var cookies = require("cookie-parser");
 
 
 
 const app = express();
+app.use(cookies());
 app.use(cors(
     {
         origin: true,
@@ -19,7 +19,7 @@ app.use(cors(
     }
 ));
 app.use(express.json());
-app.use(cookies());
+
 
 
 const transporter = nodemailer.createTransport({
@@ -113,7 +113,7 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
 
     const trader = await TraderModel.findOne({
         email: req.body.email
@@ -178,9 +178,21 @@ app.post('/verifyOTP', async (req, res) => {
     }
 });
 
-app.get('/dashboard', (req, res) => {
-    console.log(req.cookies);
-    res.send(req.trader);
+app.post('/dashboard', async (req, res) => {
+    // console.log("Inside Dashboard");
+    try {
+        const token = req.body.jwtoken;
+        const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
+        const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
+        if (!trader) {
+            res.send("User not found");
+        }
+        // console.log(trader);
+        res.send(trader);
+    } catch (e) {
+        res.send("No User Signed In");
+
+    }
 });
 
 

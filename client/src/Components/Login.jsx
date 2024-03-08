@@ -33,8 +33,9 @@ const Login = () => {
                 if (res.data.result === "Success") {
                     alert("Login Successful");
                     // console.log(res.data.token);
-                    cookies.set('jwtoken', res.data.token, { path: '/' }, { maxAge: 300000 });
-                    navigate('/');
+                    cookies.set('jwtoken', res.data.token, { path: '/' });
+                    // console.log(cookies.get('jwtoken'));
+                    navigate('/dashboard');
                 }
                 else {
                     alert(res.data.result);
