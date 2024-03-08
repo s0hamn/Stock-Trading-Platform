@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const http = require('http');
 const TraderModel = require('./models/Trader');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -8,9 +9,14 @@ const nodemailer = require('nodemailer');
 const OTP = require('./models/OTP');
 var cookies = require("cookie-parser");
 const Stock = require('./models/Stock');
-
+const socketIo = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+
+
 app.use(cookies());
 app.use(cors(
     {
@@ -19,6 +25,28 @@ app.use(cors(
     }
 ));
 app.use(express.json());
+
+io.on('connection', socket => {
+    console.log('Client connected');
+
+    // Fetch and send initial stock data to the client
+    sendAllStocks(socket);
+
+    // Example: Send periodic updates to the client
+    setInterval(() => {
+        sendAllStocks(socket);
+    }, 5000); // Update every 5 seconds (adjust as needed)
+});
+
+// Function to fetch all stocks from MongoDB and send them to the client
+async function sendAllStocks(socket) {
+    try {
+        const stocks = await Stock.find();
+        socket.emit('stockUpdate', stocks);
+    } catch (error) {
+        console.error('Error fetching stocks:', error);
+    }
+}
 
 
 
@@ -178,7 +206,7 @@ app.post('/verifyOTP', async (req, res) => {
     }
 });
 
-app.post('/dashboard', async (req, res) => {
+app.post('/verifyLogin', async (req, res) => {
     // console.log("Inside Dashboard");
     try {
         const token = req.body.jwtoken;
@@ -197,17 +225,27 @@ app.post('/dashboard', async (req, res) => {
 
 app.get('/getStockInfo', async (req, res) => {
     try {
-      const symbol = req.query.symbol;
-      const stock = await Stock.findOne({ symbol: symbol });
-      if (!stock) {
-        return res.status(404).json({ message: 'Stock not found' });
-      }
-      res.status(200).json(stock);
+        const symbol = req.query.symbol;
+        const stock = await Stock.findOne({ symbol: symbol });
+        if (!stock) {
+            return res.status(404).json({ message: 'Stock not found' });
+        }
+        res.status(200).json(stock);
     } catch (error) {
-      console.error('Error fetching stock:', error);
-      res.status(500).json({ message: 'Internal server error' });
+        console.error('Error fetching stock:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-  });
+});
+
+app.get('/getAllStocks', async (req, res) => {
+    try {
+        const stocks = await Stock.find();
+        res.status(200).json(stocks);
+    } catch (error) {
+        console.error('Error fetching stocks:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 
 
