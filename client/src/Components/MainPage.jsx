@@ -89,8 +89,11 @@ function MainPage() {
                         src="https://tecdn.b-cdn.net/wp-content/uploads/2020/06/vertical.jpg"
                         alt="" />
                 </div>
-                {/* Footer */}
-                <footer className="bg-gray-800 text-white py-4 mt-24">
+                
+                
+            </div>
+            {/* Footer */}
+            <footer className="bg-gray-800 text-white py-4 mt-24">
                     <div className="container mx-auto flex flex-col md:flex-row md:justify-between">
                         {/* About Section */}
                         <div className="mb-4 md:mb-0 w-56">
@@ -118,7 +121,6 @@ function MainPage() {
                         </div>
                     </div>
                 </footer >
-            </div>
 
 
         </>
