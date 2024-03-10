@@ -78,46 +78,56 @@ const ListOfStocks = () => {
     return (
         <div>
             <Navbar trader={trader} />
-            <div className="flex justify-center mt-4">
-                <div className="max-w-xl w-full">
+            <div className="flex justify-center mt-0">
+                <div className="w-full">
                     {/* Filters */}
-                    <div className="flex space-x-4 mb-4">
-                        <select
-                            value={marketCapFilter}
-                            onChange={e => setMarketCapFilter(e.target.value)}
-                            className="border border-gray-300 rounded-md px-2 py-1"
-                        >
-                            <option value="">All Market Caps</option>
-                            <option value="Small">Small</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Large">Large</option>
-                        </select>
-                        <select
-                            value={sectorFilter}
-                            onChange={e => setSectorFilter(e.target.value)}
-                            className="border border-gray-300 rounded-md px-2 py-1"
-                        >
-                            <option value="">All Sectors</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Finance">Finance</option>
-                            {/* Add other sectors */}
-                        </select>
+                    <div className="bg-white p-4 rounded-lg shadow-lg mb-8 flex items-start">
+                        <h2 className="text-lg font-semibold ml-4 mr-12">Filters</h2>
+                        <div className="flex justify-center space-x-4 ml-14">
+                            <select
+                                value={marketCapFilter}
+                                onChange={e => setMarketCapFilter(e.target.value)}
+                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white dark:bg-neutral-700 dark:border-neutral-600 gap-2 mr-4"
+                            >
+                                <option value="">All Market Caps</option>
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                            </select>
+                            <select
+                                value={sectorFilter}
+                                onChange={e => setSectorFilter(e.target.value)}
+                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white dark:bg-neutral-700 dark:border-neutral-600"
+                            >
+                                <option value="">All Sectors</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                {/* Add other sectors */}
+                            </select>
+                        </div>
                     </div>
+
                     {/* Stock List */}
-                    {filteredStocks.map(stock => (
-                        <StockListCard
-                            symbol={stock.symbol}
-                            companyName={stock.companyName}
-                            sector={stock.sector}
-                            currentPrice={stock.currentPrice}
-                            marketCap={stock.marketCap}
-                            previousClose={stock.previousClose}
-                        />
-                    ))}
+                    <div className="w-full flex justify-center">
+                        <div className="w-5/6 grid grid-cols-3 gap-4">
+                            {filteredStocks.map(stock => (
+                                <StockListCard
+                                    key={stock.symbol}
+                                    symbol={stock.symbol}
+                                    companyName={stock.companyName}
+                                    sector={stock.sector}
+                                    currentPrice={stock.currentPrice}
+                                    marketCap={stock.marketCap}
+                                    previousClose={stock.previousClose}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
+
 };
 
 export default ListOfStocks;

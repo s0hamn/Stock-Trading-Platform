@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import MainImage from '../media/stockmarket.png';
 import MainImage2 from '../media/main-page-second.jpeg';
 import Logo from '../media/logo.png';
+import { useNavigate } from 'react-router-dom';
 
 // import MainImage3 from '../media/main-page-third.jpeg';
 
@@ -10,6 +11,11 @@ import Logo from '../media/logo.png';
 
 
 function MainPage() {
+    const navigate = useNavigate();
+    const handleLoginClick = () => {
+        navigate('/login');
+    };    
+
     return (
         <>
             <Navbar />
@@ -89,38 +95,47 @@ function MainPage() {
                         src="https://tecdn.b-cdn.net/wp-content/uploads/2020/06/vertical.jpg"
                         alt="" />
                 </div>
-                
-                
+
+                <div className="flex justify-center">
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4 w-20 h-12"  onClick={handleLoginClick}>
+                        Login
+                    </button>
+                </div>
+
+
+
+
+
             </div>
             {/* Footer */}
             <footer className="bg-gray-800 text-white py-4 mt-24">
-                    <div className="container mx-auto flex flex-col md:flex-row md:justify-between">
-                        {/* About Section */}
-                        <div className="mb-4 md:mb-0 w-56">
-                            <h3 className="text-lg font-semibold mb-2">Stock Trading App</h3>
-                            <span>A platform for all your trading needs, Empower your investment journey with our stock trading platform. Seamlessly trade stocks, track portfolios, and stay informed with real-time market updates. Experience the convenience of intuitive tools.</span>
-                        </div>
+                <div className="container mx-auto flex flex-col md:flex-row md:justify-between">
+                    {/* About Section */}
+                    <div className="mb-4 md:mb-0 w-56">
+                        <h3 className="text-lg font-semibold mb-2">Stock Trading App</h3>
+                        <span>A platform for all your trading needs, Empower your investment journey with our stock trading platform. Seamlessly trade stocks, track portfolios, and stay informed with real-time market updates. Experience the convenience of intuitive tools.</span>
+                    </div>
 
-                        {/* Links Section */}
-                        <div className="mb-4 md:mb-0">
-                            <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
-                            <div>
-                                <a href="#" className="block mb-2 hover:text-gray-400">Home</a>
-                                <a href="#" className="block mb-2 hover:text-gray-400">About Us</a>
-                                <a href="#" className="block mb-2 hover:text-gray-400">Contact Us</a>
-                                <a href="#" className="block hover:text-gray-400">Terms of Service</a>
-                            </div>
-                        </div>
-
-                        {/* Copyright Section */}
+                    {/* Links Section */}
+                    <div className="mb-4 md:mb-0">
+                        <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
                         <div>
-                            <p>&copy; 2024 Stock Trading App. All rights reserved.</p>
-                            <p>© 2024 StockTrader Inc. All rights reserved.</p>
-                            <p>Icons made by John Doe from www.flaticon.com</p>
-                            <p>Licensed under the MIT License, https://opensource.org/licenses/MIT</p>
+                            <a href="#" className="block mb-2 hover:text-gray-400">Home</a>
+                            <a href="#" className="block mb-2 hover:text-gray-400">About Us</a>
+                            <a href="#" className="block mb-2 hover:text-gray-400">Contact Us</a>
+                            <a href="#" className="block hover:text-gray-400">Terms of Service</a>
                         </div>
                     </div>
-                </footer >
+
+                    {/* Copyright Section */}
+                    <div>
+                        <p>&copy; 2024 Stock Trading App. All rights reserved.</p>
+                        <p>© 2024 StockTrader Inc. All rights reserved.</p>
+                        <p>Icons made by John Doe from www.flaticon.com</p>
+                        <p>Licensed under the MIT License, https://opensource.org/licenses/MIT</p>
+                    </div>
+                </div>
+            </footer >
 
 
         </>
