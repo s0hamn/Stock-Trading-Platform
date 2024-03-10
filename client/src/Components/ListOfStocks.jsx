@@ -18,12 +18,13 @@ const ListOfStocks = () => {
 
     useEffect(() => {
         // Establish WebSocket connection
-        const socket = io('http://localhost:3001');
+        const socket = io('http://localhost:3001', {transports: ['websocket', 'polling', 'flashsocket']});
 
         // Subscribe to stock updates
         socket.on('stockUpdate', updatedStocks => {
             // Update state with new stock data
             setStocks(updatedStocks);
+            console.log('Client received stockUpdate event:', updatedStocks);
         });
 
         // Cleanup: close WebSocket connection

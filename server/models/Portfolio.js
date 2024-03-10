@@ -12,10 +12,6 @@ const portfolioSchema = new mongoose.Schema({
             ref: 'Stock',
             required: true
         },
-        current_price: {
-            type: Number,
-            required: true
-        },
         quantity: {
             type: Number,
             required: true

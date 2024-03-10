@@ -36,17 +36,25 @@ io.on('connection', socket => {
     setInterval(() => {
         sendAllStocks(socket);
     }, 5000); // Update every 5 seconds (adjust as needed)
+
+    // Log events being sent to the client
+    socket.on('stockUpdate', stocks => {
+        console.log('Server sending stockUpdate event:', stocks);
+    });
 });
+
 
 // Function to fetch all stocks from MongoDB and send them to the client
 async function sendAllStocks(socket) {
     try {
         const stocks = await Stock.find();
         socket.emit('stockUpdate', stocks);
+        console.log('Server sending stockUpdate event:', stocks);
     } catch (error) {
         console.error('Error fetching stocks:', error);
     }
 }
+
 
 
 
@@ -250,6 +258,6 @@ app.get('/getAllStocks', async (req, res) => {
 
 
 
-app.listen(3001, () => {
+server.listen(3001, () => {
     console.log('Server is running on port 3001');
 });
