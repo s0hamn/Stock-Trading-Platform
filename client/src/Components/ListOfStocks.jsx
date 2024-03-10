@@ -82,7 +82,7 @@ const ListOfStocks = () => {
             <div className="flex justify-center mt-0">
                 <div className="w-full">
                     {/* Filters */}
-                    <div className="bg-white p-4 rounded-lg shadow-lg mb-8 flex items-start">
+                    <div className="bg-white p-4 rounded-lg shadow-lg mb-8 flex items-start align-middle">
                         <h2 className="text-lg font-semibold ml-4 mr-12">Filters</h2>
                         <div className="flex justify-center space-x-4 ml-14">
                             <select

@@ -2,10 +2,16 @@ import React from 'react';
 import LogoImage from '../media/logo.svg';
 import { FaRegChartBar } from "react-icons/fa";
 import Logo from '../media/logo.png';
+import { useNavigate } from 'react-router-dom';
 import profileImg from '../media/profilewhite-removebg-preview.png';
 
-
 const Navbar = () => {
+
+    const navigate = useNavigate();
+    const handleProfileClick = () => {
+        navigate('/profile');
+    }
+
     return (
         <nav className=" flex items-center justify-between flex-wrap bg-blue-900 pt-6 pb-6 pl-36 pr-36 sticky top-0">
             <div className="flex items-center flex-shrink-0 text-white">
@@ -32,7 +38,7 @@ const Navbar = () => {
                     </a>
                 </div>
             </div>
-            <div className="profile cursor-pointer">
+            <div className="profile cursor-pointer" onClick={handleProfileClick}>
                 <img src={profileImg} alt="profile" className='h-10 w-10' />
             </div>
 
