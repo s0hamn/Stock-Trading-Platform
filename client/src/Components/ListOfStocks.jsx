@@ -18,7 +18,7 @@ const ListOfStocks = () => {
 
     useEffect(() => {
         // Establish WebSocket connection
-        const socket = io('http://localhost:3001', {transports: ['websocket', 'polling', 'flashsocket']});
+        const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
 
         // Subscribe to stock updates
         socket.on('stockUpdate', updatedStocks => {
@@ -76,6 +76,9 @@ const ListOfStocks = () => {
         setFilteredStocks(filteredStocks);
     }, [stocks, marketCapFilter, sectorFilter]);
 
+    // Function to handle mouse enter and leave for a specific card
+
+
     return (
         <div>
             <Navbar trader={trader} />
@@ -111,16 +114,19 @@ const ListOfStocks = () => {
                     {/* Stock List */}
                     <div className="w-full flex justify-center">
                         <div className="w-5/6 grid grid-cols-3 gap-4">
-                            {filteredStocks.map(stock => (
-                                <StockListCard
-                                    key={stock.symbol}
-                                    symbol={stock.symbol}
-                                    companyName={stock.companyName}
-                                    sector={stock.sector}
-                                    currentPrice={stock.currentPrice}
-                                    marketCap={stock.marketCap}
-                                    previousClose={stock.previousClose}
-                                />
+                            {filteredStocks.map((stock) => (
+                                
+                                    <StockListCard
+                                        key={stock._id}
+                                        id={stock._id}
+                                        symbol={stock.symbol}
+                                        companyName={stock.companyName}
+                                        sector={stock.sector}
+                                        currentPrice={stock.currentPrice}
+                                        marketCap={stock.marketCap}
+                                        previousClose={stock.previousClose}
+                                    />
+                                
                             ))}
                         </div>
                     </div>
