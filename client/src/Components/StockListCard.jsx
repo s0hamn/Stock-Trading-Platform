@@ -54,8 +54,8 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
       <p className="text-sm mt-2">Sector: {sector}</p>
       <p className="text-sm mt-2">Market Cap: {marketCap}</p>
 
-      {isHovered && (
-        <div className="flex justify-center">
+      {(
+        <div className={`flex justify-center ${isHovered ? '' : 'hidden'}`}>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
             onClick={() => handleButtonClick(id)}
