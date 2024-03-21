@@ -35,7 +35,7 @@ io.on('connection', socket => {
     // Example: Send periodic updates to the client
     setInterval(() => {
         sendAllStocks(socket);
-    }, 5000); // Update every 5 seconds (adjust as needed)
+    }, 10000); // Update every 5 seconds (adjust as needed)
 
     // Log events being sent to the client
     socket.on('stockUpdate', stocks => {
