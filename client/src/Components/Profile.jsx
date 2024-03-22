@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 import Navbar from './Navbar'
-// import { navigate } from '@reach/router';
-
+import { useNavigate } from 'react-router-dom';
+import bcrypt from 'bcryptjs';
 const Profile = () => {
     const [user, setUser] = useState({});
     const cookies = new Cookies();
+
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         try {
@@ -16,6 +19,7 @@ const Profile = () => {
                 if (res.data === "No User Signed In" || res.data === "User not found") {
                     navigate('/login');
                 } else {
+                    console.log("hello");
                     setUser(res.data);
                 }
             })
@@ -25,42 +29,69 @@ const Profile = () => {
         }
     }, [])
 
+    
+    function comparePassword(password, hash) {
+        const result = bcrypt.compareSync(password, hash);
+        // console.log("login result brrrrrrrrrrrr", result);
+        return result;
+    }
     const handleDeposit = () => {
-        alert(user.password);
         const enteredPassword = prompt('Enter your password to deposit funds: ');
         let depositAmount = prompt('Enter the amount to deposit: ');
         depositAmount = Number(depositAmount);
-        
-        // const depositAmount = 12;
-        if(enteredPassword == user.password && !isNaN(depositAmount) && depositAmount > 0 && depositAmount <= 10000 ) {
-            setUser(prevUser => ({
-                ...prevUser,
-                funds: prevUser.funds + depositAmount
-            }));
-            alert('Deposit button clicked');
+        let verifyPass = comparePassword(enteredPassword, user.password);
+        if (verifyPass){
+            alert("Password correct");
+            try {
+                axios.put('http://localhost:3001/updateDeposit', {
+                    jwtoken: cookies.get('jwtoken'),
+                    deposit: depositAmount
+                }).then(res => {
+                    if(res.data == "unsuccessful"){
+                        alert("unsuccessful");
+                    }
+                    else{
+                        alert("successful");
+                        setUser(res.data);
+                    }
+                })
+            } catch (err) {
+                alert('Error');
+                // navigate('/login');
+            }
         }
         else{
-            alert(user.password);
+            alert("password wrong");
         }
     };
 
     const handleWithdraw = () => {
-        alert(user.password);
         const enteredPassword = prompt('Enter your password to withdraw funds: ');
         let withdrawAmount = prompt('Enter the amount to withdraw: ');
-        depositAmount = Number(withdrawAmount);
-        
-        // const depositAmount = 12;
-        if(enteredPassword == user.password && !isNaN(withdrawAmount) && withdrawAmount > 0 && withdrawAmount <= 10000 ) {
-
-            setUser(prevUser => ({
-                ...prevUser,
-                funds: prevUser.funds - withdrawAmount
-            }));
-            alert('Deposit button clicked');
+        withdrawAmount = Number(withdrawAmount);
+        let verifyPass = comparePassword(enteredPassword, user.password);
+        if (verifyPass){
+            alert("Password correct");
+            try {
+                axios.put('http://localhost:3001/updateWithdraw', {
+                    jwtoken: cookies.get('jwtoken'),
+                    withdraw: withdrawAmount
+                }).then(res => {
+                    if(res.data == "unsuccessful"){
+                        alert("unsuccessful");
+                    }
+                    else{
+                        alert("successful");
+                        setUser(res.data);
+                    }
+                })
+            } catch (err) {
+                alert('Error');
+                // navigate('/login');
+            }
         }
         else{
-            alert(user.password);
+            alert("password wrong");
         }
     };
     return (
