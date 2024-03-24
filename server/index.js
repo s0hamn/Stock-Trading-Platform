@@ -237,7 +237,7 @@ app.post('/verifyOTP', async (req, res) => {
                     res.json(err);
                 });
 
-        }
+        }   
         else {
             res.status(401).send('Invalid OTP');
         }
@@ -246,6 +246,56 @@ app.post('/verifyOTP', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+app.put('/updateDeposit', async (req, res) =>{
+    try{
+        const token = req.body.jwtoken;
+        const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
+        const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
+        if(!trader){
+            res.send("unsuccessful");
+        }
+        else{
+            // Update the funds attribute
+            trader.funds += req.body.deposit; // Replace newFundsValue with the new value you want to set
+
+            // Save the updated trader object back to the database
+            
+            const updatedTrader = await trader.save();
+            res.send(updatedTrader);
+        }
+    }
+    catch(error){
+        res.send("unsuccessful");
+    }
+})
+
+app.put('/updateWithdraw', async (req, res) =>{
+    try{
+        const token = req.body.jwtoken;
+        const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
+        const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
+        if(!trader){
+            res.send("unsuccessful");
+        }
+        else{
+            // Update the funds attribute
+            if(trader.funds - req.body.withdraw < 0){
+                res.send('unsuccessful');
+            }
+            else{
+                trader.funds -= req.body.withdraw; // Replace newFundsValue with the new value you want to set
+
+                // Save the updated trader object back to the database
+            
+                const updatedTrader = await trader.save();
+                res.send(updatedTrader);
+            }
+        }
+    }
+    catch(error){
+        res.send("unsuccessful");
+    }
+})
 
 app.post('/verifyLogin', async (req, res) => {
     // console.log("Inside Dashboard");
