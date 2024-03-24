@@ -14,12 +14,12 @@ function MainPage() {
     const navigate = useNavigate();
     const handleLoginClick = () => {
         navigate('/login');
-    };    
+    };
 
     return (
         <>
             <Navbar />
-            <div className='bg-gray-200 max-w-screen-lg m-auto'>
+            <div className=' max-w-screen-lg m-auto'>
 
 
                 {/* Big space for photo */}
@@ -97,7 +97,7 @@ function MainPage() {
                 </div>
 
                 <div className="flex justify-center">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4 w-20 h-12"  onClick={handleLoginClick}>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4 w-20 h-12" onClick={handleLoginClick}>
                         Login
                     </button>
                 </div>

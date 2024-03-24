@@ -40,6 +40,13 @@ const TraderSchema = new mongoose.Schema({
             ref: 'Stock'
         }
     ],
+    investments: [
+        {
+            quantity: { type: Number },
+            symbol: { type: String },
+            avg: { type: Number },
+        }
+    ],
     tokens: [{
         token: {
             type: String,

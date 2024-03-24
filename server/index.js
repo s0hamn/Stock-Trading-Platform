@@ -29,18 +29,24 @@ app.use(express.json());
 io.on('connection', socket => {
     console.log('Client connected');
 
-    // Fetch and send initial stock data to the client
-    sendAllStocks(socket);
 
-    // Example: Send periodic updates to the client
-    setInterval(() => {
+    socket.on('allStocks', () => {
+        console.log('Client requested all stocks');
         sendAllStocks(socket);
-    }, 10000); // Update every 5 seconds (adjust as needed)
 
-    // Log events being sent to the client
-    socket.on('stockUpdate', stocks => {
-        console.log('Server sending stockUpdate event:', stocks);
+        setInterval(() => {
+            sendAllStocks(socket);
+        }, 10000);
     });
+    socket.on('someStocks', (investments) => {
+        console.log('Client requested some stocks');
+        sendStocks(socket, investments);
+
+        setInterval(() => {
+            sendStocks(socket, investments);
+        }, 10000);
+    });
+
 });
 
 
@@ -49,7 +55,30 @@ async function sendAllStocks(socket) {
     try {
         const stocks = await Stock.find();
         socket.emit('stockUpdate', stocks);
-        console.log('Server sending stockUpdate event:', stocks);
+        // console.log('Server sending stockUpdate event:', stocks);
+    } catch (error) {
+        console.error('Error fetching stocks:', error);
+    }
+}
+
+async function sendStocks(socket, investments) {
+    const stocks = [];
+    try {
+        if (investments == null || investments.length === 0) {
+            console.log('No investments');
+            socket.emit('stockUpdate', stocks);
+
+            return;
+        }
+
+        for (let i = 0; i < investments.length; i++) {
+            console.log(investments[i].symbol);
+            const stock = await Stock.findOne({ symbol: investments[i].symbol });
+            if (stock) {
+                stocks.push(stock);
+            }
+        }
+        socket.emit('stockUpdate', stocks);
     } catch (error) {
         console.error('Error fetching stocks:', error);
     }
@@ -195,7 +224,11 @@ app.post('/verifyOTP', async (req, res) => {
                 accountNumber: req.body.accountNumber,
                 panNumber: req.body.panNumber,
                 address: req.body.address,
-                phoneNumber: req.body.phoneNumber
+                phoneNumber: req.body.phoneNumber,
+                funds: 0,
+                watchlist: [],
+                investments: [],
+                tokens: []
             })
                 .then((traders) => {
                     res.send('Success');

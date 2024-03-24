@@ -25,7 +25,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   return (
 
-    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out`}
+    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-6`}
       onMouseEnter={() => {
         setIsHovered(true);
         console.log('Mouse entered');

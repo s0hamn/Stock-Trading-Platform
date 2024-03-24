@@ -4,6 +4,7 @@ import Login from './Components/Login'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
+import './styles.css'
 import MainPage from './Components/MainPage'
 import Dashboard from './Components/Dashboard'
 import ListOfStocks from './Components/ListOfStocks'

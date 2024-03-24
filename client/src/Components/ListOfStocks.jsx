@@ -20,6 +20,8 @@ const ListOfStocks = () => {
         // Establish WebSocket connection
         const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
 
+        socket.emit('allStocks');
+
         // Subscribe to stock updates
         socket.on('stockUpdate', updatedStocks => {
             // Update state with new stock data
@@ -113,20 +115,20 @@ const ListOfStocks = () => {
 
                     {/* Stock List */}
                     <div className="w-full flex justify-center">
-                        <div className="w-5/6 grid grid-cols-3 gap-4">
+                        <div className="w-5/6 grid grid-cols-3 gap-4 ">
                             {filteredStocks.map((stock) => (
-                                
-                                    <StockListCard
-                                        key={stock._id}
-                                        id={stock._id}
-                                        symbol={stock.symbol}
-                                        companyName={stock.companyName}
-                                        sector={stock.sector}
-                                        currentPrice={stock.currentPrice}
-                                        marketCap={stock.marketCap}
-                                        previousClose={stock.previousClose}
-                                    />
-                                
+
+                                <StockListCard
+                                    key={stock._id}
+                                    id={stock._id}
+                                    symbol={stock.symbol}
+                                    companyName={stock.companyName}
+                                    sector={stock.sector}
+                                    currentPrice={stock.currentPrice}
+                                    marketCap={stock.marketCap}
+                                    previousClose={stock.previousClose}
+                                />
+
                             ))}
                         </div>
                     </div>
