@@ -56,7 +56,7 @@ const Register = () => {
 
     const handleOTPSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:3001/verifyOTP', {
+        axios.post('/api/verifyOTP', {
             name: form.name,
             email: form.email,
             password: form.password,

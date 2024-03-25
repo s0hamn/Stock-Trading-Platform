@@ -177,6 +177,8 @@ app.post('/register', async (req, res) => {
 
 });
 
+
+
 app.post('/login', async (req, res) => {
     // console.log(req.body);
 
@@ -237,7 +239,7 @@ app.post('/verifyOTP', async (req, res) => {
                     res.json(err);
                 });
 
-        }   
+        }
         else {
             res.status(401).send('Invalid OTP');
         }
@@ -246,53 +248,53 @@ app.post('/verifyOTP', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-app.put('/updateDeposit', async (req, res) =>{
-    try{
-        const token = req.body.jwtoken;
+app.put('/updateDeposit', async (req, res) => {
+    try {
+        const token = req.cookies.jwtoken;
         const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
         const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
-        if(!trader){
+        if (!trader) {
             res.send("unsuccessful");
         }
-        else{
+        else {
             // Update the funds attribute
             trader.funds += req.body.deposit; // Replace newFundsValue with the new value you want to set
 
             // Save the updated trader object back to the database
-            
+
             const updatedTrader = await trader.save();
             res.send(updatedTrader);
         }
     }
-    catch(error){
+    catch (error) {
         res.send("unsuccessful");
     }
 })
 
-app.put('/updateWithdraw', async (req, res) =>{
-    try{
-        const token = req.body.jwtoken;
+app.put('/updateWithdraw', async (req, res) => {
+    try {
+        const token = req.cookies.jwtoken;
         const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
         const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
-        if(!trader){
+        if (!trader) {
             res.send("unsuccessful");
         }
-        else{
+        else {
             // Update the funds attribute
-            if(trader.funds - req.body.withdraw < 0){
+            if (trader.funds - req.body.withdraw < 0) {
                 res.send('unsuccessful');
             }
-            else{
+            else {
                 trader.funds -= req.body.withdraw; // Replace newFundsValue with the new value you want to set
 
                 // Save the updated trader object back to the database
-            
+
                 const updatedTrader = await trader.save();
                 res.send(updatedTrader);
             }
         }
     }
-    catch(error){
+    catch (error) {
         res.send("unsuccessful");
     }
 })
@@ -300,7 +302,7 @@ app.put('/updateWithdraw', async (req, res) =>{
 app.post('/verifyLogin', async (req, res) => {
     // console.log("Inside Dashboard");
     try {
-        const token = req.body.jwtoken;
+        const token = req.cookies.jwtoken;
         const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
         const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
         if (!trader) {

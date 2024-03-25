@@ -37,7 +37,7 @@ const ListOfStocks = () => {
 
     useEffect(() => {
         // Fetch stocks from backend
-        axios.get('http://localhost:3001/getAllStocks')
+        axios.get('/api/getAllStocks')
             .then(res => {
                 setStocks(res.data);
                 setFilteredStocks(res.data); // Initially display all stocks
@@ -48,7 +48,7 @@ const ListOfStocks = () => {
 
         // Verify login
         try {
-            axios.post('http://localhost:3001/verifyLogin', {
+            axios.post('/api/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data === "No User Signed In" || res.data === "User not found") {

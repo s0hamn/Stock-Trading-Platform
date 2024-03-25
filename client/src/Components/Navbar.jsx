@@ -2,7 +2,7 @@ import React from 'react';
 import LogoImage from '../media/logo.svg';
 import { FaRegChartBar } from "react-icons/fa";
 import Logo from '../media/logo.png';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import profileImg from '../media/profilewhite-removebg-preview.png';
 
 const Navbar = () => {
@@ -24,18 +24,9 @@ const Navbar = () => {
             </div>
             <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto mr-6">
                 <div className="text-sm lg:flex-grow flex justify-end">
-                    <a href="#responsive-header" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">
-                        Option 1
-                    </a>
-                    <a href="#responsive-header" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">
-                        Option 2
-                    </a>
-                    <a href="#responsive-header" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">
-                        Option 3
-                    </a>
-                    <a href="#responsive-header" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">
-                        Option 4
-                    </a>
+                    <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
+                    <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
+
                 </div>
             </div>
             <div className="profile cursor-pointer" onClick={handleProfileClick}>

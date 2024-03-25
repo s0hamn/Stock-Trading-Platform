@@ -13,7 +13,7 @@ const Profile = () => {
 
     useEffect(() => {
         try {
-            axios.post('http://localhost:3001/verifyLogin', {
+            axios.post('/api/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data === "No User Signed In" || res.data === "User not found") {
@@ -29,7 +29,7 @@ const Profile = () => {
         }
     }, [])
 
-    
+
     function comparePassword(password, hash) {
         const result = bcrypt.compareSync(password, hash);
         // console.log("login result brrrrrrrrrrrr", result);
@@ -40,17 +40,17 @@ const Profile = () => {
         let depositAmount = prompt('Enter the amount to deposit: ');
         depositAmount = Number(depositAmount);
         let verifyPass = comparePassword(enteredPassword, user.password);
-        if (verifyPass){
+        if (verifyPass) {
             alert("Password correct");
             try {
-                axios.put('http://localhost:3001/updateDeposit', {
+                axios.put('/api/updateDeposit', {
                     jwtoken: cookies.get('jwtoken'),
                     deposit: depositAmount
                 }).then(res => {
-                    if(res.data == "unsuccessful"){
+                    if (res.data == "unsuccessful") {
                         alert("unsuccessful");
                     }
-                    else{
+                    else {
                         alert("successful");
                         setUser(res.data);
                     }
@@ -60,7 +60,7 @@ const Profile = () => {
                 // navigate('/login');
             }
         }
-        else{
+        else {
             alert("password wrong");
         }
     };
@@ -70,17 +70,17 @@ const Profile = () => {
         let withdrawAmount = prompt('Enter the amount to withdraw: ');
         withdrawAmount = Number(withdrawAmount);
         let verifyPass = comparePassword(enteredPassword, user.password);
-        if (verifyPass){
+        if (verifyPass) {
             alert("Password correct");
             try {
-                axios.put('http://localhost:3001/updateWithdraw', {
+                axios.put('/api/updateWithdraw', {
                     jwtoken: cookies.get('jwtoken'),
                     withdraw: withdrawAmount
                 }).then(res => {
-                    if(res.data == "unsuccessful"){
+                    if (res.data == "unsuccessful") {
                         alert("unsuccessful");
                     }
-                    else{
+                    else {
                         alert("successful");
                         setUser(res.data);
                     }
@@ -90,13 +90,13 @@ const Profile = () => {
                 // navigate('/login');
             }
         }
-        else{
+        else {
             alert("password wrong");
         }
     };
     return (
         <>
-        <Navbar />
+            <Navbar />
             <div className="flex flex-col justify-center items-center min-h-screen bg-gray-200 mt-4 mb-4">
                 <h1 className="text-center text-6xl font-bold mb-4 mt-10">My Profile</h1>
                 <div className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md w-4/5 mx-auto">
