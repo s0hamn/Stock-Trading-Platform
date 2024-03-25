@@ -96,53 +96,60 @@ const Profile = () => {
     };
     return (
         <>
-            <Navbar />
-            <div className="flex flex-col justify-center items-center min-h-screen bg-gray-200 mt-4 mb-4">
-                <h1 className="text-center text-6xl font-bold mb-4 mt-10">My Profile</h1>
-                <div className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md w-4/5 mx-auto">
-                    <h2 className="text-center text-4xl font-bold">Personal Information</h2>
-                    <hr />
-                    <form className="p-5">
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                            <p>{user.name}</p>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                            <p>{user.email}</p>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Account Number:</label>
-                            <p>{user.accountNumber}</p>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">PAN Number:</label>
-                            <p>{user.panNumber}</p>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Address:</label>
-                            <p>{user.address}</p>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
-                            <p>{user.phoneNumber}</p>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Available funds</label>
-                            <p>{user.funds}</p>
-                        </div>
-                    </form>
+            <div className="flex flex-col h-screen">
+                <div >
+                    <Navbar />
                 </div>
-                <div className="grid grid-cols-1 gap-6 bg-white p-10 rounded-lg shadow-md w-4/5 mx-auto mt-10">
-                    <h2 className="text-center text-4xl font-bold">Available Funds</h2>
-                    <hr />
-                    <div className="flex p-5">
-                        <div className="mb-4 ml-4 mr-40">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Available funds:</label>
-                            <p>{user.funds}</p>
+
+                {/* <h1 className="text-center text-6xl font-bold mb-4 mt-10">My Profile</h1> */}
+                <div className="flex justify-center items-center h-full p-8">
+                    <div className=" bg-white rounded h-full w-full shadow-lg">
+                        <div className="flex flex-col w-1/2 h-full">
+                            {/* <h2 className="text-center text-4xl font-bold">Personal Information</h2> */}
+                            <hr />
+                            <form className="p-5">
+                                <div className="mb-4 flex justify-between">
+                                    <label>Name:</label>
+                                    <p>{user.name}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <label>Email:</label>
+                                    <p>{user.email}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <label>Account Number:</label>
+                                    <p>{user.accountNumber}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <label>PAN Number:</label>
+                                    <p>{user.panNumber}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <label>Address:</label>
+                                    <p>{user.address}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
+                                    <p>{user.phoneNumber}</p>
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">Available funds</label>
+                                    <p>{user.funds}</p>
+                                </div>
+                            </form>
                         </div>
-                        <button className="border-2 border-gray-300 px-2 py-1 rounded-lg mr-10" onClick={handleDeposit}>Deposit</button>
-                        <button className="border-2 border-gray-300 p-2 rounded-lg" onClick={handleWithdraw}>Withdraw</button>
+                        <div className="w-1/2">
+                            {/* <h2 className="text-center text-4xl font-bold">Available Funds</h2>
+                        <hr />
+                        <div className="flex p-5">
+                            <div className="mb-4 ml-4 mr-40">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Available funds:</label>
+                                <p>{user.funds}</p>
+                            </div>
+                            <button className="border-2 border-gray-300 px-2 py-1 rounded-lg mr-10" onClick={handleDeposit}>Deposit</button>
+                            <button className="border-2 border-gray-300 p-2 rounded-lg" onClick={handleWithdraw}>Withdraw</button>
+                        </div> */}
+                        </div>
                     </div>
                 </div>
             </div>

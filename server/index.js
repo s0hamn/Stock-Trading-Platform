@@ -65,14 +65,14 @@ async function sendStocks(socket, investments) {
     const stocks = [];
     try {
         if (investments == null || investments.length === 0) {
-            console.log('No investments');
+            // console.log('No investments');
             socket.emit('stockUpdate', stocks);
 
             return;
         }
 
         for (let i = 0; i < investments.length; i++) {
-            console.log(investments[i].symbol);
+            // console.log(investments[i].symbol);
             const stock = await Stock.findOne({ symbol: investments[i].symbol });
             if (stock) {
                 stocks.push(stock);

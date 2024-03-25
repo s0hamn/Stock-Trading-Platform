@@ -5,12 +5,15 @@ const stockSchema = new mongoose.Schema({
     companyName: { type: String, required: true },
     sector: { type: String, required: true },
     currentPrice: { type: Number, required: true },
-    marketCap: { type: String, required: true },
+    marketCap: { type: Number, required: true },
     previousClose: { type: Number, required: true },
     priceHistory: [
         {
             date: { type: Date },
-            closingPrice: { type: Number }
+            open: { type: Number },
+            high: { type: Number },
+            low: { type: Number },
+            close: { type: Number },
         }
     ],
     dailyPrices: [
