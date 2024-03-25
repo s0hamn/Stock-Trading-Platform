@@ -4,14 +4,24 @@ import { FaRegChartBar } from "react-icons/fa";
 import Logo from '../media/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import profileImg from '../media/profilewhite-removebg-preview.png';
+import axios from 'axios';
 
 const Navbar = () => {
 
     const navigate = useNavigate();
     const handleProfileClick = () => {
+        console.log('profile');
         navigate('/profile');
     }
-
+    const handleLogout =  () => {
+        try {
+            console.log('i m client');
+            axios.get('/logout', { withCredentials: true });
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout Error:', error);
+        }
+    };
     return (
         <nav className=" flex items-center justify-between flex-wrap bg-indigo-500  pt-6 pb-6 pl-36 pr-36">
             <div className="flex items-center flex-shrink-0 text-white">
@@ -26,7 +36,9 @@ const Navbar = () => {
                 <div className="text-sm lg:flex-grow flex justify-end">
                     <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
                     <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
-
+                    <div className="profile cursor-pointer" onClick={handleLogout}>
+                        Logout
+                    </div>
                 </div>
             </div>
             <div className="profile cursor-pointer" onClick={handleProfileClick}>
