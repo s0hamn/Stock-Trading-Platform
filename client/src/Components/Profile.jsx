@@ -103,52 +103,63 @@ const Profile = () => {
 
                 {/* <h1 className="text-center text-6xl font-bold mb-4 mt-10">My Profile</h1> */}
                 <div className="flex justify-center items-center h-full p-8">
-                    <div className=" bg-white rounded h-full w-full shadow-lg">
-                        <div className="flex flex-col w-1/2 h-full">
-                            {/* <h2 className="text-center text-4xl font-bold">Personal Information</h2> */}
-                            <hr />
+                    <div className="flex bg-white rounded h-full w-full shadow-lg">
+                        <div className="flex flex-col w-1/2 h-full p-10">
+                            <h6 className="text-center text-xl font-semibold">Personal Information</h6>
                             <form className="p-5">
-                                <div className="mb-4 flex justify-between">
+                                <div className="my-5 flex justify-between">
                                     <label>Name:</label>
                                     <p>{user.name}</p>
                                 </div>
-                                <div className="mb-4">
+                                <hr />
+                                <div className="my-5 flex justify-between">
                                     <label>Email:</label>
                                     <p>{user.email}</p>
                                 </div>
-                                <div className="mb-4">
+                                <hr />
+                                <div className="my-5 flex justify-between">
                                     <label>Account Number:</label>
                                     <p>{user.accountNumber}</p>
                                 </div>
-                                <div className="mb-4">
+                                <hr />
+                                <div className="my-5 flex justify-between">
                                     <label>PAN Number:</label>
                                     <p>{user.panNumber}</p>
                                 </div>
-                                <div className="mb-4">
+                                <hr />
+                                <div className="my-5 flex justify-between">
                                     <label>Address:</label>
                                     <p>{user.address}</p>
                                 </div>
-                                <div className="mb-4">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
+                                <hr />
+                                <div className="my-5 flex justify-between">
+                                    <label>Phone Number:</label>
                                     <p>{user.phoneNumber}</p>
                                 </div>
-                                <div className="mb-4">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2">Available funds</label>
+                                <hr />
+                                <div className="my-5 flex justify-between">
+                                    <label >Available funds</label>
                                     <p>{user.funds}</p>
                                 </div>
+                                <hr />
                             </form>
                         </div>
-                        <div className="w-1/2">
-                            {/* <h2 className="text-center text-4xl font-bold">Available Funds</h2>
-                        <hr />
-                        <div className="flex p-5">
-                            <div className="mb-4 ml-4 mr-40">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Available funds:</label>
-                                <p>{user.funds}</p>
+                        <div className="w-1/2 h-full p-10">
+                            <h2 className="text-center text-xl font-semibold">Available Funds</h2>
+                            <div className="flex flex-col p-5">
+                                <div className="my-5 flex justify-between">
+                                    <label className="block">Available funds:</label>
+                                    <p>{user.funds}</p>
+                                </div>
+                                <hr />
+
+                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-3 rounded " onClick={handleDeposit}>
+                                    Deposit
+                                </button>
+                                <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 my-2 border border-blue-500 hover:border-transparent rounded" onClick={handleWithdraw}>
+                                    Withdraw
+                                </button>
                             </div>
-                            <button className="border-2 border-gray-300 px-2 py-1 rounded-lg mr-10" onClick={handleDeposit}>Deposit</button>
-                            <button className="border-2 border-gray-300 p-2 rounded-lg" onClick={handleWithdraw}>Withdraw</button>
-                        </div> */}
                         </div>
                     </div>
                 </div>

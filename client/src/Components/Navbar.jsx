@@ -13,7 +13,7 @@ const Navbar = () => {
         console.log('profile');
         navigate('/profile');
     }
-    const handleLogout =  () => {
+    const handleLogout = () => {
         try {
             console.log('i m client');
             axios.get('/logout', { withCredentials: true });
@@ -33,12 +33,12 @@ const Navbar = () => {
                 </button>
             </div>
             <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto mr-6">
-                <div className="text-sm lg:flex-grow flex justify-end">
+                <div className="text-sm lg:flex-grow flex justify-end items-center">
                     <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
                     <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
-                    <div className="profile cursor-pointer" onClick={handleLogout}>
+                    <button class="bg-transparent hover:bg-white text-slate-200 font-semibold hover:text-indigo-500 py-2 px-4 border border-white hover:border-transparent rounded-sm" onClick={handleLogout}>
                         Logout
-                    </div>
+                    </button>
                 </div>
             </div>
             <div className="profile cursor-pointer" onClick={handleProfileClick}>
