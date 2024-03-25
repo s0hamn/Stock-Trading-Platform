@@ -340,7 +340,19 @@ app.get('/getAllStocks', async (req, res) => {
     }
 });
 
+app.get('/logout', async (req, res) => {
+    try {
+        // Clear the token from the user's session
+        req.trader.tokens = [];
+        await req.trader.save();
 
+        res.clearCookie('jwtoken'); // Clear the token cookie
+        res.redirect('/login'); // Redirect to login page
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
 
 
 server.listen(3001, () => {
