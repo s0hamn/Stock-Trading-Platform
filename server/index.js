@@ -190,7 +190,7 @@ app.post('/login', async (req, res) => {
         const compare = await comparePassword(req.body.password, trader.password);
 
         const token = await trader.generateAuthToken();
-        console.log("Token", token);
+        // console.log("Token", token);
         res.cookie("jwtoken", token, {
             expires: new Date(Date.now() + 300000),
             httpOnly: true
@@ -343,8 +343,11 @@ app.get('/getAllStocks', async (req, res) => {
 app.get('/logout', async (req, res) => {
     try {
         // Clear the token from the user's session
-        req.trader.tokens = [];
-        await req.trader.save();
+        const token = req.cookies.jwtoken;
+        const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
+        const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
+        trader.tokens = trader.tokens.filter(t => t.token !== token);
+        await trader.save();
 
         res.clearCookie('jwtoken'); // Clear the token cookie
         res.redirect('/login'); // Redirect to login page

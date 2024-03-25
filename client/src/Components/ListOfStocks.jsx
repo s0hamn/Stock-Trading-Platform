@@ -93,7 +93,7 @@ const ListOfStocks = () => {
                             <select
                                 value={marketCapFilter}
                                 onChange={e => setMarketCapFilter(e.target.value)}
-                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white dark:bg-neutral-700 dark:border-neutral-600 gap-2 mr-4"
+                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white gap-2 mr-4"
                             >
                                 <option value="">All Market Caps</option>
                                 <option value="Small">Small</option>
@@ -103,7 +103,7 @@ const ListOfStocks = () => {
                             <select
                                 value={sectorFilter}
                                 onChange={e => setSectorFilter(e.target.value)}
-                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white dark:bg-neutral-700 dark:border-neutral-600"
+                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white "
                             >
                                 <option value="">All Sectors</option>
                                 <option value="Technology">Technology</option>

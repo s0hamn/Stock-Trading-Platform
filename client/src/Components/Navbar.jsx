@@ -16,14 +16,14 @@ const Navbar = () => {
     const handleLogout = () => {
         try {
             console.log('i m client');
-            axios.get('/logout', { withCredentials: true });
+            axios.get('/api/logout', { withCredentials: true });
             navigate('/login');
         } catch (error) {
             console.error('Logout Error:', error);
         }
     };
     return (
-        <nav className=" flex items-center justify-between flex-wrap bg-indigo-500  pt-6 pb-6 pl-36 pr-36">
+        <nav className=" flex items-center justify-between flex-wrap bg-indigo-500  pt-6 pb-6 pl-36 pr-36 sticky top-0">
             <div className="flex items-center flex-shrink-0 text-white">
                 <img src={Logo} alt="logo" className='h-10 w-10' />
             </div>
@@ -36,7 +36,7 @@ const Navbar = () => {
                 <div className="text-sm lg:flex-grow flex justify-end items-center">
                     <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
                     <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
-                    <button class="bg-transparent hover:bg-white text-slate-200 font-semibold hover:text-indigo-500 py-2 px-4 border border-white hover:border-transparent rounded-sm" onClick={handleLogout}>
+                    <button className="bg-transparent hover:bg-white text-slate-200 font-semibold hover:text-indigo-500 py-2 px-4 border border-white hover:border-transparent rounded-sm" onClick={handleLogout}>
                         Logout
                     </button>
                 </div>

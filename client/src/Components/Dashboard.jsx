@@ -135,17 +135,17 @@ function Dashboard() {
                             </div>
                         </div>
                         <div className="w-2/3 p-4 flex flex-col h-full">
-                            <div className='flex shadow-lg bg-white rounded  flex-col w-full p-8 text-lg mb-6'>
-                                <div className='flex   text-base w-full justify-between text-slate-400'>
+                            <div className='flex shadow-lg bg-white rounded  flex-col w-full px-8 py-4 text-lg mb-3 h-1/3 justify-evenly'>
+                                <div className='flex text-base w-full justify-between text-slate-400'>
                                     <p>Invested</p>
                                     <p>Current</p>
                                 </div>
-                                <div className='flex my-4 w-full justify-between'>
+                                <div className='flex  w-full justify-between'>
                                     <p>{totalInvestment.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                     <p>{current.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                 </div>
                                 <hr />
-                                <div className='flex justify-between mt-4'>
+                                <div className='flex justify-between'>
                                     <div className='text-slate-400'>P&L</div>
                                     <div className={current - totalInvestment > 0 ? "text-lime-600 flex" : "text-orange-600 flex"}>{current - totalInvestment > 0 ? "+" : ""}{((current - totalInvestment)).toLocaleString(undefined, { maximumFractionDigits: 2 })}
 
@@ -154,9 +154,8 @@ function Dashboard() {
                                 </div>
                             </div>
 
-                            <hr />
 
-                            <div className='w-full h-full bg-slate-800'>
+                            <div className='w-full h-2/3 bg-slate-800'>
 
                             </div>
                         </div>
