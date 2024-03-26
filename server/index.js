@@ -362,7 +362,7 @@ app.get('/stockInfo/:symbol', async (req, res) => {
     try {
         const symbol = req.params.symbol;
         const stock = await Stock.findOne({ symbol: symbol });
-        console.log(stock)
+        // console.log(stock)
         if (!stock) {
 
             return res.status(404).json({ message: 'Stock not found' });
