@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie';
 import { useState } from 'react';
 import io from 'socket.io-client';
+import Chart from './Chart'
 
 function Dashboard() {
     const [trader, setTrader] = useState({})
@@ -156,7 +157,7 @@ function Dashboard() {
 
 
                             <div className='w-full h-2/3 bg-slate-800'>
-
+                                <Chart />
                             </div>
                         </div>
                     </div>}

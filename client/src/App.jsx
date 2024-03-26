@@ -9,6 +9,7 @@ import MainPage from './Components/MainPage'
 import Dashboard from './Components/Dashboard'
 import ListOfStocks from './Components/ListOfStocks'
 import Profile from './Components/Profile'
+import Chart from './Components/Chart'
 function App() {
 
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/stocks" element={<ListOfStocks />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/charts" element={<Chart />} />
       </Routes>
     </BrowserRouter>
   );
