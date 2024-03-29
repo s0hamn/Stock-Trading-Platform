@@ -62,7 +62,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   return (
 
-    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-6`}
+    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-6 h-96`}
       onMouseEnter={() => {
         setIsHovered(true);
         console.log('Mouse entered');
@@ -240,8 +240,8 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
         <Popup trigger={<button
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
-           position="right center"
-           onOpen= {() => analyseStock(id, userId)}
+          position="right center"
+          onOpen={() => analyseStock(id, userId)}
         >
           Analyse
         </button>}>
