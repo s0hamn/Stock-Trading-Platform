@@ -10,6 +10,9 @@ const OTP = require('./models/OTP');
 var cookies = require("cookie-parser");
 const Stock = require('./models/Stock');
 const socketIo = require('socket.io');
+const Order = require('./models/Order');
+const axios = require('axios');
+const yahooFinance = require('yahoo-finance2').default;
 
 const app = express();
 const server = http.createServer(app);
@@ -35,11 +38,12 @@ io.on('connection', socket => {
     // Example: Send periodic updates to the client
     setInterval(() => {
         sendAllStocks(socket);
-    }, 5000); // Update every 5 seconds (adjust as needed)
+    }, 20000); // Update every 5 seconds (adjust as needed)
 
     // Log events being sent to the client
     socket.on('stockUpdate', stocks => {
-        console.log('Server sending stockUpdate event:', stocks);
+        //console.log('Server sending stockUpdate event:', stocks);
+        console.log('Server sending stockUpdate event');
     });
 });
 
@@ -49,7 +53,8 @@ async function sendAllStocks(socket) {
     try {
         const stocks = await Stock.find();
         socket.emit('stockUpdate', stocks);
-        console.log('Server sending stockUpdate event:', stocks);
+        //console.log('Server sending stockUpdate event:', stocks);
+        console.log('Server sending stockUpdate event');
     } catch (error) {
         console.error('Error fetching stocks:', error);
     }
@@ -228,6 +233,72 @@ app.post('/verifyLogin', async (req, res) => {
     } catch (e) {
         res.send("No User Signed In");
 
+    }
+});
+
+app.get('/analyseStock', async (req, res) => {
+    try {
+
+        console.log("Inside Analyse Stock");
+        const stockId = req.query.stockId;
+
+        const orderBook = await Order.find({ stockId: stockId });
+
+        const buyOrders = orderBook.filter(order => order.orderType === 'Buy');
+        const sellOrders = orderBook.filter(order => order.orderType === 'Sell');
+
+        const buyOrdersTotal = buyOrders.reduce((total, order) => total + order.quantity, 0);
+        const sellOrdersTotal = sellOrders.reduce((total, order) => total + order.quantity, 0);
+
+        // Sorting buy orders in ascending order based on priceLimit
+        buyOrders.sort((a, b) => a.priceLimit - b.priceLimit);
+
+        // Sorting sell orders in descending order based on priceLimit
+        sellOrders.sort((a, b) => b.priceLimit - a.priceLimit);
+
+
+        // console.log(stockId);
+        const stock = await Stock.findOne({ _id: stockId });
+        if (!stock) {
+            console.log("stock not found");
+        }
+
+
+        const priceHistory = stock.priceHistory;
+
+        const dailyPrices = stock.dailyPrices;
+
+        try {
+            const query = stock.symbol;
+            const queryOptions = { modules: ['balanceSheetHistory'] }; // defaults
+            const response = await yahooFinance.quoteSummary(query, queryOptions);
+            const balanceSheet = response.balanceSheetHistory.balanceSheetStatements[0];
+            //console.log("api data : ", balanceSheet);
+
+            // Check if data is available
+
+            const responseData = {
+                buyOrders: buyOrders,
+                sellOrders: sellOrders,
+                buyOrdersTotal: buyOrdersTotal,
+                sellOrdersTotal: sellOrdersTotal,
+                priceHistory: priceHistory,
+                dailyPrices: dailyPrices,
+            };
+
+            console.log(responseData);
+            res.status(200).json(responseData);
+
+            
+        }
+        catch (error) {
+            console.error('Error fetching balance sheet data:', error.message);
+            // console.log(error);
+        }
+    }
+    catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
