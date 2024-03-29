@@ -117,18 +117,19 @@ const ListOfStocks = () => {
                     <div className="w-full flex justify-center">
                         <div className="w-5/6 grid grid-cols-3 gap-4 ">
                             {filteredStocks.map((stock) => (
-
-                                <StockListCard
-                                    key={stock._id}
-                                    id={stock._id}
-                                    symbol={stock.symbol}
-                                    companyName={stock.companyName}
-                                    sector={stock.sector}
-                                    currentPrice={stock.currentPrice}
-                                    marketCap={stock.marketCap}
-                                    previousClose={stock.previousClose}
-                                />
-
+                                
+                                    <StockListCard
+                                        key={stock._id}
+                                        id={stock._id}
+                                        symbol={stock.symbol}
+                                        companyName={stock.companyName}
+                                        sector={stock.sector}
+                                        currentPrice={stock.currentPrice}
+                                        marketCap={stock.marketCap}
+                                        previousClose={stock.previousClose}
+                                        userId={trader._id}
+                                    />
+                                
                             ))}
                         </div>
                     </div>
