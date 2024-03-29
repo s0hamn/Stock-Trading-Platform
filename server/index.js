@@ -38,6 +38,7 @@ io.on('connection', socket => {
             sendAllStocks(socket);
         }, 10000);
     });
+
     socket.on('someStocks', (investments) => {
         console.log('Client requested some stocks');
         sendStocks(socket, investments);
@@ -47,7 +48,32 @@ io.on('connection', socket => {
         }, 10000);
     });
 
+    socket.on('stockChart', async (symbol) => {
+        console.log('Client requested stock chart:', symbol);
+        sendStockChart(socket, symbol);
+
+        setInterval(() => {
+            sendStockChart(socket, symbol);
+        }, 10000);
+
+    });
+
 });
+
+async function sendStockChart(socket, symbol) {
+    try {
+        const stock = await Stock.findOne({
+            symbol: symbol
+        });
+        if (!stock) {
+            return socket.emit('stockChart', { message: 'Stock not found' });
+        }
+        socket.emit('stockChart', stock);
+    } catch (error) {
+        console.error('Error fetching stock:', error);
+        socket.emit('stockChart', { message: 'Internal server error' });
+    }
+}
 
 
 // Function to fetch all stocks from MongoDB and send them to the client
