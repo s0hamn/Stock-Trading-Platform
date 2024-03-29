@@ -11,6 +11,7 @@ var cookies = require("cookie-parser");
 const Stock = require('./models/Stock');
 const socketIo = require('socket.io');
 const Order = require('./models/Order');
+const Portfolio = require('./models/Portfolio');
 const axios = require('axios');
 const yahooFinance = require('yahoo-finance2').default;
 
@@ -318,6 +319,41 @@ app.post('/verifyLogin', async (req, res) => {
 
     }
 });
+
+app.get('/checkIfUserHolding', async (req,res) => {
+    try {
+        console.log("Inside checkIfUserHolding");
+        if (!req.query.userId || !req.query.symbol) {
+            // return res.status(400).json({ err: "Missing required parameters" });
+            console.log("Missing required parameters\n");
+        }
+        const userId = req.query.userId;
+        const stockSymbol = req.query.symbol;
+
+        const trader = await TraderModel.findById(userId);
+
+        if(trader){
+
+            for(let i = 0; i < trader.investments.length; i++){
+                if(trader.investments[i].symbol === stockSymbol){
+                    res.status(200).json({
+                        isHolding: true,
+                        quantity: trader.investments[i].quantity  // Use 'trader.investments[i].quantity'
+                    });
+                    // Add 'return' to exit the loop after finding the stock
+                }
+            }
+
+            res.status(200).json({isHolding: false});
+        }
+        else{
+            res.status(404).json({err: "User or stock not found"});
+        }
+    }
+    catch{
+        res.status(500).send("Internal Server Error");
+    }
+})
 
 app.get('/analyseStock', async (req, res) => {
     try {
