@@ -346,7 +346,7 @@ app.post('/verifyLogin', async (req, res) => {
     }
 });
 
-app.get('/checkIfUserHolding', async (req,res) => {
+app.get('/checkIfUserHolding', async (req, res) => {
     try {
         console.log("Inside checkIfUserHolding");
         if (!req.query.userId || !req.query.symbol) {
@@ -358,10 +358,10 @@ app.get('/checkIfUserHolding', async (req,res) => {
 
         const trader = await TraderModel.findById(userId);
 
-        if(trader){
+        if (trader) {
 
-            for(let i = 0; i < trader.investments.length; i++){
-                if(trader.investments[i].symbol === stockSymbol){
+            for (let i = 0; i < trader.investments.length; i++) {
+                if (trader.investments[i].symbol === stockSymbol) {
                     res.status(200).json({
                         isHolding: true,
                         quantity: trader.investments[i].quantity  // Use 'trader.investments[i].quantity'
@@ -370,13 +370,13 @@ app.get('/checkIfUserHolding', async (req,res) => {
                 }
             }
 
-            res.status(200).json({isHolding: false});
+            res.status(200).json({ isHolding: false });
         }
-        else{
-            res.status(404).json({err: "User or stock not found"});
+        else {
+            res.status(404).json({ err: "User or stock not found" });
         }
     }
-    catch{
+    catch {
         res.status(500).send("Internal Server Error");
     }
 })
@@ -434,7 +434,7 @@ app.get('/analyseStock', async (req, res) => {
             console.log(responseData);
             res.status(200).json(responseData);
 
-            
+
         }
         catch (error) {
             console.error('Error fetching balance sheet data:', error.message);

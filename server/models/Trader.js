@@ -45,6 +45,7 @@ const TraderSchema = new mongoose.Schema({
             quantity: { type: Number },
             symbol: { type: String },
             avg: { type: Number },
+            timestamp: { type: Date }
         }
     ],
     tokens: [{

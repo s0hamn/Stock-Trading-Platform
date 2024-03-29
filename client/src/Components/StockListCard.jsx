@@ -7,51 +7,11 @@ import Popup from 'reactjs-popup';
 const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCap, previousClose, userId }) => {
   const [isHolding, setIsHolding] = useState(false);
 
-  const [quantity, setQuantity] = useState(0);
-
   const [isHovered, setIsHovered] = useState(false);
 
   const [buyorderQueue, setBuyOrderQueue] = useState([]);
 
   const [sellOrderQueue, setSellOrderQueue] = useState([]);
-
-  useEffect(() => {
-    // Function to check if the user holds the stock
-    const checkUserHoldings = async () => {
-      try {
-        console.log('Checking user holdings...');
-        axios.get('http://localhost:3001/checkIfUserHolding', {
-          params: {
-            userId: userId,
-            symbol: symbol
-          }
-        }).then(response => {
-          if (response.data.err) {
-            console.log(response.data.err);
-            setIsHolding(false);
-          } else {
-            if (response.data.isHolding) {
-              setQuantity(response.data.quantity);
-            }
-            setIsHolding(response.data.isHolding);
-          }
-          setQuantity(response.data.quantity);
-        }).catch(err =>{
-          console.error('Error checking user holdings:', err);
-        });
-        // If the user holds the stock, set isHolding state to true
-        
-      } 
-      catch (error) {
-        console.error('Error checking user holdings:', error);
-      }
-    };
-
-    // Call the function to check user holdings when the component mounts
-    checkUserHoldings();
-  }, []); // Empty dependency array means the effect runs only once when the component mounts
-
-
 
 
   const navigate = useNavigate();
@@ -102,7 +62,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   return (
 
-    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2`}
+    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-6 h-96`}
       onMouseEnter={() => {
         setIsHovered(true);
         console.log('Mouse entered');
@@ -112,10 +72,10 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
         console.log('Mouse left');
       }} // Set isHovered to false on mouse leave
     >
-      <h2 className="text-xl font-bold mb-2">{companyName}</h2>
+      <h2 className="text-2xl font-bold mb-2">{companyName}</h2>
       <p className="text-gray-600 mb-4">Symbol: {symbol}</p>
       <div className="flex items-center mb-4">
-        <p className={`text-xl font-bold mr-2 ${currentPrice >= previousClose ? 'text-green-600' : 'text-red-600'}`}>
+        <p className={`text-3xl font-bold mr-2 ${currentPrice >= previousClose ? 'text-green-600' : 'text-red-600'}`}>
           {currentPrice.toFixed(2)} INR
         </p>
         <div className={`text-sm font-bold ${currentPrice >= previousClose ? 'text-green-600' : 'text-red-600'}`}>
@@ -127,7 +87,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
       <p className={`text-sm ${currentPrice >= previousClose ? 'text-green-600' : 'text-red-600'}`}>
         {currentPrice >= previousClose ? 'Price Increased' : 'Price Decreased'} since yesterday's last close
       </p>
-      <p className="text-sm mt-2">{isHolding ? 'Holding' : 'Not Holding'}  {isHolding ? `${quantity}` : ''}</p>
+      <p className="text-sm mt-2">{isHolding ? 'Holding' : 'Not Holding'}</p>
       <p className="text-sm mt-2">Sector: {sector}</p>
       <p className="text-sm mt-2">Market Cap: {marketCap}</p>
 
@@ -144,7 +104,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
           {close => (
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
               <div className="bg-white p-6 rounded-md w-1/3">
-                <h3 className="text-xl font-bold mb-4">Buy   {symbol}    {currentPrice.toFixed(2)}</h3>
+                <h3 className="text-xl font-bold mb-4">Buy   {symbol} </h3>
                 <form onSubmit={handleSubmit}>
                   <div className="mb-4">
                     <label className="block text-sm font-bold mb-2">
@@ -255,11 +215,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
                     <button
                       type="button"
                       className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
-                      onClick={() => {
-                        close(); // Close the popup
-                        setIsHovered(false); // Set isHovered to false
-                      }}
-
+                      onClick={close}
                     >
                       Cancel
                     </button>
@@ -277,23 +233,18 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
-          onClick={() => analyseStock(id, userId)}
+          onClick={() => handleButtonClick(id)}
         >
           Sell
         </button>
 
-
-        <Popup trigger={open => (<button
-          id="analyseButton"
+        <Popup trigger={<button
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
           position="right center"
-          onClick={() => {
-            analyseStock(id, userId);
-          }}
-
+          onOpen={() => analyseStock(id, userId)}
         >
           Analyse
-        </button>)}>
+        </button>}>
 
 
 
