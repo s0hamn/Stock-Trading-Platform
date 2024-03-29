@@ -125,6 +125,7 @@ const ListOfStocks = () => {
                                         currentPrice={stock.currentPrice}
                                         marketCap={stock.marketCap}
                                         previousClose={stock.previousClose}
+                                        userId={trader._id}
                                     />
                                 
                             ))}

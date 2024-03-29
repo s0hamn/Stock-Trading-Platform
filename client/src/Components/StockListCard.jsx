@@ -2,26 +2,63 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import Popup from 'reactjs-popup';
 
-
-const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCap, previousClose }) => {
+const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCap, previousClose, userId }) => {
   const [isHolding, setIsHolding] = useState(false);
 
   const [isHovered, setIsHovered] = useState(false);
 
+  const [buyorderQueue, setBuyOrderQueue] = useState([]);
+
+  const [sellOrderQueue, setSellOrderQueue] = useState([]);
+
+
   const navigate = useNavigate();
 
-  // const handleMouseEnter = () => {
-  //   setIsHovered(true);
-  // }
+  // const [orderType, setOrderType] = useState('market');
+  const [formData, setFormData] = useState({
+    orderType: 'market',
+    price: '',
+    stopLoss: '',
+    quantity: '',
+    orderDuration: 'intraday'
+  });
 
-  // const handleMouseLeave = () => {
-  //   setIsHovered(false);
-  // }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-  const handleButtonClick = (stockId) => {
-    navigate(`/viewstock/${stockId}`);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    // You can add your logic to handle form submission here
+  };
+
+
+  const analyseStock = (stockId, userId) => {
+    console.log("inside analyse stock event\n")
+    axios.get('http://localhost:3001/analyseStock', {
+      params: {
+        stockId: stockId,
+        userId: userId
+      }
+    }).then(res => {
+      console.log(res.data);
+      if (res.data == 'error') {
+        alert('Error analysing stock, please try again later');
+      }
+      else {
+        setBuyOrderQueue(res.data.buyOrderQueue);
+        setSellOrderQueue(res.data.sellOrderQueue);
+      }
+    }).catch(err => {
+      console.error('Error analysing stock:', err);
+    });
   }
+
+
 
   return (
 
@@ -54,19 +91,209 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
       <p className="text-sm mt-2">Sector: {sector}</p>
       <p className="text-sm mt-2">Market Cap: {marketCap}</p>
 
-      {isHovered && (
-        <div className="flex justify-center">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
-            onClick={() => handleButtonClick(id)}
-          >
-            Actions
-          </button>
-        </div>
-      )}
+
+      <div className={`flex justify-center ${isHovered ? '' : 'hidden'} gap-2 mt-2`}>
 
 
-    </div>
+        <Popup trigger={<button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+        >
+          Buy
+        </button>} position="right center"  >
+
+          {close => (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
+              <div className="bg-white p-6 rounded-md w-1/3">
+                <h3 className="text-xl font-bold mb-4">Buy   {symbol} </h3>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2">
+                      Order Type:
+                    </label>
+                    <div className="flex">
+                      <label className="inlin</div>e-flex items-center mr-4">
+                        <input
+                          type="radio"
+                          name="orderType"
+                          value="market"
+                          checked={formData.orderType === 'market'}
+                          onChange={handleInputChange}
+                        />
+                        <span className="ml-2">Market Order</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name="orderType"
+                          value="limit"
+                          checked={formData.orderType === 'limit'}
+                          onChange={handleInputChange}
+                        />
+                        <span className="ml-2">Limit Order</span>
+                      </label>
+                    </div>
+                  </div>
+                  {formData.orderType === 'limit' && (
+                    <>
+                      <div className="mb-4">
+                        <label className="block text-sm font-bold mb-2" htmlFor="price">
+                          Price:
+                        </label>
+                        <input
+                          type="text"
+                          id="price"
+                          name="price"
+                          value={formData.price}
+                          onChange={handleInputChange}
+                          placeholder="Enter price"
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full"
+                        />
+                      </div>
+
+                    </>
+                  )}
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="stopLoss">
+                      Stop Loss:
+                    </label>
+                    <input
+                      type="text"
+                      id="stopLoss"
+                      name="stopLoss"
+                      value={formData.stopLoss}
+                      onChange={handleInputChange}
+                      placeholder="Enter stop loss"
+                      className="border border-gray-300 rounded-md px-4 py-2 w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2" htmlFor="quantity">
+                      Quantity:
+                    </label>
+                    <input
+                      type="text"
+                      id="quantity"
+                      name="quantity"
+                      value={formData.quantity}
+                      onChange={handleInputChange}
+                      placeholder="Enter quantity"
+                      className="border border-gray-300 rounded-md px-4 py-2 w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold mb-2">Order Duration:</label>
+                    <div className="flex">
+                      <label className="inline-flex items-center mr-4">
+                        <input
+                          type="radio"
+                          name="orderDuration"
+                          value="intraday"
+                          checked={formData.orderDuration === 'intraday'}
+                          onChange={handleInputChange}
+                        />
+                        <span className="ml-2">Intraday</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name="orderDuration"
+                          value="cnc"
+                          checked={formData.orderDuration === 'cnc'}
+                          onChange={handleInputChange}
+                        />
+                        <span className="ml-2">CNC</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                    >
+                      Place
+                    </button>
+                    <button
+                      type="button"
+                      className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                      onClick={close}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+
+          )}
+
+
+        </Popup>
+
+
+        <button
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
+          onClick={() => handleButtonClick(id)}
+        >
+          Sell
+        </button>
+
+        <Popup trigger={<button
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
+           position="right center"
+           onOpen= {() => analyseStock(id, userId)}
+        >
+          Analyse
+        </button>}>
+
+
+
+          {close => (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
+              <div className=" bg-white p-6 rounded-md w-1/2">
+                <div className="flex">
+                  {/* Left side - Buying/Selling order queues and company fundamentals */}
+                  <div className="w-1/2 p-4 flex flex-col">
+                    {/* Company fundamentals */}
+                    <div className="mb-4 ">
+                      <h3 className="text-xl font-bold mb-2">Company Fundamentals</h3>
+                      {/* Add company fundamentals content here */}
+                    </div>
+                    {/* Buying/Selling order queues */}
+                    <div className=''>
+                      <h3 className="text-xl font-bold mb-2 ">Order Queues</h3>
+                      {/* Add buying/selling order queues content here */}
+                    </div>
+                  </div>
+                  {/* Right side - Stock graph */}
+                  <div className="w-1/2 p-4 ">
+                    {/* Stock graph */}
+                    <h3 className="text-xl font-bold mb-2">Stock Graph</h3>
+                    {/* Add stock graph component or content here */}
+                  </div>
+
+                </div>
+                <div className='flex justify-center'>
+                  <button
+                    type="button"
+                    className="bg-gray-400 hover:bg-gray-600 text-white font-bold p-3 rounded"
+                    onClick={close}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+
+        </Popup>
+
+
+      </div >
+
+    </div >
 
 
   );
