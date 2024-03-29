@@ -115,7 +115,7 @@ const ListOfStocks = () => {
 
                     {/* Stock List */}
                     <div className="w-full flex justify-center">
-                        <div className="w-5/6 grid grid-cols-3 gap-4 ">
+                        <div className="w-5/6 grid grid-cols-3 ">
                             {filteredStocks.map((stock) => (
                                 
                                     <StockListCard
