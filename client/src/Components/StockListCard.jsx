@@ -20,7 +20,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
     const checkUserHoldings = async () => {
       try {
         console.log('Checking user holdings...');
-        axios.get('http://localhost:3001/checkIfUserHolding', {
+        axios.get('/api/checkIfUserHolding', {
           params: {
             userId: userId,
             symbol: symbol
@@ -36,12 +36,12 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
             setIsHolding(response.data.isHolding);
           }
           setQuantity(response.data.quantity);
-        }).catch(err =>{
+        }).catch(err => {
           console.error('Error checking user holdings:', err);
         });
         // If the user holds the stock, set isHolding state to true
-        
-      } 
+
+      }
       catch (error) {
         console.error('Error checking user holdings:', error);
       }
@@ -79,7 +79,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   const analyseStock = (stockId, userId) => {
     console.log("inside analyse stock event\n")
-    axios.get('http://localhost:3001/analyseStock', {
+    axios.get('/api/analyseStock', {
       params: {
         stockId: stockId,
         userId: userId
@@ -102,7 +102,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   return (
 
-    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2`}
+    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2 h-96`}
       onMouseEnter={() => {
         setIsHovered(true);
         console.log('Mouse entered');
