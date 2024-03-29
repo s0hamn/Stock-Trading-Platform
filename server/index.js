@@ -348,7 +348,7 @@ app.post('/verifyLogin', async (req, res) => {
 
 app.get('/checkIfUserHolding', async (req, res) => {
     try {
-        console.log("Inside checkIfUserHolding");
+
         if (!req.query.userId || !req.query.symbol) {
             // return res.status(400).json({ err: "Missing required parameters" });
             console.log("Missing required parameters\n");
@@ -356,23 +356,25 @@ app.get('/checkIfUserHolding', async (req, res) => {
         const userId = req.query.userId;
         const stockSymbol = req.query.symbol;
 
+        console.log("Inside checkIfUserHolding checking", stockSymbol);
+
         const trader = await TraderModel.findById(userId);
 
         if (trader) {
+            let isHolding = false;
+            let quantity = 0;
 
             for (let i = 0; i < trader.investments.length; i++) {
                 if (trader.investments[i].symbol === stockSymbol) {
-                    res.status(200).json({
-                        isHolding: true,
-                        quantity: trader.investments[i].quantity  // Use 'trader.investments[i].quantity'
-                    });
-                    // Add 'return' to exit the loop after finding the stock
+                    isHolding = true;
+                    quantity = trader.investments[i].quantity;
+                    break; // Exit the loop once the stock is found
                 }
             }
 
-            res.status(200).json({ isHolding: false });
-        }
-        else {
+            res.status(200).json({ isHolding, quantity });
+        } else {
+
             res.status(404).json({ err: "User or stock not found" });
         }
     }
