@@ -22,7 +22,30 @@ const stockSchema = new mongoose.Schema({
             timestamps: [{ type: Date }],
             prices: [{ type: Number }]
         }
+    ],
+    buyOrderQueue: [
+        {
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Trader', required: true },
+            orderType: { type: String, enum: ['limit', 'market'], required: true },
+            orderCategory: { type: String, enum: ['buy', 'sell'], required: true },
+            quantity: { type: Number, required: true, min: 0 },
+            priceLimit: { type: Number, min: 0 },
+            orderDate: { type: Date, default: Date.now },
+            stopLoss: { type: Number, min: 0 }
+        }
+    ],
+    sellOrderQueue: [
+        {
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Trader', required: true },
+            orderType: { type: String, enum: ['limit', 'market'], required: true },
+            orderCategory: { type: String, enum: ['buy', 'sell'], required: true },
+            quantity: { type: Number, required: true, min: 0 },
+            priceLimit: { type: Number, min: 0 },
+            orderDate: { type: Date, default: Date.now },
+            stopLoss: { type: Number, min: 0 }
+        }
     ]
+
 });
 
 module.exports = mongoose.model('Stock', stockSchema);
