@@ -10,10 +10,11 @@ const OTP = require('./models/OTP');
 var cookies = require("cookie-parser");
 const Stock = require('./models/Stock');
 const socketIo = require('socket.io');
-const Order = require('./models/Order');
 const Portfolio = require('./models/Portfolio');
 const axios = require('axios');
 const yahooFinance = require('yahoo-finance2').default;
+
+var request = require('request');
 
 const app = express();
 const server = http.createServer(app);
@@ -207,6 +208,34 @@ app.post('/register', async (req, res) => {
 
 });
 
+app.post('/addToWatchlist', async (req, res) => {
+    try {
+        const stockId = req.body.stockId;
+        const userId = req.body.userId;
+
+        const trader = await TraderModel.findById(userId);
+
+        if (!trader) {
+            return res.status(404).send("Trader not found");
+        }
+
+        for (let i = 0; i < trader.watchlist.length; i++) {
+            if (trader.watchlist[i].equals(stockId)) {
+                return res.status(400).send("Stock already exists in watchlist");
+            }
+        }
+
+        trader.watchlist.push(stockId);
+        await trader.save();
+
+        return res.status(200).json({ message: "Stock added to watchlist successfully" });
+    }
+    catch (error) {
+        console.error("Error adding stock to watchlist:", error);
+        return res.status(500).send("Internal Server Error");
+    }
+});
+
 
 
 app.post('/login', async (req, res) => {
@@ -346,6 +375,68 @@ app.post('/verifyLogin', async (req, res) => {
     }
 });
 
+app.post('/placeOrder', async (req, res) => {
+
+    try {
+        const symbol = req.body.symbol;
+        const orderData = req.body.orderData;
+        const userId = req.body.userId;
+
+        const currentTime = new Date();
+        const currentHour = currentTime.getHours();
+        if (currentHour >= 17 || currentHour < 9) {
+            return res.status(403).json({ error: 'Orders are only allowed between 9:00 AM and 5:00 PM' });
+        }
+
+
+        const stock = await Stock.findOne({ symbol: symbol });
+
+        if (!stock) {
+            return res.status(404).json({ error: 'Stock not found' });
+        }
+
+
+
+
+        const order = {
+            userId: userId,
+            orderType: orderData.orderType,
+            quantity: orderData.quantity,
+            priceLimit: orderData.priceLimit,
+            orderCategory: orderData.orderCategory,
+            orderDate: new Date(),
+            stopLoss: orderData.stopLoss
+        };
+
+        let updateQuery;
+        if (orderData.orderCategory === 'buy') {
+            updateQuery = { $push: { buyOrderQueue: order } };
+        }
+        else{
+            updateQuery = { $push: { sellOrderQueue: order } };
+        }
+
+        await Stock.findOneAndUpdate(
+            { symbol: symbol },
+            updateQuery,
+            { new: true }
+        );
+
+        res.status(200).json({ message: 'Order placed successfully' });
+
+        
+
+
+
+
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+    }
+
+});
+
 app.get('/checkIfUserHolding', async (req, res) => {
     try {
 
@@ -383,71 +474,71 @@ app.get('/checkIfUserHolding', async (req, res) => {
     }
 })
 
+app.get('/getOrderBook', async (req, res) => {
+
+    try {
+        const symbol = req.query.symbol; // Get symbol from request parameters
+        console.log("Inside orders", symbol);
+
+
+
+        const stock = await Stock.findOne({ symbol: symbol }); // Find stock with the given symbol
+
+        if (!stock) {
+            return res.status(404).json({ error: 'Stock not found' });
+        }
+
+        // Filter orders based on the symbol
+        const buyOrders = stock.buyOrderQueue;
+        const sellOrders = stock.sellOrderQueue;
+
+
+        res.status(200).json({
+            buyOrders: buyOrders,
+            sellOrders: sellOrders
+        }); // Send filtered orders as JSON response
+    }
+    catch {
+        res.status(500).send("Internal Server Error");
+    }
+
+
+});
+
+
 app.get('/analyseStock', async (req, res) => {
     try {
-
         console.log("Inside Analyse Stock");
         const stockId = req.query.stockId;
 
-        const orderBook = await Order.find({ stockId: stockId });
-
-        const buyOrders = orderBook.filter(order => order.orderType === 'Buy');
-        const sellOrders = orderBook.filter(order => order.orderType === 'Sell');
-
-        const buyOrdersTotal = buyOrders.reduce((total, order) => total + order.quantity, 0);
-        const sellOrdersTotal = sellOrders.reduce((total, order) => total + order.quantity, 0);
-
-        // Sorting buy orders in ascending order based on priceLimit
-        buyOrders.sort((a, b) => a.priceLimit - b.priceLimit);
-
-        // Sorting sell orders in descending order based on priceLimit
-        sellOrders.sort((a, b) => b.priceLimit - a.priceLimit);
-
-
-        // console.log(stockId);
         const stock = await Stock.findOne({ _id: stockId });
         if (!stock) {
             console.log("stock not found");
+            return res.status(404).json({ error: 'Stock not found' });
         }
 
+        console.log("Stock found", stock.symbol);
 
-        const priceHistory = stock.priceHistory;
+        const data = await yahooFinance.quoteSummary(stock.symbol, { modules: ["incomeStatementHistory", "majorHoldersBreakdown", "industryTrend", "indexTrend"] });
 
-        const dailyPrices = stock.dailyPrices;
+        const responseData = {
+            incomeStatements: data.incomeStatementHistory?.incomeStatementHistory || [],
+            majorHoldersBreakdown: data.majorHoldersBreakdown || {},
+            industryTrend: data.industryTrend || {},
+            indexTrend: data.indexTrend || {}
+        };
 
-        try {
-            const query = stock.symbol;
-            const queryOptions = { modules: ['balanceSheetHistory'] }; // defaults
-            const response = await yahooFinance.quoteSummary(query, queryOptions);
-            const balanceSheet = response.balanceSheetHistory.balanceSheetStatements[0];
-            //console.log("api data : ", balanceSheet);
-
-            // Check if data is available
-
-            const responseData = {
-                buyOrders: buyOrders,
-                sellOrders: sellOrders,
-                buyOrdersTotal: buyOrdersTotal,
-                sellOrdersTotal: sellOrdersTotal,
-                priceHistory: priceHistory,
-                dailyPrices: dailyPrices,
-            };
-
-            console.log(responseData);
-            res.status(200).json(responseData);
+        // console.log("responeData", responseData);
 
 
-        }
-        catch (error) {
-            console.error('Error fetching balance sheet data:', error.message);
-            // console.log(error);
-        }
+        res.status(200).json({ data: responseData });
     }
     catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 app.get('/getStockInfo', async (req, res) => {
     try {
