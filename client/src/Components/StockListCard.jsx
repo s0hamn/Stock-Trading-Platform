@@ -112,7 +112,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
         console.log('Mouse left');
       }} // Set isHovered to false on mouse leave
     >
-      <h2 className="text-xl font-bold mb-2">{companyName}</h2>
+      <h2 className="text-xl font-semibold mb-2">{companyName}</h2>
       <p className="text-gray-600 mb-4">Symbol: {symbol}</p>
       <div className="flex items-center mb-4">
         <p className={`text-xl font-bold mr-2 ${currentPrice >= previousClose ? 'text-green-600' : 'text-red-600'}`}>

@@ -20,7 +20,7 @@ const ApexChart = () => {
 
         const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
         // console.log("Trader investments", trader.investments);
-        socket.emit('stockChart', "HDFCBANK.BSE");
+        socket.emit('stockChart', "HDFCBANK.NS");
         // Subscribe to stock updates
         socket.on('stockChart', stockData => {
             const temp = [];

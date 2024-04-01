@@ -16,6 +16,7 @@ function Dashboard() {
     const [traderstocks, setTraderStocks] = useState([]);
     const [loader, setLoader] = useState(true)
     // const [isMounted, setIsMounted] = useState(false);
+    const [stocksType, setStocksType] = useState('investments');
     const [totalInvestment, setTotalInvestment] = useState(0);
     const [current, setCurrent] = useState(0);
     const navigate = useNavigate();
@@ -109,12 +110,24 @@ function Dashboard() {
                     </div> :
                     <div className="flex h-full">
                         <div className="flex h-full px-4 py-4 w-1/3 flex-col ">
-                            <h2 className="text-lg font-semibold w-full mb-4">Portfolio</h2>
+                            <h2 className="text-lg font-semibold w-full">Portfolio</h2>
                             <div className="h-full w-full overflow-y-scroll">
 
-                                <div className=" flex flex-col w-full pr-4">
+                                <div className=" flex flex-col w-full pr-4 ">
+                                    <div className="text-sm font-medium text-center text-gray-500  border-gray-200 dark:text-gray-400 dark:border-gray-700 mb-2">
+                                        <ul className="flex flex-wrap -mb-px">
+                                            <button onClick={() => setStocksType('investments')} className="me-2 flex-1">
+                                                <a href="#" className={`inline-block p-4 ${stocksType == 'investments' ? "text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`}>Investments</a>
+                                            </button>
+                                            <button onClick={() => setStocksType('watchlist')} className="me-2 flex-1">
+                                                <a href="#" className={`inline-block p-4 ${stocksType == 'watchlist' ? "text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`} aria-current="page">Watchlist</a>
+                                            </button>
 
-                                    {traderstocks.map((stock, index) => {
+                                        </ul>
+                                    </div>
+
+                                    <hr />
+                                    {stocksType == "investments" ? traderstocks.map((stock, index) => {
                                         const profit = (stock.quantity * (stocks[index].currentPrice - stock.avg)) / (stock.quantity * stock.avg) * 100;
                                         const profitClass = profit > 0 ? 'text-lime-600' : 'text-orange-600';
                                         return (
@@ -122,7 +135,7 @@ function Dashboard() {
                                                 <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} />
                                             </div>
                                         )
-                                    })}
+                                    }) : "Portfolio is empty"}
 
                                     <div>
                                         <div className="flex justify-between my-4">
@@ -136,7 +149,7 @@ function Dashboard() {
                             </div>
                         </div>
                         <div className="w-2/3 p-4 flex flex-col h-full">
-                            <div className='flex shadow-lg bg-white rounded  flex-col w-full px-8 py-4 text-lg mb-3 h-1/3 justify-evenly'>
+                            <div className='flex shadow-lg bg-white rounded  flex-col w-full  px-8 py-4 text-lg mb-3 h-1/3 justify-evenly'>
                                 <div className='flex text-base w-full justify-between text-slate-400'>
                                     <p>Invested</p>
                                     <p>Current</p>
