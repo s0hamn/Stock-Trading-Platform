@@ -474,7 +474,7 @@ app.get('/checkIfUserHolding', async (req, res) => {
         const userId = req.query.userId;
         const stockSymbol = req.query.symbol;
 
-        console.log("Inside checkIfUserHolding checking", stockSymbol);
+        // console.log("Inside checkIfUserHolding checking", stockSymbol);
 
         const trader = await TraderModel.findById(userId);
 
@@ -505,7 +505,7 @@ app.get('/getOrderBook', async (req, res) => {
 
     try {
         const symbol = req.query.symbol; // Get symbol from request parameters
-        console.log("Inside orders", symbol);
+        // console.log("Inside orders", symbol);
 
 
 
@@ -583,7 +583,7 @@ app.get('/getStockInfo', async (req, res) => {
 
 app.get('/getTrader', async (req, res) => {
     try {
-        const symbol = req.query.userId;
+        const userId = req.query.userId;
         const trader = await TraderModel.findOne({ _id: userId });
         if (!trader) {
             return res.status(404).json({ message: 'Trader not found' });

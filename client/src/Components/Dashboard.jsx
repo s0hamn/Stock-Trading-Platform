@@ -123,20 +123,20 @@ function Dashboard() {
     }, [trader]);
 
 
-    useEffect(() => {
-        if (trader.watchlist) {
-            const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+    // useEffect(() => {
+    //     if (trader.watchlist) {
+    //         const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
 
-            socket.emit('watchlistStocks', trader.watchlist);
+    //         socket.emit('watchlistStocks', trader.watchlist);
 
-            socket.on("watchlistStocks", watchlistStocks => {
-                console.log(watchlistStocks);
-            })
+    //         socket.on("watchlistStocks", watchlistStocks => {
+    //             console.log(watchlistStocks);
+    //         })
 
-            return () => socket.close();
+    //         return () => socket.close();
 
-        }
-    }, [trader])
+    //     }
+    // }, [trader])
 
     useEffect(() => {
         let total = 0;
@@ -192,7 +192,9 @@ function Dashboard() {
                                         const profit = (stock.quantity * (stocks[index].currentPrice - stock.avg)) / (stock.quantity * stock.avg) * 100;
                                         const profitClass = profit > 0 ? 'text-lime-600' : 'text-orange-600';
                                         return (
+
                                             <div key={index} className='px-2'>
+                                                {console.log(trader._id)}
                                                 <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
                                             </div>
                                         )

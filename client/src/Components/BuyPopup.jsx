@@ -6,7 +6,7 @@ import axios from 'axios';
 
 
 const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered }) => {
-
+    // console.log(text);
     const [buyOrderQueue, setBuyOrderQueue] = useState([]);
 
     const [sellOrderQueue, setSellOrderQueue] = useState([]);
@@ -19,10 +19,10 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
         stopLoss: 0,
         quantity: 0,
         orderDuration: 'intraday',
-        orderCategory: '',
+        orderCategory: text,
     });
 
-    
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -31,11 +31,11 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if(text === "Buy"){
-            setFormData({...formData, orderCategory: "Buy"});
+        if (text == "Buy") {
+            setFormData({ ...formData, orderCategory: "Buy" });
         }
-        else{
-            setFormData({...formData, orderCategory: "Sell"});
+        else {
+            setFormData({ ...formData, orderCategory: "Sell" });
         }
         console.log("form data", formData);
 
@@ -61,15 +61,8 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                 params: {
                     userId: userId
                 }
-            });
-
-            if (response.status === 404 || response.status === 500) {
-                alert("Stock not found");
-                setIsHovered(false);
-                return;
-            }
-            else {
-                const trader = response.data.trader;
+            }).then(res => {
+                const trader = res.data.trader;
 
 
                 if (formData.quantity <= 0) {
@@ -105,9 +98,10 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                         }
                     }
                 });
-
-
-            }
+            }).catch(err => {
+                console.error('Error fetching trader:', err);
+                setIsHovered(false);
+            });
 
 
         }
@@ -181,7 +175,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
         };
 
         const startFetchingOrders = () => {
-            intervalId = setInterval(fetchOrders, 1000); // Fetch orders every second
+            intervalId = setInterval(fetchOrders, 10000); // Fetch orders every second
             fetchOrders(); // Fetch orders immediately
         };
 
@@ -338,7 +332,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                                             {buyOrderQueue.slice(0, 7).map((order, index) => (
 
                                                 <tr key={index}>
-                                                    {console.log(order)}
+                                                    {/* {console.log(order)} */}
                                                     <td className="px-4 py-2">{index + 1}</td>
                                                     <td className="px-4 py-2">{order.orderType === "market" ? currentPrice : order.priceLimit}</td>
                                                     <td className="px-4 py-2">{order ? order.quantity : 0}</td>
