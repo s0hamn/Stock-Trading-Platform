@@ -19,7 +19,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
         stopLoss: 0,
         quantity: 0,
         orderDuration: 'intraday',
-        orderCategory: 'buy'
+        orderCategory: text,
     });
 
     const handleInputChange = (e) => {
@@ -27,22 +27,75 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("form data", formData);
 
-        if (formData.quantity <= 0) {
-            alert("Please enter valid quantity");
-            return;
+        if(orderCategory === "Buy"){
+            if (formData.quantity <= 0) {
+                alert("Please enter valid quantity");
+                return;
+            }
+            if (formData.orderType === 'limit' && formData.priceLimit <= 0) {
+                alert("Please enter valid price");
+                return;
+            }
+            if (formData.stopLoss >= currentPrice) {
+                alert("Please enter valid stop loss");
+                return;
+            }
         }
-        if (formData.orderType === 'limit' && formData.priceLimit <= 0) {
-            alert("Please enter valid price");
-            return;
+        else{
+            const response = await axios.get(`/api/getTrader`, {
+                params: {
+                    userId: userId
+                }
+            });
+
+            if(response.status === 404){
+                alert("Stock not found");
+                return;
+            }
+            else{
+                const trader = response.data.trader;
+
+
+                if (formData.quantity <= 0) {
+                    alert("Please enter valid quantity");
+                    return;
+                }
+
+                if(formData.priceLimit <= 0){
+                    alert("Please enter valid price");
+                    return;
+                }
+
+                if(formData.stopLoss >= currentPrice){
+                    alert("Please enter valid stop loss");
+                    return;
+                }
+
+                if(formData.priceLimit > currentPrice*1.3 || formData.priceLimit < currentPrice*0.7){
+                    alert("Price limit should be within 30% of current price");
+                    return;
+                }
+
+                trader.investments.forEach((investment) => {
+                    if(investment.symbol === symbol){
+                        if(investment.quantity < formData.quantity){
+                            alert("You do not have enough stocks to sell");
+                            return;
+                        }
+                    }
+                });
+
+
+            }
+
+            
         }
-        if (formData.stopLoss >= currentPrice) {
-            alert("Please enter valid stop loss");
-            return;
-        }
+
+        
 
         // send order to backend
 
@@ -52,7 +105,14 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
             userId: userId,
         }).then(res => {
 
-
+            if(res.status === 404 || res.status === 500){
+                alert("Order placing failed");
+                return;
+            }
+            else{
+                alert("Order placed successfully");
+                setPopupOpen(false);
+            }
 
 
         }).catch(err => {
@@ -140,7 +200,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
             {close => (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50 ">
                     <div className="bg-white p-6 rounded-md w-1/2 h-4/5 overflow-y-scroll">
-                        <h3 className="text-xl font-bold mb-4">Buy   {symbol}    {currentPrice.toFixed(2)}</h3>
+                        <h3 className="text-xl font-bold mb-4">{text}   {symbol}    {currentPrice.toFixed(2)}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label className="block text-sm font-bold mb-2">

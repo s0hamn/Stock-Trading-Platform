@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import BuyPopup from './BuyPopup';
 import Modal from 'react-modal';
+import Preloader from './Preloader';
+
 
 const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCap, previousClose, userId }) => {
 
@@ -159,6 +161,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
       <div className={`flex justify-center ${isHovered ? '' : 'hidden'} gap-2 mt-2`}>
 
         <BuyPopup
+          text="Buy"
           symbol={symbol}
           currentPrice={currentPrice}
           userId={userId}
@@ -196,7 +199,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
           contentLabel="Analyse Stock Modal"
         >
 
-          {analyseStockData && (
+          {analyseStockData ? (
             <div className="fixed z-10 inset-0 overflow-y-scroll h-5/6 m-auto w-full">
               <div className="flex items-center justify-center  px-4">
                 <div className="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -302,7 +305,10 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
                 </div>
               </div>
             </div>
-          )}
+          ) : (
+            <Preloader />
+          )
+          }
 
 
 
@@ -321,4 +327,5 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
 
 export default StockListCard;
+
 

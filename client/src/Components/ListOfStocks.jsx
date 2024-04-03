@@ -7,6 +7,7 @@ import Cookies from 'universal-cookie';
 import io from 'socket.io-client';
 
 
+
 const ListOfStocks = () => {
     const [trader, setTrader] = useState({});
     const [stocks, setStocks] = useState([]);

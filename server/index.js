@@ -581,6 +581,22 @@ app.get('/getStockInfo', async (req, res) => {
     }
 });
 
+app.get('/getTrader', async (req, res) => {
+    try {
+        const symbol = req.query.userId;
+        const trader = await TraderModel.findOne({ _id: userId });
+        if (!trader) {
+            return res.status(404).json({ message: 'Trader not found' });
+        }
+        res.status(200).json({
+            trader: trader
+        });
+    } catch (error) {
+        console.error('Error fetching trader:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 app.get('/getAllStocks', async (req, res) => {
     try {
         const stocks = await Stock.find();
