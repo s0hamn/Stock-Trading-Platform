@@ -165,6 +165,8 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
           symbol={symbol}
           currentPrice={currentPrice}
           userId={userId}
+          isHovered={isHovered}
+          setIsHovered={setIsHovered}
         />
 
 

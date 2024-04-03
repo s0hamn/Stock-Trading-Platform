@@ -409,11 +409,11 @@ app.post('/placeOrder', async (req, res) => {
         const orderData = req.body.orderData;
         const userId = req.body.userId;
 
-        const currentTime = new Date();
-        const currentHour = currentTime.getHours();
-        if (currentHour >= 17 || currentHour < 9) {
-            return res.status(403).json({ error: 'Orders are only allowed between 9:00 AM and 5:00 PM' });
-        }
+        // const currentTime = new Date();
+        // const currentHour = currentTime.getHours();
+        // if (currentHour >= 17 || currentHour < 9) {
+        //     return res.status(403).json({ error: 'Orders are only allowed between 9:00 AM and 5:00 PM' });
+        // }
 
 
         const stock = await Stock.findOne({ symbol: symbol });
@@ -436,7 +436,7 @@ app.post('/placeOrder', async (req, res) => {
         };
 
         let updateQuery;
-        if (orderData.orderCategory === 'buy') {
+        if (orderData.orderCategory === 'Buy') {
             updateQuery = { $push: { buyOrderQueue: order } };
         }
         else {

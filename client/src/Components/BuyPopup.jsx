@@ -5,7 +5,7 @@ import axios from 'axios';
 
 
 
-const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
+const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered }) => {
 
     const [buyOrderQueue, setBuyOrderQueue] = useState([]);
 
@@ -19,8 +19,10 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
         stopLoss: 0,
         quantity: 0,
         orderDuration: 'intraday',
-        orderCategory: text,
+        orderCategory: '',
     });
+
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -29,34 +31,44 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(text === "Buy"){
+            setFormData({...formData, orderCategory: "Buy"});
+        }
+        else{
+            setFormData({...formData, orderCategory: "Sell"});
+        }
         console.log("form data", formData);
 
-        if(orderCategory === "Buy"){
+        if (formData.orderCategory === "Buy") {
             if (formData.quantity <= 0) {
                 alert("Please enter valid quantity");
+                setIsHovered(false);
                 return;
             }
             if (formData.orderType === 'limit' && formData.priceLimit <= 0) {
                 alert("Please enter valid price");
+                setIsHovered(false);
                 return;
             }
             if (formData.stopLoss >= currentPrice) {
                 alert("Please enter valid stop loss");
+                setIsHovered(false);
                 return;
             }
         }
-        else{
+        else {
             const response = await axios.get(`/api/getTrader`, {
                 params: {
                     userId: userId
                 }
             });
 
-            if(response.status === 404){
+            if (response.status === 404 || response.status === 500) {
                 alert("Stock not found");
+                setIsHovered(false);
                 return;
             }
-            else{
+            else {
                 const trader = response.data.trader;
 
 
@@ -65,25 +77,30 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
                     return;
                 }
 
-                if(formData.priceLimit <= 0){
+                if (formData.priceLimit <= 0) {
                     alert("Please enter valid price");
+                    setIsHovered(false);
                     return;
                 }
 
-                if(formData.stopLoss >= currentPrice){
+                if (formData.stopLoss >= currentPrice) {
                     alert("Please enter valid stop loss");
+                    setIsHovered(false);
+
                     return;
                 }
 
-                if(formData.priceLimit > currentPrice*1.3 || formData.priceLimit < currentPrice*0.7){
+                if (formData.priceLimit > currentPrice * 1.3 || formData.priceLimit < currentPrice * 0.7) {
                     alert("Price limit should be within 30% of current price");
+                    setIsHovered(false);
                     return;
                 }
 
                 trader.investments.forEach((investment) => {
-                    if(investment.symbol === symbol){
-                        if(investment.quantity < formData.quantity){
+                    if (investment.symbol === symbol) {
+                        if (investment.quantity < formData.quantity) {
                             alert("You do not have enough stocks to sell");
+                            setIsHovered(false);
                             return;
                         }
                     }
@@ -92,26 +109,30 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
 
             }
 
-            
+
         }
 
-        
+
 
         // send order to backend
 
-        axios.post('/api/placeOrder', {
+        await axios.post('/api/placeOrder', {
+
             symbol: symbol,
             orderData: formData,
             userId: userId,
+
         }).then(res => {
 
-            if(res.status === 404 || res.status === 500){
+            if (res.status === 404 || res.status === 500) {
                 alert("Order placing failed");
+                setIsHovered(false);
                 return;
             }
-            else{
+            else {
                 alert("Order placed successfully");
                 setPopupOpen(false);
+                setIsHovered(false);
             }
 
 
@@ -355,7 +376,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
                                             {sellOrderQueue.slice(0, 7).map((order, index) => (
                                                 <tr key={index}>
                                                     <td className="px-4 py-2">{index + 1}</td>
-                                                    <td className="px-4 py-2">{order ? order.price : 0}</td>
+                                                    <td className="px-4 py-2">{order.orderType === "market" ? currentPrice : order.priceLimit}</td>
                                                     <td className="px-4 py-2">{order ? order.quantity : 0}</td>
                                                 </tr>
                                             ))}
