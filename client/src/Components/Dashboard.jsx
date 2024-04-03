@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import Navbar from './Navbar'
 import StockCard from './StockCard'
 import Loader from './Loader'
-import axios from 'axios'
+import axios, { all } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Cookies from 'universal-cookie';
 import { useState } from 'react';
@@ -17,10 +17,15 @@ function Dashboard() {
     const [loader, setLoader] = useState(true)
     // const [isMounted, setIsMounted] = useState(false);
     const [stocksType, setStocksType] = useState('investments');
+    const [watchlist, setWatchlist] = useState([]);
     const [totalInvestment, setTotalInvestment] = useState(0);
     const [current, setCurrent] = useState(0);
     const navigate = useNavigate();
     const cookies = new Cookies();
+    const [chartData, setChartData] = useState({
+        companyName: "",
+        data: []
+    });
 
 
     // console.log(cookies.get('jwtoken'));
@@ -46,10 +51,52 @@ function Dashboard() {
             navigate('/login');
         }
 
+
     }, [])
+
+
 
     useEffect(() => {
         // Establish WebSocket connection
+
+        const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+        // console.log("Trader investments", trader.investments);
+        socket.emit('allStocks');
+        // Subscribe to stock updates
+        socket.on('stockUpdate', allStocksData => {
+            const final = []
+            for (let i = 0; i < 100; i++) {
+                let opensum = 0;
+                let highsum = 0;
+                let lowsum = 0;
+                let closesum = 0;
+                // let volume = 0;
+                let date = allStocksData[0].previousHistory[i].date;
+                allStocksData.forEach(stock => {
+                    opensum += stock.previousHistory[i].open;
+                    highsum += stock.previousHistory[i].high;
+                    lowsum += stock.previousHistory[i].low;
+                    closesum += stock.previousHistory[i].close;
+                })
+
+                final.push({
+                    x: date,
+                    y: [opensum / allStocksData.length, highsum / allStocksData.length, lowsum / allStocksData.length, closesum / allStocksData.length]
+                })
+            }
+            // console.log(final)
+            setChartData(final);
+
+        });
+
+        // Cleanup: close WebSocket connection
+        return () => socket.close();
+
+    }, []);
+
+    useEffect(() => {
+        // Establish WebSocket connection
+        // console.log(trader)
         if (trader.investments) {
 
             const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
@@ -67,8 +114,6 @@ function Dashboard() {
                 });
                 setTotalInvestment(total);
 
-
-                // console.log('Client received stockUpdate event:', stocks);
             });
 
             // Cleanup: close WebSocket connection
@@ -76,6 +121,22 @@ function Dashboard() {
         }
 
     }, [trader]);
+
+
+    useEffect(() => {
+        if (trader.watchlist) {
+            const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+
+            socket.emit('watchlistStocks', trader.watchlist);
+
+            socket.on("watchlistStocks", watchlistStocks => {
+                console.log(watchlistStocks);
+            })
+
+            return () => socket.close();
+
+        }
+    }, [trader])
 
     useEffect(() => {
         let total = 0;
@@ -132,7 +193,7 @@ function Dashboard() {
                                         const profitClass = profit > 0 ? 'text-lime-600' : 'text-orange-600';
                                         return (
                                             <div key={index} className='px-2'>
-                                                <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} />
+                                                <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
                                             </div>
                                         )
                                     }) : "Portfolio is empty"}
@@ -170,7 +231,7 @@ function Dashboard() {
 
 
                             <div className='w-full h-2/3 bg-slate-800'>
-                                <Chart />
+                                <Chart chartData={chartData} />
                             </div>
                         </div>
                     </div>}

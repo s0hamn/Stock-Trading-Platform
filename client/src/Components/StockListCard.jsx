@@ -120,7 +120,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   return (
 
-    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2`}
+    <div className={`bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2 h-80`}
       onMouseEnter={() => {
         setIsHovered(true);
         console.log('Mouse entered');
@@ -168,7 +168,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
 
         <button
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
+          className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded mt-2"
           onClick={() => addToWatchlist(id, userId)}
         >
           Watchlist
@@ -178,7 +178,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
         <button
           id="analyseButton"
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
+          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded mt-2"
           position="right center"
           onClick={() => {
             setModalIsOpen(true);

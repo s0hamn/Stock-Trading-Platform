@@ -3,12 +3,9 @@ import ReactApexChart from 'react-apexcharts';
 import axios from 'axios';
 import io from 'socket.io-client';
 
-const ApexChart = () => {
-    const [data, setData] = useState({
-        companyName: "",
-        data: []
-    });
+const ApexChart = ({ chartData }) => {
 
+    const [data, setData] = useState({ companyName: '', data: [] });
     const [chartType, setChartType] = useState('candlestick');
 
     const handleChartTypeChange = (type) => {
@@ -16,53 +13,30 @@ const ApexChart = () => {
     };
 
     useEffect(() => {
-        // Establish WebSocket connection
-
-        const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
-        // console.log("Trader investments", trader.investments);
-        socket.emit('stockChart', "HDFCBANK.NS");
-        // Subscribe to stock updates
-        socket.on('stockChart', stockData => {
-            const temp = [];
-            stockData.previousHistory.forEach(date => {
-                temp.push({
-                    x: date.date,
-                    y: [date.open, date.high, date.low, date.close]
+        axios.get('/api/stockInfo/HDFCBANK.NS')
+            .then(response => {
+                const temp = [];
+                response.data.previousHistory.forEach(date => {
+                    temp.push({
+                        x: date.date,
+                        y: [date.open, date.high, date.low, date.close]
+                    });
                 });
+                setData({
+                    companyName: response.data.companyName,
+                    data: temp
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching stock information:', error);
             });
-            setData({
-                companyName: stockData.companyName,
-                data: temp
-            });
-            console.log('Client received stockUpdate event:', stockData);
-        });
-
-        // Cleanup: close WebSocket connection
-        return () => socket.close();
-
     }, []);
 
+
     // useEffect(() => {
-    //     axios.get('/api/stockInfo/HDFCBANK.BSE')
-    //         .then(response => {
-    //             const temp = [];
-    //             response.data.previousHistory.forEach(date => {
-    //                 temp.push({
-    //                     x: date.date,
-    //                     y: [date.open, date.high, date.low, date.close]
-    //                 });
-    //             });
-    //             setData({
-    //                 companyName: response.data.companyName,
-    //                 data: temp
-    //             });
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching stock information:', error);
-    //         });
-    // }, []);
-
-
+    //     setData(chartData);
+    //     console.log(data);
+    // }, [chartData]);
 
     const chartOptions = {
         candlestick: {

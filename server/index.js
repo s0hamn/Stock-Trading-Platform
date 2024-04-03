@@ -63,7 +63,34 @@ io.on('connection', socket => {
 
     });
 
+    socket.on('watchlistStocks', async (watchlist) => {
+        console.log('Client requested watchlist stocks');
+        sendWatchlist(socket, watchlist);
+
+        setInterval(() => {
+            sendWatchlist(socket, watchlist);
+        }, 10000);
+    });
+
 });
+
+async function sendWatchlist(socket, watchlist) {
+    const stocks = []
+    console.log("Watchlist requested for: ", watchlist)
+    try {
+        watchlist.forEach(stockid => {
+            const stock = Stock.findOne({ _id: stockid });
+            console.log(stock);
+            stocks.push(stock);
+        });
+        console.log(stocks);
+        socket.emit("watchlistStocks", stocks);
+    } catch (error) {
+        // console.log("Error", error);
+        socket.emit('watchlistStocks', { message: 'Internal server error' });
+
+    }
+}
 
 async function sendStockChart(socket, symbol) {
     try {
@@ -251,7 +278,7 @@ app.post('/login', async (req, res) => {
         const token = await trader.generateAuthToken();
         // console.log("Token", token);
         res.cookie("jwtoken", token, {
-            expires: new Date(Date.now() + 300000),
+            expires: new Date(Date.now() + 1800000),
             httpOnly: true
         });
 
@@ -412,7 +439,7 @@ app.post('/placeOrder', async (req, res) => {
         if (orderData.orderCategory === 'buy') {
             updateQuery = { $push: { buyOrderQueue: order } };
         }
-        else{
+        else {
             updateQuery = { $push: { sellOrderQueue: order } };
         }
 
@@ -424,7 +451,7 @@ app.post('/placeOrder', async (req, res) => {
 
         res.status(200).json({ message: 'Order placed successfully' });
 
-        
+
 
 
 

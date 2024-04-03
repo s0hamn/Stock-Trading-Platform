@@ -5,7 +5,7 @@ import axios from 'axios';
 
 
 
-const BuyPopup = ({ symbol, currentPrice , userId }) => {
+const BuyPopup = ({ symbol, currentPrice, userId, text }) => {
 
     const [buyOrderQueue, setBuyOrderQueue] = useState([]);
 
@@ -29,29 +29,29 @@ const BuyPopup = ({ symbol, currentPrice , userId }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
-        
-        if(formData.quantity <= 0){
+        console.log("form data", formData);
+
+        if (formData.quantity <= 0) {
             alert("Please enter valid quantity");
             return;
         }
-        if(formData.orderType === 'limit' && formData.price <= 0){
+        if (formData.orderType === 'limit' && formData.priceLimit <= 0) {
             alert("Please enter valid price");
             return;
         }
-        if(formData.stopLoss >= currentPrice){
+        if (formData.stopLoss >= currentPrice) {
             alert("Please enter valid stop loss");
             return;
         }
 
         // send order to backend
 
-        axios.post('/api/placeOrder',{
+        axios.post('/api/placeOrder', {
             symbol: symbol,
             orderData: formData,
             userId: userId,
         }).then(res => {
-            
+
 
 
 
@@ -61,6 +61,7 @@ const BuyPopup = ({ symbol, currentPrice , userId }) => {
 
 
     };
+
 
 
 
@@ -81,7 +82,7 @@ const BuyPopup = ({ symbol, currentPrice , userId }) => {
                 }
                 const orders = response.data.orders;
                 console.log("fetched orders for ", symbol);
-                
+
                 // Filter orders into buy and sell queues
                 const buyOrders = response.data.buyOrders;
                 const sellOrders = response.data.sellOrders;
@@ -118,14 +119,18 @@ const BuyPopup = ({ symbol, currentPrice , userId }) => {
         };
     }, [popupOpen, symbol]); // Include symbol in the dependency array to re-fetch orders when it changes
 
+    // useEffect(() => {
+    //     console.log("Buy queue", buyOrderQueue);
+    // }
+    //     , [buyOrderQueue]);
 
 
 
     return (
         <Popup trigger={
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
-                Buy
-            </button>} 
+            <button className="bg-blue-500 hover:bg-blue-700 text-white  py-2 px-4 rounded mt-2">
+                {text}
+            </button>}
             position="right center"
             open={popupOpen}
             onOpen={() => setPopupOpen(true)}
@@ -167,14 +172,14 @@ const BuyPopup = ({ symbol, currentPrice , userId }) => {
                             {formData.orderType === 'limit' && (
                                 <>
                                     <div className="mb-4">
-                                        <label className="block text-sm font-bold mb-2" htmlFor="price">
+                                        <label className="block text-sm font-bold mb-2" htmlFor="priceLimit">
                                             Price:
                                         </label>
                                         <input
                                             type="text"
-                                            id="price"
-                                            name="price"
-                                            value={formData.price}
+                                            id="priceLimit"
+                                            name="priceLimit"
+                                            value={formData.priceLimit}
                                             onChange={handleInputChange}
                                             placeholder="Enter price"
                                             className="border border-gray-300 rounded-md px-4 py-2 w-full"
@@ -250,9 +255,11 @@ const BuyPopup = ({ symbol, currentPrice , userId }) => {
                                         </thead>
                                         <tbody>
                                             {buyOrderQueue.slice(0, 7).map((order, index) => (
+
                                                 <tr key={index}>
+                                                    {console.log(order)}
                                                     <td className="px-4 py-2">{index + 1}</td>
-                                                    <td className="px-4 py-2">{order ? order.price : 0}</td>
+                                                    <td className="px-4 py-2">{order.orderType === "market" ? currentPrice : order.priceLimit}</td>
                                                     <td className="px-4 py-2">{order ? order.quantity : 0}</td>
                                                 </tr>
                                             ))}
