@@ -13,6 +13,8 @@ const socketIo = require('socket.io');
 const Portfolio = require('./models/Portfolio');
 const axios = require('axios');
 const yahooFinance = require('yahoo-finance2').default;
+const Transaction = require('./models/Transaction');
+// const executeOrder = require('executeOrder')
 
 var request = require('request');
 
@@ -80,7 +82,7 @@ async function sendWatchlist(socket, watchlist) {
     try {
         watchlist.forEach(stockid => {
             const stock = Stock.findOne({ _id: stockid });
-            console.log(stock);
+            // console.log(stock);
             stocks.push(stock);
         });
         console.log(stocks);
@@ -191,9 +193,305 @@ async function comparePassword(password, hash) {
     return result;
 }
 
+async function executeOrder(symbol, orderType, orderCategory) {
+
+    try {
+        const stock = await Stock.findOne({ symbol: symbol });
+
+        if (!stock) {
+            return;
+        }
+
+        const marketBuyOrderQueue = stock.marketBuyOrderQueue;
+        const marketSellOrderQueue = stock.marketSellOrderQueue;
+        const limitBuyOrderQueue = stock.limitBuyOrderQueue;
+        const limitSellOrderQueue = stock.limitSellOrderQueue;
+
+
+        if (marketBuyOrderQueue.length != 0 && marketSellOrderQueue.length == 0 && limitSellOrderQueue.length == 0) {
+            return;
+        } else if (limitBuyOrderQueue.length != 0 && marketSellOrderQueue.length == 0 && limitSellOrderQueue.length == 0) {
+            return;
+        }
+
+        limitBuyOrderQueue.sort((a, b) => {
+            // First, compare by price in descending order
+            if (a.priceLimit > b.priceLimit) return -1;
+            if (a.priceLimit < b.priceLimit) return 1;
+            // If prices are equal, compare by orderDate in ascending order
+            return a.orderDate - b.orderDate;
+        });
+
+        // Sort sell orders
+        limitSellOrderQueue.sort((a, b) => {
+            // First, compare by price in ascending order
+            if (a.priceLimit < b.priceLimit) return -1;
+            if (a.priceLimit > b.priceLimit) return 1;
+            // If prices are equal, compare by orderDate in ascending order
+            return a.orderDate - b.orderDate;
+        });
+
+        marketBuyOrderQueue.sort((a, b) => {
+            return a.orderDate - b.orderDate;
+        });
+
+        marketSellOrderQueue.sort((a, b) => {
+            return a.orderDate - b.orderDate;
+        });
+
+        if (orderType === 'market') {
+            if (orderCategory === 'Buy') {
+                executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitSellOrderQueue);
+            } else {
+                executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitBuyOrderQueue);
+            }
+        } else {
+            if (orderCategory === 'Buy') {
+                executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketSellOrderQueue);
+            } else {
+                executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketBuyOrderQueue);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+
+
+
+}
+
+async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitSellOrderQueue) {
+    const stock = Stock.findOne({ symbol: symbol });
+    if (!stock) {
+        return;
+    }
+
+
+    while (marketBuyOrderQueue.length && marketSellOrderQueue.length) {
+
+
+        const marketBuyOrder = marketBuyOrderQueue[0];
+        const marketSellOrder = marketSellOrderQueue[0];
+
+        if (marketBuyOrder.quantity === marketSellOrder.quantity) {
+
+            // console.log("Inside equal quantity");
+            // console.log("Market Buy Order", marketBuyOrder);
+            // console.log("Market Sell Order", marketSellOrder);
+            const a = await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketBuyOrderQueue: { _id: marketBuyOrder._id }
+                }
+            });
+
+            // Remove the sell order
+            const b = await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            console.log("A", a);
+            console.log("B", b);
+
+
+
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            // await Transaction.create({
+            //     buyer_id: marketBuyOrder.userId,
+            //     seller_id: marketSellOrder.userId,
+            //     stock_id: stock._id,
+            //     quantity: marketBuyOrder.quantity,
+            //     price: stock.currentPrice
+            // });
+
+            marketBuyOrderQueue.shift();
+            marketSellOrderQueue.shift();
+
+            // updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+
+            // updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+
+        }
+        else if (marketBuyOrder.quantity < marketSellOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketBuyOrderQueue: { _id: marketBuyOrder._id }
+                }
+            });
+
+            // Update the sell order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketSellOrderQueue.0.quantity": marketSellOrder.quantity - marketBuyOrder.quantity
+                }
+            });
+
+            const quantity = marketSellOrder.quantity - marketBuyOrder.quantity;
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketBuyOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            marketBuyOrderQueue.shift();
+            marketSellOrderQueue[0].quantity = quantity;
+
+            // updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            // updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+
+        } else { // marketBuyOrder.quantity > marketSellOrder.quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Update the buy order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketBuyOrderQueue.0.quantity": marketBuyOrder.quantity - marketSellOrder.quantity
+                }
+            });
+
+            // const buyerId = marketBuyOrder.userId;
+            // const sellerId = marketSellOrder.userId;
+
+            // const quantity = marketBuyOrder.quantity - marketSellOrder.quantity;
+
+            // // Create a transaction
+            // await Transaction.create({
+            //     buyer_id: marketBuyOrder.userId,
+            //     seller_id: marketSellOrder.userId,
+            //     stock_id: stock._id,
+            //     quantity: marketSellOrder.quantity,
+            //     price: stock.currentPrice
+            // });
+
+            // marketSellOrderQueue.shift();
+
+            // marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - marketSellOrder.quantity
+
+            // updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+            // updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity.stock.currentPrice);
+        }
+
+
+
+
+    }
+
+    // while (marketBuyOrderQueue.length && limitSellOrderQueue.length) {
+
+    // }
+
+
+
+}
+
+
+
+
+
+
+// Function to update buyer's investment array
+const updateBuyerInvestments = async (buyerId, symbol, quantity, price) => {
+    let buyer = await Trader.findOne({ _id: buyerId });
+
+    // Find the index of the stock in investments array
+    const index = buyer.investments.findIndex(investment => investment.symbol === symbol);
+
+    if (index !== -1) {
+        // Stock already exists in investments, update quantity
+        const investment = buyer.investments[index];
+        const prevTotal = investment.quantity * investment.avg;
+        const newTotal = prevTotal + (quantity * price);
+        investment.quantity += quantity;
+        investment.avg = newTotal / investment.quantity;
+
+    } else {
+        // Stock does not exist in investments, add new entry
+        if (quantity > 0) {
+            buyer.investments.push({
+                symbol,
+                quantity,
+                avg: price,
+                timestamp: new Date()
+            });
+        }
+    }
+
+    buyer.funds -= quantity * price;
+
+    // Save the updated buyer document
+    await buyer.save();
+};
+
+// Function to update seller's investment array
+const updateSellerInvestments = async (sellerId, symbol, quantity, price) => {
+    let seller = await Trader.findOne({ _id: sellerId });
+
+    // Find the index of the stock in investments array
+    const index = seller.investments.findIndex(investment => investment.symbol === symbol);
+
+    if (index !== -1) {
+        // Stock already exists in investments, update quantity
+        const investment = seller.investments[index];
+        investment.quantity -= quantity;
+        // If quantity becomes zero, remove the investment from array
+        if (investment.quantity === 0) {
+            seller.investments.splice(index, 1);
+        }
+
+
+    }
+    else {
+        return;
+    }
+
+    seller.funds += quantity * price;
+
+    // Save the updated seller document
+    await seller.save();
+};
+
+
+
+async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitBuyOrderQueue) {
+}
+
+async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketSellOrderQueue) {
+}
+
+async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketBuyOrderQueue) {
+}
+
 
 app.post('/register', async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     if (req.body.password !== req.body.confirmPassword) {
         const error = {
             errorType: 'ValidationError',
@@ -470,6 +768,8 @@ app.post('/placeOrder', async (req, res) => {
         // console.log("current", stock.buyOrderPrice);
         // console.log(orderData);
 
+
+
         res.status(200).json({ message: 'Order placed successfully' });
 
 
@@ -484,6 +784,19 @@ app.post('/placeOrder', async (req, res) => {
     }
 
 });
+
+
+app.get('/executeOrder', async (req, res) => {
+    try {
+        const symbol = req.query.symbol;
+        const orderType = req.query.orderType;
+        const orderCategory = req.query.orderCategory;
+
+        const execute = executeOrder(symbol, orderType, orderCategory);
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 app.get('/checkIfUserHolding', async (req, res) => {
     try {
@@ -536,7 +849,7 @@ app.get('/getOrderBook', async (req, res) => {
             return res.status(404).json({ error: 'Stock not found' });
         }
 
-        console.log("Stock found", stock);
+        // console.log("Stock found", stock);
 
         // Filter orders based on the symbol
         const limitBuyOrderQueue = stock.limitBuyOrderQueue;

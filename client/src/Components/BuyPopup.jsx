@@ -126,7 +126,16 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
                 alert("Order placed successfully");
                 setPopupOpen(false);
                 setIsHovered(false);
+
+                axios.get(`/api/executeOrder`, {
+                    params: {
+                        symbol: symbol,
+                        orderType: formData.orderType,
+                        orderCategory: orderCategory
+                    }
+                })
             }
+
 
 
         }).catch(err => {
