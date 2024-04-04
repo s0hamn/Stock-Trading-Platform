@@ -45,8 +45,19 @@ const stockSchema = new mongoose.Schema({
             stopLoss: { type: Number, min: 0 }
         }
     ]
+});
 
+stockSchema.pre('findOneAndUpdate', async function(next) {
+    const docToUpdate = await this.model.findOne(this.getQuery());
+    if (docToUpdate) {
+        docToUpdate.buyOrderQueue.forEach(order => {
+            if (order.orderType === 'market') {
+                order.priceLimit = docToUpdate.currentPrice;
+            }
+        });
+        await this.model.findOneAndUpdate(this.getQuery(), { $set: { buyOrderQueue: docToUpdate.buyOrderQueue } });
+    }
+    next();
 });
 
 module.exports = mongoose.model('Stock', stockSchema);
-

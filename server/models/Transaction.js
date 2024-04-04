@@ -1,31 +1,13 @@
+
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to User Collection
-        required: true
-    },
-    stock_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Stock', // Reference to Stock Collection
-        required: true
-    },
-    transaction_type: {
-        type: String,
-        enum: ['Buy', 'Sell'],
-        required: true
-    },
-    quantity: {
-        type: Number,
-        required: true
-    },
-    price: {
-        type: Number,
-        required: true
-    }
-}, {
-    timestamps: true // Automatically add createdAt and updatedAt fields
+    buyer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    seller_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    stock_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Stock', required: true },
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+    transaction_date: { type: Date, default: Date.now }
 });
 
 const Transaction = mongoose.model('Transaction', transactionSchema);

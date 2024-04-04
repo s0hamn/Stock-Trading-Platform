@@ -449,6 +449,8 @@ app.post('/placeOrder', async (req, res) => {
             { new: true }
         );
 
+        console.log("current", stock.buyOrderPrice);
+
         res.status(200).json({ message: 'Order placed successfully' });
 
 
