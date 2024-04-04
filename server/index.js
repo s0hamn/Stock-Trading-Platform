@@ -408,6 +408,7 @@ app.post('/placeOrder', async (req, res) => {
         const symbol = req.body.symbol;
         const orderData = req.body.orderData;
         const userId = req.body.userId;
+        const orderCategory = req.body.orderCategory;
 
         // const currentTime = new Date();
         // const currentHour = currentTime.getHours();
@@ -425,22 +426,39 @@ app.post('/placeOrder', async (req, res) => {
 
 
 
-        const order = {
-            userId: userId,
-            orderType: orderData.orderType,
-            quantity: orderData.quantity,
-            priceLimit: orderData.priceLimit,
-            orderCategory: orderData.orderCategory,
-            orderDate: new Date(),
-            stopLoss: orderData.stopLoss
-        };
+
 
         let updateQuery;
-        if (orderData.orderCategory === 'Buy') {
-            updateQuery = { $push: { buyOrderQueue: order } };
+        if (orderData.orderType === 'market') {
+            const order = {
+                userId: userId,
+                quantity: orderData.quantity,
+                orderDate: new Date(),
+                stopLoss: orderData.stopLoss
+            };
+            if (orderCategory === "Buy") {
+
+                updateQuery = { $push: { marketBuyOrderQueue: order } };
+            } else {
+                console.log("Inside sell");
+                updateQuery = { $push: { marketSellOrderQueue: order } };
+            }
         }
         else {
-            updateQuery = { $push: { sellOrderQueue: order } };
+            const order = {
+                userId: userId,
+                quantity: orderData.quantity,
+                price: orderData.priceLimit,
+                orderDate: new Date(),
+                stopLoss: orderData.stopLoss
+            };
+
+            if (orderCategory === "Buy") {
+                updateQuery = { $push: { limitBuyOrderQueue: order } };
+            }
+            else {
+                updateQuery = { $push: { limitSellOrderQueue: order } };
+            }
         }
 
         await Stock.findOneAndUpdate(
@@ -449,7 +467,8 @@ app.post('/placeOrder', async (req, res) => {
             { new: true }
         );
 
-        console.log("current", stock.buyOrderPrice);
+        // console.log("current", stock.buyOrderPrice);
+        // console.log(orderData);
 
         res.status(200).json({ message: 'Order placed successfully' });
 
@@ -508,7 +527,7 @@ app.get('/getOrderBook', async (req, res) => {
     try {
         const symbol = req.query.symbol; // Get symbol from request parameters
         // console.log("Inside orders", symbol);
-
+        // console.log("Symbol", symbol);
 
 
         const stock = await Stock.findOne({ symbol: symbol }); // Find stock with the given symbol
@@ -517,14 +536,18 @@ app.get('/getOrderBook', async (req, res) => {
             return res.status(404).json({ error: 'Stock not found' });
         }
 
-        // Filter orders based on the symbol
-        const buyOrders = stock.buyOrderQueue;
-        const sellOrders = stock.sellOrderQueue;
+        console.log("Stock found", stock);
 
+        // Filter orders based on the symbol
+        const limitBuyOrderQueue = stock.limitBuyOrderQueue;
+        const limitSellOrderQueue = stock.limitSellOrderQueue;
+
+        console.log("Limit Buy Orders", limitBuyOrderQueue);
+        console.log("Limit Sell Orders", limitSellOrderQueue);
 
         res.status(200).json({
-            buyOrders: buyOrders,
-            sellOrders: sellOrders
+            limitBuyOrderQueue: limitBuyOrderQueue,
+            limitSellOrderQueue: limitSellOrderQueue
         }); // Send filtered orders as JSON response
     }
     catch {

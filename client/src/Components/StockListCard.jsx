@@ -161,7 +161,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
       <div className={`flex justify-center ${isHovered ? '' : 'hidden'} gap-2 mt-2`}>
 
         <BuyPopup
-          text="Buy"
+          orderCategory="Buy"
           symbol={symbol}
           currentPrice={currentPrice}
           userId={userId}

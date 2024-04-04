@@ -68,7 +68,7 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId }) {
                     <div className='absolute top-0 right-1/3 w-full flex justify-end gap-2'>
 
                         <BuyPopup
-                            text="Sell"
+                            orderCategory="Sell"
                             symbol={stocks[index].symbol}
                             currentPrice={stocks[index].currentPrice}
                             userId={userId}
@@ -204,9 +204,9 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId }) {
                                     </div>
                                 </div>
                             )
-                            : (
-                                <Preloader />
-                            )
+                                : (
+                                    <Preloader />
+                                )
                             }
 
 

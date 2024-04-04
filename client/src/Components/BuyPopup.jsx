@@ -5,11 +5,11 @@ import axios from 'axios';
 
 
 
-const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered }) => {
+const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setIsHovered }) => {
     // console.log(text);
-    const [buyOrderQueue, setBuyOrderQueue] = useState([]);
 
-    const [sellOrderQueue, setSellOrderQueue] = useState([]);
+    const [limitBuyOrderQueue, setLimitBuyOrderQueue] = useState([]);
+    const [limitSellOrderQueue, setLimitSellOrderQueue] = useState([]);
 
     const [popupOpen, setPopupOpen] = useState(false);
 
@@ -19,7 +19,6 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
         stopLoss: 0,
         quantity: 0,
         orderDuration: 'intraday',
-        orderCategory: text,
     });
 
 
@@ -31,15 +30,15 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (text == "Buy") {
-            setFormData({ ...formData, orderCategory: "Buy" });
-        }
-        else {
-            setFormData({ ...formData, orderCategory: "Sell" });
-        }
-        console.log("form data", formData);
+        // if (orderCategory == "Buy") {
+        //     setFormData({ ...formData, orderCategory: "Buy" });
+        // }
+        // else {
+        //     setFormData({ ...formData, orderCategory: "Sell" });
+        // }
+        // console.log("form data", formData);
 
-        if (formData.orderCategory === "Buy") {
+        if (orderCategory === "Buy") {
             if (formData.quantity <= 0) {
                 alert("Please enter valid quantity");
                 setIsHovered(false);
@@ -64,26 +63,25 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
             }).then(res => {
                 const trader = res.data.trader;
 
-
                 if (formData.quantity <= 0) {
                     alert("Please enter valid quantity");
                     return;
                 }
 
-                if (formData.priceLimit <= 0) {
+                if (formData.priceLimit <= 0 && formData.orderType === "limit") {
                     alert("Please enter valid price");
                     setIsHovered(false);
                     return;
                 }
 
-                if (formData.stopLoss >= currentPrice) {
-                    alert("Please enter valid stop loss");
-                    setIsHovered(false);
+                // if (formData.stopLoss >= currentPrice) {
+                //     alert("Please enter valid stop loss");
+                //     setIsHovered(false);
 
-                    return;
-                }
+                //     return;
+                // }
 
-                if (formData.priceLimit > currentPrice * 1.3 || formData.priceLimit < currentPrice * 0.7) {
+                if (formData.orderType == 'limit' && (formData.priceLimit > currentPrice * 1.3 || formData.priceLimit < currentPrice * 0.7)) {
                     alert("Price limit should be within 30% of current price");
                     setIsHovered(false);
                     return;
@@ -115,6 +113,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
             symbol: symbol,
             orderData: formData,
             userId: userId,
+            orderCategory: orderCategory,
 
         }).then(res => {
 
@@ -144,6 +143,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
         let intervalId;
 
         const fetchOrders = async () => {
+            // console.log("fetching orders for ", limitBuyOrderQueue);
             try {
                 // Fetch orders from backend API
                 const response = await axios.get(`/api/getOrderBook/`, {
@@ -155,20 +155,20 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                     console.error('Error fetching orders:', response);
                     return;
                 }
-                const orders = response.data.orders;
-                console.log("fetched orders for ", symbol);
+                // const orders = response.data.orders;
+                // console.log("fetched orders for ", symbol);
 
                 // Filter orders into buy and sell queues
-                const buyOrders = response.data.buyOrders;
-                const sellOrders = response.data.sellOrders;
+                const limitBuyOrderQueue = response.data.limitBuyOrderQueue;
+                const limitSellOrderQueue = response.data.limitSellOrderQueue;
 
                 // Sort orders by price
-                buyOrders.sort((a, b) => b.priceLimit - a.priceLimit);
-                sellOrders.sort((a, b) => a.priceLimit - b.priceLimit);
+                limitBuyOrderQueue.sort((a, b) => b.price - a.price);
+                limitBuyOrderQueue.sort((a, b) => a.price - b.price);
 
                 // Update state with the new order queues
-                setBuyOrderQueue(buyOrders);
-                setSellOrderQueue(sellOrders);
+                setLimitBuyOrderQueue(limitBuyOrderQueue);
+                setLimitSellOrderQueue(limitSellOrderQueue);
             } catch (error) {
                 console.error('Error fetching orders:', error);
             }
@@ -204,7 +204,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
     return (
         <Popup trigger={
             <button className="bg-blue-500 hover:bg-blue-700 text-white  py-2 px-4 rounded mt-2">
-                {text}
+                {orderCategory}
             </button>}
             position="right center"
             open={popupOpen}
@@ -215,7 +215,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
             {close => (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50 ">
                     <div className="bg-white p-6 rounded-md w-1/2 h-4/5 overflow-y-scroll">
-                        <h3 className="text-xl font-bold mb-4">{text}   {symbol}    {currentPrice.toFixed(2)}</h3>
+                        <h3 className="text-xl font-bold mb-4">{orderCategory}   {symbol}    {currentPrice.toFixed(2)}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label className="block text-sm font-bold mb-2">
@@ -329,19 +329,19 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {buyOrderQueue.slice(0, 7).map((order, index) => (
+                                            {limitBuyOrderQueue.slice(0, 7).map((order, index) => (
 
                                                 <tr key={index}>
                                                     {/* {console.log(order)} */}
                                                     <td className="px-4 py-2">{index + 1}</td>
-                                                    <td className="px-4 py-2">{order.orderType === "market" ? currentPrice : order.priceLimit}</td>
+                                                    <td className="px-4 py-2">{order.price}</td>
                                                     <td className="px-4 py-2">{order ? order.quantity : 0}</td>
                                                 </tr>
                                             ))}
                                             {/* Padding with zeros if less than 10 orders */}
-                                            {Array.from({ length: Math.max(7 - buyOrderQueue.length, 0) }).map((_, index) => (
-                                                <tr key={index + buyOrderQueue.length}>
-                                                    <td className="px-4 py-2">{buyOrderQueue.length + index + 1}</td>
+                                            {Array.from({ length: Math.max(7 - limitBuyOrderQueue.length, 0) }).map((_, index) => (
+                                                <tr key={index + limitBuyOrderQueue.length}>
+                                                    <td className="px-4 py-2">{limitBuyOrderQueue.length + index + 1}</td>
                                                     <td className="px-4 py-2">0</td>
                                                     <td className="px-4 py-2">0</td>
                                                 </tr>
@@ -349,7 +349,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                                             <tr>
                                                 <td colSpan="2" className="px-4 py-2 font-bold">Total Quantity:</td>
                                                 <td className="px-4 py-2 font-bold">
-                                                    {buyOrderQueue.reduce((acc, curr) => acc + curr.quantity, 0)}
+                                                    {limitBuyOrderQueue.reduce((acc, curr) => acc + curr.quantity, 0)}
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -367,17 +367,17 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {sellOrderQueue.slice(0, 7).map((order, index) => (
+                                            {limitSellOrderQueue.slice(0, 7).map((order, index) => (
                                                 <tr key={index}>
                                                     <td className="px-4 py-2">{index + 1}</td>
-                                                    <td className="px-4 py-2">{order.orderType === "market" ? currentPrice : order.priceLimit}</td>
+                                                    <td className="px-4 py-2">{order.price}</td>
                                                     <td className="px-4 py-2">{order ? order.quantity : 0}</td>
                                                 </tr>
                                             ))}
                                             {/* Padding with zeros if less than 10 orders */}
-                                            {Array.from({ length: Math.max(7 - sellOrderQueue.length, 0) }).map((_, index) => (
-                                                <tr key={index + sellOrderQueue.length}>
-                                                    <td className="px-4 py-2">{sellOrderQueue.length + index + 1}</td>
+                                            {Array.from({ length: Math.max(7 - limitSellOrderQueue.length, 0) }).map((_, index) => (
+                                                <tr key={index + limitSellOrderQueue.length}>
+                                                    <td className="px-4 py-2">{limitSellOrderQueue.length + index + 1}</td>
                                                     <td className="px-4 py-2">0</td>
                                                     <td className="px-4 py-2">0</td>
                                                 </tr>
@@ -385,7 +385,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, text, isHovered, setIsHovered 
                                             <tr>
                                                 <td colSpan="2" className="px-4 py-2 font-bold">Total Quantity:</td>
                                                 <td className="px-4 py-2 font-bold">
-                                                    {sellOrderQueue.reduce((acc, curr) => acc + curr.quantity, 0)}
+                                                    {limitSellOrderQueue.reduce((acc, curr) => acc + curr.quantity, 0)}
                                                 </td>
                                             </tr>
                                         </tbody>
