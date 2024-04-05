@@ -10,6 +10,7 @@ import Dashboard from './Components/Dashboard'
 import ListOfStocks from './Components/ListOfStocks'
 import Profile from './Components/Profile'
 import Chart from './Components/Chart'
+import DiscussionForum from './Components/DiscussionForum'
 function App() {
 
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/stocks" element={<ListOfStocks />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/charts" element={<Chart />} />
+        <Route path="/discussionForum" element={<DiscussionForum />} />
       </Routes>
     </BrowserRouter>
   );

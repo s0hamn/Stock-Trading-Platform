@@ -14,7 +14,11 @@ const Portfolio = require('./models/Portfolio');
 const axios = require('axios');
 const yahooFinance = require('yahoo-finance2').default;
 const Transaction = require('./models/Transaction');
+const Post = require('./models/Post');
+const Comment = require('./models/Comment');
 // const executeOrder = require('executeOrder')
+
+
 
 var request = require('request');
 
@@ -1130,6 +1134,16 @@ const updateSellerInvestments = async (sellerId, symbol, quantity, price) => {
 
 
 
+app.get('/posts', async (req, res) => {
+    try {
+        const posts = await Post.find(); // Retrieve all posts from the database
+        res.status(200).json(posts); // Send the posts as a JSON response
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 app.post('/register', async (req, res) => {
     // console.log(req.body);
@@ -1173,6 +1187,99 @@ app.post('/register', async (req, res) => {
     res.send(response);
 
 });
+
+app.post('/addPost', async (req, res) => {
+    try {
+        const formData = req.body.formData; // Destructure the request body
+        console.log('Form data:', formData);
+        // Create a new post instance
+        await Post.create({
+            title: formData.title,
+            content: formData.content,
+            image: formData.image,
+            stockName: formData.stockName,
+            userId: formData.userId,
+        });
+    
+        res.status(200).json({ message: 'Post created successfully' });
+    } catch (error) {
+        console.error('Error creating post:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.get('/comments', async (req, res) => {
+    try {
+        // Fetch all comments from the database
+        const allComments = await Comment.find();
+
+        // Initialize an object to store comments categorized by post IDs
+        const commentsByPost = {};
+
+        // Categorize comments by post IDs
+        allComments.forEach(comment => {
+            const postId = comment.postId; // Convert postId to string for consistency
+            if (!commentsByPost[postId]) {
+                commentsByPost[postId] = [];
+            }
+            commentsByPost[postId].push(comment);
+        });
+
+        res.json(commentsByPost); // Send the object of objects as a JSON response
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/deletePost/:postId', async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        // Find the post by ID and delete it
+        await Post.findByIdAndDelete(postId);
+        res.status(200).json({ message: 'Post deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/deleteComment/:commentId', async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        // Find the post by ID and delete it
+        await Comment.findByIdAndDelete(commentId);
+        res.status(200).json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.post('/addComment/:postId', async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const content  = req.body.content;
+
+        // Create a new comment
+        const newComment = new Comment({
+            content: content,
+            postId: postId, // Assign postId to the comment
+            userId: req.body.userId,
+            // You may also assign other fields like userId if needed
+        });
+
+        // Save the comment to the database
+        await newComment.save();
+
+        res.status(200).json(newComment); // Send a 201 status code with the newly created comment
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 app.post('/addToWatchlist', async (req, res) => {
     try {

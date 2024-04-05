@@ -36,6 +36,7 @@ const Navbar = () => {
                 <div className="text-sm lg:flex-grow flex justify-end items-center">
                     <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
                     <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
+                    <Link to="/discussionForum" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Discussion</Link>
                     <button className="bg-transparent hover:bg-white text-slate-200 font-semibold hover:text-indigo-500 py-2 px-4 border border-white hover:border-transparent rounded-sm" onClick={handleLogout}>
                         Logout
                     </button>
