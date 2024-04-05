@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import BuyPopup from './BuyPopup';
 import Modal from 'react-modal';
-import Preloader from './Preloader';
-
+import Loader from './Loader';
 
 const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCap, previousClose, userId }) => {
 
@@ -308,7 +307,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
               </div>
             </div>
           ) : (
-            <Preloader />
+            <Loader />
           )
           }
 
