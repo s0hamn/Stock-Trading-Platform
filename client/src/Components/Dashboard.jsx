@@ -148,9 +148,11 @@ function Dashboard() {
                 setCurrent(total);
             })
 
-            setLoader(false);
+
 
         }
+
+        setLoader(false);
     }
         , [stocks])
 
