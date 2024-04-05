@@ -45,7 +45,13 @@ io.on('connection', socket => {
             sendAllStocks(socket);
         }, 10000);
     });
-
+    socket.on('allTransactions', () => {
+        console.log('Client requested all transactions');
+        sendAllTransactions(socket);
+        setInterval(() => {
+            sendAllTransactions(socket);
+        }, 10000);
+    });
     socket.on('someStocks', (investments) => {
         console.log('Client requested some stocks');
         sendStocks(socket, investments);
@@ -118,6 +124,15 @@ async function sendAllStocks(socket) {
         // console.log('Server sending stockUpdate event:', stocks);
     } catch (error) {
         console.error('Error fetching stocks:', error);
+    }
+}
+
+async function sendAllTransactions(socket) {
+    try {
+        const transactions = await Transaction.find();
+        socket.emit('transactionsUpdate', transactions);
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
     }
 }
 
