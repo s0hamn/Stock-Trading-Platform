@@ -16,7 +16,7 @@ function Dashboard() {
     const [stocks, setStocks] = useState([]);
     const [orderStatus, setOrderStatus] = useState('pending');
     const [traderstocks, setTraderStocks] = useState([]);
-    const [loader, setLoader] = useState(false)
+    const [loader, setLoader] = useState(true)
     // const [isMounted, setIsMounted] = useState(false);
     const [stocksType, setStocksType] = useState('investments');
     const [watchlist, setWatchlist] = useState([]);
@@ -133,6 +133,7 @@ function Dashboard() {
                     total += stock.quantity * stock.avg;
                 });
                 setTotalInvestment(total);
+                setLoader(false);
 
             });
 
@@ -169,13 +170,6 @@ function Dashboard() {
             })
 
 
-
-        }
-
-        if (!loader) {
-            setLoader(true);
-        } else {
-            setLoader(false);
 
         }
     }
