@@ -1,9 +1,8 @@
 import React from 'react'
 import Navbar from './Navbar';
 import MainImage from '../media/stockmarket.png';
-import MainImage2 from '../media/main-page-second.jpeg';
-import Logo from '../media/logo.png';
 import { useNavigate } from 'react-router-dom';
+const PROXY_URL = import.meta.env.VITE_PROXY_URL;
 
 // import MainImage3 from '../media/main-page-third.jpeg';
 
@@ -11,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 function MainPage() {
+    // console.log(PROXY_URL);
     const navigate = useNavigate();
     const handleLoginClick = () => {
         navigate('/login');

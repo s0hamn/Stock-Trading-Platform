@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import io from 'socket.io-client';
 import Loader from './Loader';
+const PROXY_URL = import.meta.env.VITE_PROXY_URL;
+
 
 
 const ListOfStocks = () => {
@@ -18,9 +20,10 @@ const ListOfStocks = () => {
     const navigate = useNavigate();
     const cookies = new Cookies();
 
+
     useEffect(() => {
         // Establish WebSocket connection
-        const socket = io('https://stock-trading-platform-o3zp.onrender.com/', { transports: ['websocket', 'polling', 'flashsocket'] });
+        const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
 
         socket.emit('allStocks');
 
@@ -71,13 +74,13 @@ const ListOfStocks = () => {
         let filteredStocks = stocks;
 
         if (marketCapFilter !== '') {
-            if(marketCapFilter === 'Small'){
+            if (marketCapFilter === 'Small') {
                 filteredStocks = filteredStocks.filter(stock => stock.marketCap <= 10000);
             }
-            else if(marketCapFilter === 'Medium'){
+            else if (marketCapFilter === 'Medium') {
                 filteredStocks = filteredStocks.filter(stock => stock.marketCap > 10000 && stock.marketCap < 100000);
             }
-            else{
+            else {
                 filteredStocks = filteredStocks.filter(stock => stock.marketCap >= 100000);
             }
         }
@@ -121,13 +124,13 @@ const ListOfStocks = () => {
                                     <option value="Technology">Technology</option>
                                     <option value="Finance">Finance</option>
                                     <option value="Banking">Banking</option>
-                                <option value="Telecommunications">Telecommunications</option>
-                                <option value="Information Technology">Information Technology</option>
-                                <option value="Consumer Goods">Consumer Goods</option>
-                                <option value="Utilities">Utilities</option>
-                                <option value="Energy">Energy</option>
-                                <option value="Pharmaceuticals">Pharmaceuticals</option>
-                                {/* Add other sectors */}
+                                    <option value="Telecommunications">Telecommunications</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Consumer Goods">Consumer Goods</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Energy">Energy</option>
+                                    <option value="Pharmaceuticals">Pharmaceuticals</option>
+                                    {/* Add other sectors */}
                                 </select>
                             </div>
                         </div>

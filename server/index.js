@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const TraderModel = require('./models/Trader');
+const dotenv = require('dotenv');
+dotenv.config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -16,7 +18,10 @@ const yahooFinance = require('yahoo-finance2').default;
 const Transaction = require('./models/Transaction');
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
+
 // const executeOrder = require('executeOrder')
+
+const MONGODB_URI = process.env.MONGODB_URI
 
 
 
@@ -170,8 +175,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: 'seprojectsem6stocktrading@gmail.com',
-        pass: 'ydecjkbocsmjnpkk',
+        user: process.env.OTP_EMAIL,
+        pass: process.env.OTP_PASS,
     },
 });
 
@@ -184,7 +189,7 @@ function generateOTP() {
 // Function to send OTP via email
 function sendOTP(email, otp) {
     const mailOptions = {
-        from: 'seprojectsem6stocktrading@gmail.com', // Your Gmail email address
+        from: process.env.OTP_EMAIL, // Your Gmail email address
         to: email,
         subject: 'OTP for Login',
         text: `Your OTP for login is: ${otp}`
@@ -199,7 +204,7 @@ function sendOTP(email, otp) {
 }
 
 
-mongoose.connect('mongodb+srv://sohamnaigaonkar:soham123@cluster0.c2rronj.mongodb.net/Database?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect(MONGODB_URI)
     .then(() => { console.log("connected to the database\n") })
     .catch((err) => { console.log(err); })
 

@@ -12,8 +12,8 @@ const News = () => {
         const fetchNews = async () => {
             try {
                 // Replace 'YOUR_API_KEY' with your actual News API key
-                const apiKey = '34e982ff53c9477c9c5bf43c5ede613e';
-                const response = await axios.get(`https://newsapi.org/v2/top-headlines?q=stock%20market&q=NSE&q=IPO&q=BSE&country=in&apiKey=${apiKey}`);
+                const apiKey = '5ba48d6cf4794f01991b0114521a6cb0';
+                const response = await axios.get(`https://newsapi.org/v2/everything?q=stock&from=2024-03-06&sortBy=publishedAt&apiKey=${apiKey}`);
                 setNews(response.data.articles);
                 setIsNewsPresent(true);
             } catch (error) {

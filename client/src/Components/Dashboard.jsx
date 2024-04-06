@@ -9,6 +9,7 @@ import Cookies from 'universal-cookie';
 import { useState } from 'react';
 import io from 'socket.io-client';
 import Chart from './Chart'
+const PROXY_URL = import.meta.env.VITE_PROXY_URL;
 
 function Dashboard() {
     const [trader, setTrader] = useState({})
@@ -59,7 +60,7 @@ function Dashboard() {
 
     useEffect(() => {
         // Establish WebSocket connection
-        const socket = io('https://stock-trading-platform-o3zp.onrender.com', { transports: ['websocket', 'polling', 'flashsocket'] });
+        const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
 
         socket.emit('allTransactions');
         console.log("requesting transactions");
@@ -77,7 +78,7 @@ function Dashboard() {
     useEffect(() => {
         // Establish WebSocket connection
 
-        const socket = io('https://stock-trading-platform-o3zp.onrender.com/', { transports: ['websocket', 'polling', 'flashsocket'] });
+        const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
         // console.log("Trader investments", trader.investments);
         socket.emit('allStocks');
         // Subscribe to stock updates
@@ -119,7 +120,7 @@ function Dashboard() {
         // console.log(trader)
         if (trader.investments) {
 
-            const socket = io('https://stock-trading-platform-o3zp.onrender.com/', { transports: ['websocket', 'polling', 'flashsocket'] });
+            const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
             // console.log("Trader investments", trader.investments);
             socket.emit('someStocks', trader.investments);
             // Subscribe to stock updates
@@ -142,22 +143,6 @@ function Dashboard() {
         }
 
     }, [trader]);
-
-
-    // useEffect(() => {
-    //     if (trader.watchlist) {
-    //         const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
-
-    //         socket.emit('watchlistStocks', trader.watchlist);
-
-    //         socket.on("watchlistStocks", watchlistStocks => {
-    //             console.log(watchlistStocks);
-    //         })
-
-    //         return () => socket.close();
-
-    //     }
-    // }, [trader])
 
     useEffect(() => {
         let total = 0;
