@@ -78,9 +78,10 @@ const Navbar = () => {
                     
                 </div>
             </div>
+            {trader && 
             <div className="profile cursor-pointer" onClick={handleProfileClick}>
                 <img src={profileImg} alt="profile" className='h-10 w-10' />
-            </div>
+            </div>}
 
 
         </nav>
