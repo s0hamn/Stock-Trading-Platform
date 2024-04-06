@@ -119,14 +119,11 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
 
             if (res.status === 404 || res.status === 500) {
                 alert("Order placing failed");
-                setIsHovered(false);
                 return;
             }
             else {
                 alert("Order placed successfully");
-                setPopupOpen(false);
-                setIsHovered(false);
-
+                console.log("Order placed successfully with", orderCategory, formData.orderType);
                 axios.get(`/api/executeOrder`, {
                     params: {
                         symbol: symbol,
@@ -171,9 +168,26 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
                 const limitBuyOrderQueue = response.data.limitBuyOrderQueue;
                 const limitSellOrderQueue = response.data.limitSellOrderQueue;
 
-                // Sort orders by price
-                limitBuyOrderQueue.sort((a, b) => b.price - a.price);
-                limitBuyOrderQueue.sort((a, b) => a.price - b.price);
+                limitBuyOrderQueue.sort((a, b) => {
+                    // First, compare by price in descending order
+                    if (a.price > b.price) return -1;
+                    if (a.price < b.price) return 1;
+                    // If prices are equal, compare by orderDate in ascending order
+                    return a.orderDate - b.orderDate;
+                });
+
+                console.log("limitBuyOrderQueue", limitBuyOrderQueue);
+
+                // Sort sell orders
+                limitSellOrderQueue.sort((a, b) => {
+                    // First, compare by price in ascending order
+                    if (a.price < b.price) return -1;
+                    if (a.price > b.price) return 1;
+                    // If prices are equal, compare by orderDate in ascending order
+                    return a.orderDate - b.orderDate;
+                });
+
+                console.log("limitSellOrderQueue", limitSellOrderQueue);
 
                 // Update state with the new order queues
                 setLimitBuyOrderQueue(limitBuyOrderQueue);
