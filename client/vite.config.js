@@ -7,7 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://stock-trading-platform-o3zp.onrender.com', // Change this to your API server URL
+        // Change this to your API server URL
+        target: 'https://stock-trading-platform-o3zp.onrender.com', 
+        // target: 'http://localhost:3001', 
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },

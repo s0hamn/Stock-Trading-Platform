@@ -81,7 +81,7 @@ const DiscussionForum = () => {
             try {
                 const response = await axios.get('/api/posts');
                 setPosts(response.data);
-                // setFilteredPosts(response.data);
+                setFilteredPosts(response.data);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching posts:', error);
