@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 import io from 'socket.io-client';
-
+import Loader from './Loader';
 
 
 const ListOfStocks = () => {
@@ -14,12 +14,13 @@ const ListOfStocks = () => {
     const [filteredStocks, setFilteredStocks] = useState([]);
     const [marketCapFilter, setMarketCapFilter] = useState('');
     const [sectorFilter, setSectorFilter] = useState('');
+    const [loader, setLoader] = useState(true);
     const navigate = useNavigate();
     const cookies = new Cookies();
 
     useEffect(() => {
         // Establish WebSocket connection
-        const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+        const socket = io('https://stock-trading-platform-o3zp.onrender.com/', { transports: ['websocket', 'polling', 'flashsocket'] });
 
         socket.emit('allStocks');
 
@@ -42,6 +43,7 @@ const ListOfStocks = () => {
             .then(res => {
                 setStocks(res.data);
                 setFilteredStocks(res.data); // Initially display all stocks
+                setLoader(false);
             })
             .catch(error => {
                 console.error('Error fetching stocks:', error);
@@ -83,42 +85,43 @@ const ListOfStocks = () => {
 
 
     return (
-        <div>
+        <div className='min-h-screen'>
             <Navbar trader={trader} />
-            <div className="flex justify-center mt-0">
-                <div className="w-full">
-                    {/* Filters */}
-                    <div className="bg-white p-4 rounded-lg shadow-lg mb-8 flex items-start align-middle">
-                        <h2 className="text-lg font-semibold ml-4 mr-12">Filters</h2>
-                        <div className="flex justify-center space-x-4 ml-14">
-                            <select
-                                value={marketCapFilter}
-                                onChange={e => setMarketCapFilter(e.target.value)}
-                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white gap-2 mr-4"
-                            >
-                                <option value="">All Market Caps</option>
-                                <option value="Small">Small</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Large">Large</option>
-                            </select>
-                            <select
-                                value={sectorFilter}
-                                onChange={e => setSectorFilter(e.target.value)}
-                                className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white "
-                            >
-                                <option value="">All Sectors</option>
-                                <option value="Technology">Technology</option>
-                                <option value="Finance">Finance</option>
-                                {/* Add other sectors */}
-                            </select>
+            <div className="flex h-full  justify-center mt-0">
+                {loader ? <Loader /> :
+                    <div className="w-full">
+                        {/* Filters */}
+                        <div className="bg-white p-4 rounded-lg shadow-lg mb-8 flex items-start align-middle">
+                            <h2 className="text-lg font-semibold ml-4 mr-12">Filters</h2>
+                            <div className="flex justify-center space-x-4 ml-14">
+                                <select
+                                    value={marketCapFilter}
+                                    onChange={e => setMarketCapFilter(e.target.value)}
+                                    className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white gap-2 mr-4"
+                                >
+                                    <option value="">All Market Caps</option>
+                                    <option value="Small">Small</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                </select>
+                                <select
+                                    value={sectorFilter}
+                                    onChange={e => setSectorFilter(e.target.value)}
+                                    className="w-52 h-9 border border-gray-300 rounded-md px-2 py-1 bg-white "
+                                >
+                                    <option value="">All Sectors</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Finance">Finance</option>
+                                    {/* Add other sectors */}
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Stock List */}
-                    <div className="w-full flex justify-center">
-                        <div className="w-5/6 grid grid-cols-3 ">
-                            {filteredStocks.map((stock) => (
-                                
+                        {/* Stock List */}
+                        <div className="w-full flex justify-center">
+                            <div className="w-5/6 grid grid-cols-3 ">
+                                {filteredStocks.map((stock) => (
+
                                     <StockListCard
                                         key={stock._id}
                                         id={stock._id}
@@ -130,13 +133,13 @@ const ListOfStocks = () => {
                                         previousClose={stock.previousClose}
                                         userId={trader._id}
                                     />
-                                
-                            ))}
+
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </div>}
             </div>
-        </div>
+        </div >
     );
 
 };

@@ -16,7 +16,7 @@ function Dashboard() {
     const [stocks, setStocks] = useState([]);
     const [orderStatus, setOrderStatus] = useState('pending');
     const [traderstocks, setTraderStocks] = useState([]);
-    const [loader, setLoader] = useState(true)
+    const [loader, setLoader] = useState(false)
     // const [isMounted, setIsMounted] = useState(false);
     const [stocksType, setStocksType] = useState('investments');
     const [watchlist, setWatchlist] = useState([]);
@@ -59,7 +59,7 @@ function Dashboard() {
 
     useEffect(() => {
         // Establish WebSocket connection
-        const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+        const socket = io('https://stock-trading-platform-o3zp.onrender.com', { transports: ['websocket', 'polling', 'flashsocket'] });
 
         socket.emit('allTransactions');
         console.log("requesting transactions");
@@ -77,7 +77,7 @@ function Dashboard() {
     useEffect(() => {
         // Establish WebSocket connection
 
-        const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+        const socket = io('https://stock-trading-platform-o3zp.onrender.com/', { transports: ['websocket', 'polling', 'flashsocket'] });
         // console.log("Trader investments", trader.investments);
         socket.emit('allStocks');
         // Subscribe to stock updates
@@ -119,7 +119,7 @@ function Dashboard() {
         // console.log(trader)
         if (trader.investments) {
 
-            const socket = io('http://localhost:3001', { transports: ['websocket', 'polling', 'flashsocket'] });
+            const socket = io('https://stock-trading-platform-o3zp.onrender.com/', { transports: ['websocket', 'polling', 'flashsocket'] });
             // console.log("Trader investments", trader.investments);
             socket.emit('someStocks', trader.investments);
             // Subscribe to stock updates
@@ -172,7 +172,12 @@ function Dashboard() {
 
         }
 
-        setLoader(false);
+        if (!loader) {
+            setLoader(true);
+        } else {
+            setLoader(false);
+
+        }
     }
         , [stocks])
 
