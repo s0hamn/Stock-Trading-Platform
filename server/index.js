@@ -49,7 +49,13 @@ io.on('connection', socket => {
             sendAllStocks(socket);
         }, 10000);
     });
-
+    socket.on('allTransactions', () => {
+        console.log('Client requested all transactions');
+        sendAllTransactions(socket);
+        setInterval(() => {
+            sendAllTransactions(socket);
+        }, 10000);
+    });
     socket.on('someStocks', (investments) => {
         console.log('Client requested some stocks');
         sendStocks(socket, investments);
@@ -122,6 +128,15 @@ async function sendAllStocks(socket) {
         // console.log('Server sending stockUpdate event:', stocks);
     } catch (error) {
         console.error('Error fetching stocks:', error);
+    }
+}
+
+async function sendAllTransactions(socket) {
+    try {
+        const transactions = await Transaction.find();
+        socket.emit('transactionsUpdate', transactions);
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
     }
 }
 
@@ -277,10 +292,16 @@ async function executeOrder(symbol, orderType, orderCategory) {
 }
 
 async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitSellOrderQueue) {
-    const stock = Stock.findOne({ symbol: symbol });
+    // console.log("SYMBOL", symbol)
+    console.log(marketBuyOrderQueue)
+    console.log(marketSellOrderQueue)
+    console.log(limitSellOrderQueue)
+    const stock = await Stock.findOne({ symbol: symbol });
     if (!stock) {
         return;
     }
+
+    console.log(stock._id)
 
 
     while (marketBuyOrderQueue.length && marketSellOrderQueue.length) {
@@ -294,21 +315,22 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             // console.log("Inside equal quantity");
             // console.log("Market Buy Order", marketBuyOrder);
             // console.log("Market Sell Order", marketSellOrder);
-            const a = await Stock.findByIdAndUpdate(stock._id, {
+            // console.log("Stock", stock);
+            await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
                     marketBuyOrderQueue: { _id: marketBuyOrder._id }
                 }
             });
 
             // Remove the sell order
-            const b = await Stock.findByIdAndUpdate(stock._id, {
+            await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
                     marketSellOrderQueue: { _id: marketSellOrder._id }
                 }
             });
 
-            console.log("A", a);
-            console.log("B", b);
+            // console.log("A", a);
+            // console.log("B", b);
 
 
 
@@ -317,20 +339,20 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
-            // await Transaction.create({
-            //     buyer_id: marketBuyOrder.userId,
-            //     seller_id: marketSellOrder.userId,
-            //     stock_id: stock._id,
-            //     quantity: marketBuyOrder.quantity,
-            //     price: stock.currentPrice
-            // });
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketBuyOrder.quantity,
+                price: stock.currentPrice
+            });
 
             marketBuyOrderQueue.shift();
             marketSellOrderQueue.shift();
 
-            // updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
 
-            // updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
 
         }
         else if (marketBuyOrder.quantity < marketSellOrder.quantity) {
@@ -364,8 +386,8 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             marketBuyOrderQueue.shift();
             marketSellOrderQueue[0].quantity = quantity;
 
-            // updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
-            // updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
 
         } else { // marketBuyOrder.quantity > marketSellOrder.quantity
             await Stock.findByIdAndUpdate(stock._id, {
@@ -381,39 +403,667 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                 }
             });
 
-            // const buyerId = marketBuyOrder.userId;
-            // const sellerId = marketSellOrder.userId;
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
 
             // const quantity = marketBuyOrder.quantity - marketSellOrder.quantity;
 
-            // // Create a transaction
-            // await Transaction.create({
-            //     buyer_id: marketBuyOrder.userId,
-            //     seller_id: marketSellOrder.userId,
-            //     stock_id: stock._id,
-            //     quantity: marketSellOrder.quantity,
-            //     price: stock.currentPrice
-            // });
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: stock.currentPrice
+            });
 
-            // marketSellOrderQueue.shift();
+            marketSellOrderQueue.shift();
+            marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - marketSellOrder.quantity
 
-            // marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - marketSellOrder.quantity
-
-            // updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
-            // updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity.stock.currentPrice);
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
         }
-
-
-
 
     }
 
-    // while (marketBuyOrderQueue.length && limitSellOrderQueue.length) {
+    console.log("here")
+    while (marketBuyOrderQueue.length && limitSellOrderQueue.length) {
+        console.log("HERE")
+        const marketBuyOrder = marketBuyOrderQueue[0];
+        const limitSellOrder = limitSellOrderQueue[0];
+        console.log("Market Buy Order", marketBuyOrder);
+        console.log("Limit Sell Order", limitSellOrder);
 
-    // }
+        if (marketBuyOrder.quantity === limitSellOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketBuyOrderQueue: { _id: marketBuyOrder._id }
+                }
+            });
+
+            // Remove the sell order
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    limitSellOrderQueue: { _id: limitSellOrder._id }
+                }
+            });
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = limitSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: limitSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketBuyOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            marketBuyOrderQueue.shift();
+            limitSellOrderQueue.shift();
+
+            // update current price of stock
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    currentPrice: limitSellOrder.price
+                }
+            });
+
+            updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+
+        }
+        else if (marketBuyOrder.quantity < limitSellOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketBuyOrderQueue: { _id: marketBuyOrder._id }
+                }
+            });
+
+            // Update the sell order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "limitSellOrderQueue.0.quantity": limitSellOrder.quantity - marketBuyOrder.quantity
+                }
+            });
+
+            const quantity = limitSellOrder.quantity - marketBuyOrder.quantity;
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = limitSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: limitSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketBuyOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    currentPrice: limitSellOrder.price
+                }
+            });
+
+            marketBuyOrderQueue.shift();
+            limitSellOrderQueue[0].quantity = quantity;
+
+            updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+
+        } else { // marketBuyOrder.quantity > limitSellOrder.quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    limitSellOrderQueue: { _id: limitSellOrder._id }
+                }
+            });
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketBuyOrderQueue.0.quantity": marketBuyOrder.quantity - limitSellOrder.quantity
+                }
+            });
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = limitSellOrder.userId;
+
+            // const quantity = marketBuyOrder.quantity - limitSellOrder.quantity;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: limitSellOrder.userId,
+                stock_id: stock._id,
+                quantity: limitSellOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    currentPrice: limitSellOrder.price
+                }
+            });
+
+            limitSellOrderQueue.shift();
+
+            marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - limitSellOrder.quantity
+
+            updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, stock.currentPrice);
+
+        }
+
+    }
+
+
+}
 
 
 
+async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitBuyOrderQueue) {
+    const stock = await Stock.findOne({ symbol: symbol });
+    if (!stock) {
+        return;
+    }
+
+    while (marketSellOrderQueue.length && marketBuyOrderQueue.length) {
+        const marketSellOrder = marketSellOrderQueue[0];
+        const marketBuyOrder = marketBuyOrderQueue[0];
+
+        if (marketSellOrder.quantity === marketBuyOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Remove the buy order
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketBuyOrderQueue: { _id: marketBuyOrder._id }
+                }
+            });
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            marketSellOrderQueue.shift();
+            marketBuyOrderQueue.shift();
+
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+
+        } else if (marketSellOrder.quantity < marketBuyOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Update the buy order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketBuyOrderQueue.0.quantity": marketBuyOrder.quantity - marketSellOrder.quantity
+                }
+            });
+
+            const quantity = marketBuyOrder.quantity - marketSellOrder.quantity;
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            marketSellOrderQueue.shift();
+            marketBuyOrderQueue[0].quantity = quantity;
+
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+
+        } else {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Update the buy order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketBuyOrderQueue.0.quantity": marketBuyOrder.quantity - marketSellOrder.quantity
+                }
+            });
+
+            const buyerId = marketBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // const quantity = marketBuyOrder.quantity - marketSellOrder.quantity;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: marketBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: stock.currentPrice
+            });
+
+            marketSellOrderQueue.shift();
+
+            marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - marketSellOrder.quantity
+
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+
+
+        }
+    }
+
+    while (marketSellOrderQueue.length && limitBuyOrderQueue.length) {
+        const marketSellOrder = marketSellOrderQueue[0];
+        const limitBuyOrder = limitBuyOrderQueue[0];
+
+        if (marketSellOrder.quantity === limitBuyOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Remove the buy order
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    limitBuyOrderQueue: { _id: limitBuyOrder._id }
+                }
+            });
+
+            const buyerId = limitBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: limitBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: limitBuyOrder.price
+            });
+
+            marketSellOrderQueue.shift();
+            limitBuyOrderQueue.shift();
+
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
+
+        } else if (marketSellOrder.quantity < limitBuyOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    limitBuyOrderQueue: { _id: limitBuyOrder._id }
+                }
+            });
+
+            // Update the sell order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketSellOrderQueue.0.quantity": marketSellOrder.quantity - limitBuyOrder.quantity
+                }
+            });
+
+            const quantity = marketSellOrder.quantity - limitBuyOrder.quantity;
+
+            const buyerId = limitBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+
+            await Transaction.create({
+                buyer_id: limitBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: limitBuyOrder.quantity,
+                price: limitBuyOrder.price
+            });
+
+            marketSellOrderQueue[0].quantity = quantity;
+
+            limitBuyOrderQueue.shift();
+
+            updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+            updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+
+        }
+        else {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Update the buy order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "limitBuyOrderQueue.0.quantity": limitBuyOrder.quantity - marketSellOrder.quantity
+                }
+            });
+
+            const buyerId = limitBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // const quantity = limitBuyOrder.quantity - marketSellOrder.quantity;
+
+            // Create a transaction
+
+            await Transaction.create({
+                buyer_id: limitBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: limitBuyOrder.price
+            });
+
+            marketSellOrderQueue.shift();
+
+            limitBuyOrderQueue[0].quantity = limitBuyOrder.quantity - marketSellOrder.quantity
+
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
+
+
+        }
+    }
+
+
+
+}
+
+async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketSellOrderQueue) {
+    const stock = await Stock.findOne({ symbol: symbol });
+    if (!stock) {
+        return;
+    }
+
+    while (limitBuyOrderQueue.length && marketSellOrderQueue.length) {
+        const limitBuyOrder = limitBuyOrderQueue[0];
+        const marketSellOrder = marketSellOrderQueue[0];
+
+        if (limitBuyOrder.quantity === marketSellOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    limitBuyOrderQueue: { _id: limitBuyOrder._id }
+                }
+            });
+
+            // Remove the sell order
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            const buyerId = limitBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: limitBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: limitBuyOrder.quantity,
+                price: limitBuyOrder.price
+            });
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    currentPrice: limitBuyOrder.price
+                }
+            });
+
+            limitBuyOrderQueue.shift();
+            marketSellOrderQueue.shift();
+
+            updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+            updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+
+        } else if (limitBuyOrder.quantity < marketSellOrder.quantity) {
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    limitBuyOrderQueue: { _id: limitBuyOrder._id }
+                }
+            });
+
+            // Update the sell order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "marketSellOrderQueue.0.quantity": marketSellOrder.quantity - limitBuyOrder.quantity
+                }
+            });
+
+            const quantity = marketSellOrder.quantity - limitBuyOrder.quantity;
+
+            const buyerId = limitBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // Create a transaction
+            await Transaction.create({
+                buyer_id: limitBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: limitBuyOrder.quantity,
+                price: limitBuyOrder.price
+            });
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    currentPrice: limitBuyOrder.price
+                }
+            });
+
+            limitBuyOrderQueue.shift();
+            marketSellOrderQueue[0].quantity = quantity;
+
+            updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+            updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+
+        } else { // limitBuyOrder.quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $pull: {
+                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                }
+            });
+
+            // Update the buy order quantity
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    "limitBuyOrderQueue.0.quantity": limitBuyOrder.quantity - marketSellOrder.quantity
+                }
+            });
+
+            const buyerId = limitBuyOrder.userId;
+            const sellerId = marketSellOrder.userId;
+
+            // const quantity = limitBuyOrder.quantity - marketSellOrder.quantity;
+
+            // Create a transaction
+
+            await Transaction.create({
+                buyer_id: limitBuyOrder.userId,
+                seller_id: marketSellOrder.userId,
+                stock_id: stock._id,
+                quantity: marketSellOrder.quantity,
+                price: limitBuyOrder.price
+            });
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    currentPrice: limitBuyOrder.price
+                }
+            });
+
+            marketSellOrderQueue.shift();
+
+            limitBuyOrderQueue[0].quantity = limitBuyOrder.quantity - marketSellOrder.quantity
+
+            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
+            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
+
+        }
+    }
+
+    while (limitBuyOrderQueue.length && limitSellOrderQueue.length) {
+
+        const limitBuyOrder = limitBuyOrderQueue[0];
+        const limitSellOrder = limitSellOrderQueue[0];
+
+        if (limitBuyOrder.price >= limitSellOrder.price) {
+            if (limitBuyOrder.quantity === limitSellOrder.quantity) {
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $pull: {
+                        limitBuyOrderQueue: { _id: limitBuyOrder._id }
+                    }
+                });
+
+                // Remove the sell order
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $pull: {
+                        limitSellOrderQueue: { _id: limitSellOrder._id }
+                    }
+                });
+
+                const buyerId = limitBuyOrder.userId;
+                const sellerId = limitSellOrder.userId;
+
+                // Create a transaction
+                await Transaction.create({
+                    buyer_id: limitBuyOrder.userId,
+                    seller_id: limitSellOrder.userId,
+                    stock_id: stock._id,
+                    quantity: limitBuyOrder.quantity,
+                    price: limitBuyOrder.price
+                });
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        currentPrice: limitBuyOrder.price
+                    }
+                });
+
+                limitBuyOrderQueue.shift();
+                limitSellOrderQueue.shift();
+
+                updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+                updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+
+            } else if (limitBuyOrder.quantity < limitSellOrder.quantity) {
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $pull: {
+                        limitBuyOrderQueue: { _id: limitBuyOrder._id }
+                    }
+                });
+
+                // Update the sell order quantity
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        "limitSellOrderQueue.0.quantity": limitSellOrder.quantity - limitBuyOrder.quantity
+                    }
+                });
+
+                const quantity = limitSellOrder.quantity - limitBuyOrder.quantity;
+
+                const buyerId = limitBuyOrder.userId;
+                const sellerId = limitSellOrder.userId;
+
+                // Create a transaction
+
+                await Transaction.create({
+                    buyer_id: limitBuyOrder.userId,
+                    seller_id: limitSellOrder.userId,
+                    stock_id: stock._id,
+                    quantity: limitBuyOrder.quantity,
+                    price: limitBuyOrder.price
+                });
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        currentPrice: limitBuyOrder.price
+                    }
+                });
+
+                limitBuyOrderQueue.shift();
+                limitSellOrderQueue[0].quantity = quantity;
+
+                updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+                updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+            } else {
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $pull: {
+                        limitSellOrderQueue: { _id: limitSellOrder._id }
+                    }
+                });
+
+                // Update the buy order quantity
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        "limitBuyOrderQueue.0.quantity": limitBuyOrder.quantity - limitSellOrder.quantity
+                    }
+                });
+
+                const buyerId = limitBuyOrder.userId;
+                const sellerId = limitSellOrder.userId;
+
+                // const quantity = limitBuyOrder.quantity - limitSellOrder.quantity;
+
+                // Create a transaction
+                await Transaction.create({
+                    buyer_id: limitBuyOrder.userId,
+                    seller_id: limitSellOrder.userId,
+                    stock_id: stock._id,
+                    quantity: limitSellOrder.quantity,
+                    price: limitBuyOrder.price
+                });
+
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        currentPrice: limitBuyOrder.price
+                    }
+                });
+
+                limitSellOrderQueue.shift();
+
+                limitBuyOrderQueue[0].quantity = limitBuyOrder.quantity - limitSellOrder.quantity
+
+                updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
+                updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
+
+
+            }
+        }
+    }
+
+
+}
+
+async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketBuyOrderQueue) {
 }
 
 
@@ -423,7 +1073,7 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
 
 // Function to update buyer's investment array
 const updateBuyerInvestments = async (buyerId, symbol, quantity, price) => {
-    let buyer = await Trader.findOne({ _id: buyerId });
+    let buyer = await TraderModel.findOne({ _id: buyerId });
 
     // Find the index of the stock in investments array
     const index = buyer.investments.findIndex(investment => investment.symbol === symbol);
@@ -456,7 +1106,7 @@ const updateBuyerInvestments = async (buyerId, symbol, quantity, price) => {
 
 // Function to update seller's investment array
 const updateSellerInvestments = async (sellerId, symbol, quantity, price) => {
-    let seller = await Trader.findOne({ _id: sellerId });
+    let seller = await TraderModel.findOne({ _id: sellerId });
 
     // Find the index of the stock in investments array
     const index = seller.investments.findIndex(investment => investment.symbol === symbol);
@@ -483,15 +1133,6 @@ const updateSellerInvestments = async (sellerId, symbol, quantity, price) => {
 };
 
 
-
-async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitBuyOrderQueue) {
-}
-
-async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketSellOrderQueue) {
-}
-
-async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQueue, marketBuyOrderQueue) {
-}
 
 app.get('/posts', async (req, res) => {
     try {
@@ -910,7 +1551,7 @@ app.get('/checkIfUserHolding', async (req, res) => {
 
         if (!req.query.userId || !req.query.symbol) {
             // return res.status(400).json({ err: "Missing required parameters" });
-            console.log("Missing required parameters\n");
+            // console.log("Missing required parameters\n");
         }
         const userId = req.query.userId;
         const stockSymbol = req.query.symbol;
@@ -962,8 +1603,8 @@ app.get('/getOrderBook', async (req, res) => {
         const limitBuyOrderQueue = stock.limitBuyOrderQueue;
         const limitSellOrderQueue = stock.limitSellOrderQueue;
 
-        console.log("Limit Buy Orders", limitBuyOrderQueue);
-        console.log("Limit Sell Orders", limitSellOrderQueue);
+        // console.log("Limit Buy Orders", limitBuyOrderQueue);
+        // console.log("Limit Sell Orders", limitSellOrderQueue);
 
         res.status(200).json({
             limitBuyOrderQueue: limitBuyOrderQueue,
