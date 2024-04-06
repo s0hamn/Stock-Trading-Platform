@@ -7,6 +7,7 @@ const transactionSchema = new mongoose.Schema({
     stock_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Stock', required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
+    sellerGain: { type: Number, required: true },
     transaction_date: { type: Date, default: Date.now }
 });
 
