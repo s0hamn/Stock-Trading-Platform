@@ -3,7 +3,7 @@ import ReactApexChart from 'react-apexcharts';
 import axios from 'axios';
 import io from 'socket.io-client';
 
-const ApexChart = ({ chartData }) => {
+const ApexChart = ({ symbol }) => {
 
     const [data, setData] = useState({ companyName: '', data: [] });
     const [chartType, setChartType] = useState('candlestick');
@@ -13,7 +13,7 @@ const ApexChart = ({ chartData }) => {
     };
 
     useEffect(() => {
-        axios.get('/api/stockInfo/HDFCBANK.NS')
+        axios.get(`/api/stockInfo/${symbol}`)
             .then(response => {
                 const temp = [];
                 response.data.previousHistory.forEach(date => {
