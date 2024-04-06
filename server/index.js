@@ -343,11 +343,15 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - stock.currentPrice);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
                 quantity: marketBuyOrder.quantity,
+                sellerGain: sellerGain,
                 price: stock.currentPrice
             });
 
@@ -379,10 +383,14 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - stock.currentPrice);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketBuyOrder.quantity,
                 price: stock.currentPrice
             });
@@ -413,6 +421,9 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             // const quantity = marketBuyOrder.quantity - marketSellOrder.quantity;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - stock.currentPrice);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
@@ -456,10 +467,14 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             const sellerId = limitSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: limitSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketBuyOrder.quantity,
                 price: stock.currentPrice
             });
@@ -498,10 +513,14 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             const sellerId = limitSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: limitSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketBuyOrder.quantity,
                 price: stock.currentPrice
             });
@@ -537,10 +556,14 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             // const quantity = marketBuyOrder.quantity - limitSellOrder.quantity;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = limitSellOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: limitSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: limitSellOrder.quantity,
                 price: stock.currentPrice
             });
@@ -597,10 +620,14 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - stock.currentPrice);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketSellOrder.quantity,
                 price: stock.currentPrice
             });
@@ -631,10 +658,14 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - stock.currentPrice);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketSellOrder.quantity,
                 price: stock.currentPrice
             });
@@ -648,14 +679,14 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
         } else {
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
-                    marketSellOrderQueue: { _id: marketSellOrder._id }
+                    marketBuyOrderQueue: { _id: marketBuyOrder._id }
                 }
             });
 
             // Update the buy order quantity
             await Stock.findByIdAndUpdate(stock._id, {
                 $set: {
-                    "marketBuyOrderQueue.0.quantity": marketBuyOrder.quantity - marketSellOrder.quantity
+                    "marketSellOrderQueue.0.quantity": marketSellOrder.quantity - marketBuyOrder.quantity
                 }
             });
 
@@ -665,20 +696,24 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             // const quantity = marketBuyOrder.quantity - marketSellOrder.quantity;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - stock.currentPrice);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
-                quantity: marketSellOrder.quantity,
+                sellerGain: sellerGain,
+                quantity: marketBuyOrder.quantity,
                 price: stock.currentPrice
             });
 
-            marketSellOrderQueue.shift();
+            marketBuyOrderQueue.shift();
 
-            marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - marketSellOrder.quantity
+            marketSellOrderQueue[0].quantity = marketSellOrder.quantity - marketBuyOrder.quantity
 
-            updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
-            updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+            updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+            updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
 
 
         }
@@ -707,9 +742,13 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
             await Transaction.create({
                 buyer_id: limitBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
+                sellerGain: sellerGain,
                 stock_id: stock._id,
                 quantity: marketSellOrder.quantity,
                 price: limitBuyOrder.price
@@ -748,11 +787,14 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
-
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: limitBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: limitBuyOrder.quantity,
                 price: limitBuyOrder.price
             });
@@ -792,11 +834,14 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             // const quantity = limitBuyOrder.quantity - marketSellOrder.quantity;
 
             // Create a transaction
-
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = limitSellOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: limitBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketSellOrder.quantity,
                 price: limitBuyOrder.price
             });
@@ -850,10 +895,14 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
             await Transaction.create({
                 buyer_id: limitBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: limitBuyOrder.quantity,
                 price: limitBuyOrder.price
             });
@@ -890,10 +939,14 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             const sellerId = marketSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = limitBuyOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
             await Transaction.create({
                 buyer_id: limitBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: limitBuyOrder.quantity,
                 price: limitBuyOrder.price
             });
@@ -930,11 +983,14 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             // const quantity = limitBuyOrder.quantity - marketSellOrder.quantity;
 
             // Create a transaction
-
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketSellOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
             await Transaction.create({
                 buyer_id: limitBuyOrder.userId,
                 seller_id: marketSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketSellOrder.quantity,
                 price: limitBuyOrder.price
             });
@@ -980,10 +1036,14 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 const sellerId = limitSellOrder.userId;
 
                 // Create a transaction
+                const seller = Trader.findById(sellerId);
+                const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+                const sellerGain = limitBuyOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
                 await Transaction.create({
                     buyer_id: limitBuyOrder.userId,
                     seller_id: limitSellOrder.userId,
                     stock_id: stock._id,
+                    sellerGain: sellerGain,
                     quantity: limitBuyOrder.quantity,
                     price: limitBuyOrder.price
                 });
@@ -1020,11 +1080,14 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 const sellerId = limitSellOrder.userId;
 
                 // Create a transaction
-
+                const seller = Trader.findById(sellerId);
+                const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+                const sellerGain = limitBuyOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
                 await Transaction.create({
                     buyer_id: limitBuyOrder.userId,
                     seller_id: limitSellOrder.userId,
                     stock_id: stock._id,
+                    sellerGain: sellerGain,
                     quantity: limitBuyOrder.quantity,
                     price: limitBuyOrder.price
                 });
@@ -1058,12 +1121,15 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 const sellerId = limitSellOrder.userId;
 
                 // const quantity = limitBuyOrder.quantity - limitSellOrder.quantity;
-
+                const seller = Trader.findById(sellerId);
+                const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+                const sellerGain = limitSellOrder.quantity * (stockInInvestmentArray.avg - limitBuyOrder.price);
                 // Create a transaction
                 await Transaction.create({
                     buyer_id: limitBuyOrder.userId,
                     seller_id: limitSellOrder.userId,
                     stock_id: stock._id,
+                    sellerGain: sellerGain,
                     quantity: limitSellOrder.quantity,
                     price: limitBuyOrder.price
                 });
@@ -1119,10 +1185,14 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             const sellerId = limitSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: limitSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: limitSellOrder.quantity,
                 price: limitSellOrder.price
             });
@@ -1159,10 +1229,14 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             const sellerId = limitSellOrder.userId;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = limitSellOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: limitSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: limitSellOrder.quantity,
                 price: limitSellOrder.price
             });
@@ -1200,10 +1274,14 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             // const quantity = limitSellOrder.quantity - marketBuyOrder.quantity;
 
             // Create a transaction
+            const seller = Trader.findById(sellerId);
+            const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+            const sellerGain = marketBuyOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
             await Transaction.create({
                 buyer_id: marketBuyOrder.userId,
                 seller_id: limitSellOrder.userId,
                 stock_id: stock._id,
+                sellerGain: sellerGain,
                 quantity: marketBuyOrder.quantity,
                 price: limitSellOrder.price
             });
@@ -1251,10 +1329,14 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 const sellerId = limitSellOrder.userId;
 
                 // Create a transaction
+                const seller = Trader.findById(sellerId);
+                const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+                const sellerGain = limitBuyOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
                 await Transaction.create({
                     buyer_id: limitBuyOrder.userId,
                     seller_id: limitSellOrder.userId,
                     stock_id: stock._id,
+                    sellerGain: sellerGain,
                     quantity: limitSellOrder.quantity,
                     price: limitSellOrder.price
                 });
@@ -1291,10 +1373,14 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 const sellerId = limitSellOrder.userId;
 
                 // Create a transaction
+                const seller = Trader.findById(sellerId);
+                const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+                const sellerGain = limitSellOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
                 await Transaction.create({
                     buyer_id: limitBuyOrder.userId,
                     seller_id: limitSellOrder.userId,
                     stock_id: stock._id,
+                    sellerGain: sellerGain,
                     quantity: limitSellOrder.quantity,
                     price: limitSellOrder.price
                 });
@@ -1333,10 +1419,14 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 // const quantity = limitSellOrder.quantity - limitBuyOrder.quantity;
 
                 // Create a transaction
+                const seller = Trader.findById(sellerId);
+                const stockInInvestmentArray = seller.investments.find(investment => investment.symbol === symbol);
+                const sellerGain = limitBuyOrder.quantity * (stockInInvestmentArray.avg - limitSellOrder.price);
                 await Transaction.create({
                     buyer_id: limitBuyOrder.userId,
                     seller_id: limitSellOrder.userId,
                     stock_id: stock._id,
+                    sellerGain: sellerGain,
                     quantity: limitBuyOrder.quantity,
                     price: limitSellOrder.price
                 });
@@ -1960,6 +2050,21 @@ app.get('/getStockInfo', async (req, res) => {
     }
 });
 
+app.get('/getStockInfoById', async (req, res) => {
+    try {
+        const id = req.query.stockId;
+        const stock = await Stock.findById({ id });
+        if (!stock) {
+            return res.status(404).json({ message: 'Stock not found' });
+        }
+        res.status(200).json(stock);
+    } catch (error) {
+        console.error('Error fetching stock:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 app.get('/getTrader', async (req, res) => {
     try {
         const userId = req.query.userId;
@@ -2018,6 +2123,45 @@ app.get('/stockInfo/:symbol', async (req, res) => {
         console.error('Error fetching stock:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
+
+})
+
+app.get('/pnl', async (req, res) => {
+
+    try {
+        const trader = req.query.trader;
+        const fromDate = req.query.fromDate;
+        const toDate = req.query.toDate;
+
+
+
+        const sellTransactions = await Transaction.find({ seller_id: trader._id, transaction_date: { $gte: fromDate, $lte: toDate } });
+
+        const buyTransactions = await Transaction.find({ buyer_id: trader._id, transaction_date: { $gte: fromDate, $lte: toDate } });
+
+        const realisedProfit = 0;
+
+        sellTransactions.forEach(transaction => {
+
+            realisedProfit += transaction.sellerGain;
+        });
+
+        res.status(200).json({
+            buyTransactions: buyTransactions,
+            sellTransactions: sellTransactions,
+            realisedProfit: realisedProfit
+        });
+
+    }
+    catch {
+        res.status(500).send("Internal Server Error");
+    }
+
+
+
+
+
+
 
 })
 

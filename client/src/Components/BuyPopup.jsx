@@ -39,21 +39,40 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
         // console.log("form data", formData);
 
         if (orderCategory === "Buy") {
-            if (formData.quantity <= 0) {
-                alert("Please enter valid quantity");
-                setIsHovered(false);
-                return;
-            }
-            if (formData.orderType === 'limit' && formData.priceLimit <= 0) {
-                alert("Please enter valid price");
-                setIsHovered(false);
-                return;
-            }
-            if (formData.stopLoss >= currentPrice) {
-                alert("Please enter valid stop loss");
-                setIsHovered(false);
-                return;
-            }
+            const response = await axios.get(`/api/getTrader`, {
+                params: {
+                    userId: userId
+                }
+            }).then(res => {
+
+                const trader = res.data.trader;
+
+                if(formData.quantity*formData.priceLimit > trader.funds){
+                    alert("you dont have sufficient funds");
+                    setIsHovered(false);
+                    return;
+                }
+
+                if (formData.quantity <= 0) {
+                    alert("Please enter valid quantity");
+                    setIsHovered(false);
+                    return;
+                }
+                if (formData.orderType === 'limit' && formData.priceLimit <= 0) {
+                    alert("Please enter valid price");
+                    setIsHovered(false);
+                    return;
+                }
+                if (formData.stopLoss >= currentPrice) {
+                    alert("Please enter valid stop loss");
+                    setIsHovered(false);
+                    return;
+                }
+            }).catch(error => {
+                console.error("order placing failed. internal server error.");
+                alert('order placing failed, try again later');
+            })
+            
         }
         else {
             const response = await axios.get(`/api/getTrader`, {
