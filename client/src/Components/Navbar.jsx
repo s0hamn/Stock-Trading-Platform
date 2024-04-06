@@ -5,8 +5,34 @@ import Logo from '../media/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import profileImg from '../media/profilewhite-removebg-preview.png';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import Cookies from 'universal-cookie';
 
 const Navbar = () => {
+
+    const [trader, setTrader] = useState(false);
+    const cookies = new Cookies();
+
+    useEffect(() => {
+        try {
+            axios.post('/api/verifyLogin', {
+                jwtoken: cookies.get('jwtoken'),
+            }).then(res => {
+                if (res.data == "No User Signed In" || res.data == "User not found") {
+                    setTrader(false);
+                } 
+                else {
+                    setTrader(res.data);
+                }
+            })
+        }
+        catch (err) {
+            console.log(err);
+            setTrader(false);
+        }
+
+
+    }, [])
 
     const navigate = useNavigate();
     const handleProfileClick = () => {
@@ -34,12 +60,22 @@ const Navbar = () => {
             </div>
             <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto mr-6">
                 <div className="text-sm lg:flex-grow flex justify-end items-center">
-                    <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
-                    <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
-                    <Link to="/discussionForum" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Discussion</Link>
-                    <button className="bg-transparent hover:bg-white text-slate-200 font-semibold hover:text-indigo-500 py-2 px-4 border border-white hover:border-transparent rounded-sm" onClick={handleLogout}>
+                    { trader &&
+                        <>
+                        <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
+                        <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
+                        <Link to="/discussionForum" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Discussion</Link>
+                        </>
+                    }
+
+                    <Link to="/news" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >News</Link>
+
+
+                    {trader ? (<button className="bg-transparent hover:bg-white text-slate-200 font-semibold hover:text-indigo-500 py-2 px-4 border border-white hover:border-transparent rounded-sm" onClick={handleLogout}>
                         Logout
-                    </button>
+                    </button>) : (<Link to="/login" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Login</Link>)}
+
+                    
                 </div>
             </div>
             <div className="profile cursor-pointer" onClick={handleProfileClick}>

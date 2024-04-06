@@ -71,7 +71,15 @@ const ListOfStocks = () => {
         let filteredStocks = stocks;
 
         if (marketCapFilter !== '') {
-            filteredStocks = filteredStocks.filter(stock => stock.marketCap === marketCapFilter);
+            if(marketCapFilter === 'Small'){
+                filteredStocks = filteredStocks.filter(stock => stock.marketCap <= 10000);
+            }
+            else if(marketCapFilter === 'Medium'){
+                filteredStocks = filteredStocks.filter(stock => stock.marketCap > 10000 && stock.marketCap < 100000);
+            }
+            else{
+                filteredStocks = filteredStocks.filter(stock => stock.marketCap >= 100000);
+            }
         }
 
         if (sectorFilter !== '') {
@@ -112,7 +120,14 @@ const ListOfStocks = () => {
                                     <option value="">All Sectors</option>
                                     <option value="Technology">Technology</option>
                                     <option value="Finance">Finance</option>
-                                    {/* Add other sectors */}
+                                    <option value="Banking">Banking</option>
+                                <option value="Telecommunications">Telecommunications</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Consumer Goods">Consumer Goods</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Energy">Energy</option>
+                                <option value="Pharmaceuticals">Pharmaceuticals</option>
+                                {/* Add other sectors */}
                                 </select>
                             </div>
                         </div>
