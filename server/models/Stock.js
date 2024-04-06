@@ -18,9 +18,12 @@ const stockSchema = new mongoose.Schema({
     ],
     dailyPrices: [
         {
-            date: { type: Date },
-            timestamps: [{ type: Date }],
-            prices: [{ type: Number }]
+            timestamp: { type: Number },
+            open: { type: Number },
+            high: { type: Number },
+            low: { type: Number },
+            close: { type: Number },
+            volume: { type: Number }
         }
     ],
     marketBuyOrderQueue: [

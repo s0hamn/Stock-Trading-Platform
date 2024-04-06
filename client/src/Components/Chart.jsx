@@ -22,6 +22,8 @@ const ApexChart = ({ symbol }) => {
                         y: [date.open, date.high, date.low, date.close]
                     });
                 });
+
+                console.log(temp);
                 setData({
                     companyName: response.data.companyName,
                     data: temp

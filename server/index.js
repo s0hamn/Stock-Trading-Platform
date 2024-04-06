@@ -215,6 +215,16 @@ async function comparePassword(password, hash) {
     return result;
 }
 
+function calculateTimestampIndex(date) {
+    // Calculate the time in minutes since 9:00 AM
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const totalMinutes = (hours - 9) * 60 + minutes;
+
+    // Calculate the index based on 5-minute intervals
+    return Math.floor(totalMinutes / 5);
+}
+
 async function executeOrder(symbol, orderType, orderCategory) {
 
     try {
@@ -294,6 +304,7 @@ async function executeOrder(symbol, orderType, orderCategory) {
 
 
 }
+
 
 async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrderQueue, limitSellOrderQueue) {
     // console.log("SYMBOL", symbol)
@@ -473,6 +484,42 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                     currentPrice: limitSellOrder.price
                 }
             });
+
+            // setting the daily price
+            //comparing current time with the timestamp of the last element in the dailyPrices array which is updated every 5 mins
+
+            const currentTimeStamp = calculateTimestampIndex(new Date());
+            const lastDailyPrice = stock.dailyPrices[stock.dailyPrices.length - 1];
+
+            //timestamp is 0 when time is 9 to 9:05 am and 1 when time is 9:05 to 9:10 am and so onn
+            if (lastDailyPrice && currentTimeStamp === lastDailyPrice.timestamp) {
+                // console.log("Inside if")
+                const lastDailyPriceIndex = stock.dailyPrices.length - 1;
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        [`dailyPrices.${lastDailyPriceIndex}.close`]: limitSellOrder.price,
+                        [`dailyPrices.${lastDailyPriceIndex}.high`]: Math.max(limitSellOrder.price, stock.dailyPrices[lastDailyPriceIndex].high),
+                        [`dailyPrices.${lastDailyPriceIndex}.low`]: Math.min(limitSellOrder.price, stock.dailyPrices[lastDailyPriceIndex].low),
+                        [`dailyPrices.${lastDailyPriceIndex}.volume`]: stock.dailyPrices[lastDailyPriceIndex].volume + marketBuyOrder.quantity
+                    }
+                });
+
+            } else {
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $push: {
+                        dailyPrices: {
+                            timestamp: currentTimeStamp,
+                            open: limitSellOrder.price,
+                            high: limitSellOrder.price,
+                            low: limitSellOrder.price,
+                            close: limitSellOrder.price,
+                            volume: marketBuyOrder.quantity
+                        }
+                    }
+                });
+
+            }
 
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);

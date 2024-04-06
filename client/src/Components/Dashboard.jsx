@@ -9,6 +9,7 @@ import Cookies from 'universal-cookie';
 import { useState } from 'react';
 import io from 'socket.io-client';
 import Chart from './Chart'
+import DailyChart from './DailyChart'
 const PROXY_URL = import.meta.env.VITE_PROXY_URL;
 
 function Dashboard() {
@@ -30,9 +31,49 @@ function Dashboard() {
         data: []
     });
     const [allTransactions, setAllTransactions] = useState([]);
+    const [chartForSymbol, setChartForSymbol] = useState('RELIANCE.NS');
+    function convertIndexToDateTime(index) {
+        // Calculate the total minutes from the start time (9:00 AM) using the index
+        const totalMinutes = index * 5;
+
+        // Calculate hours and minutes from total minutes
+        const hours = Math.floor(totalMinutes / 60) + 9; // Add 9 hours to account for starting from 9:00 AM
+        const minutes = totalMinutes % 60;
 
 
-    // console.log(cookies.get('jwtoken'));
+        // Format hours and minutes to display leading zeros if necessary
+        const formattedHours = hours < 10 ? '0' + hours : hours;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+        // Return the formatted time string
+        // if (minutes % 30 === 0) {
+        return `${formattedHours}:${formattedMinutes}`;
+        // } else {
+        //     return '';
+        // }
+    }
+
+    function calculateTimestampIndex(date) {
+        // Calculate the time in minutes since 9:00 AM
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const totalMinutes = (hours - 9) * 60 + minutes;
+
+        // Calculate the index based on 5-minute intervals
+        return Math.floor(totalMinutes / 5);
+    }
+
+    // useEffect(() => {
+    //     axios.get(`/api/stockInfo/${symbol}`)
+    //         .then(response => {
+
+    //         })
+    //         .catch(error => {
+    //             console.error('Error fetching stock information:', error);
+    //         });
+    // }, []);
+
+    // // console.log(cookies.get('jwtoken'));
 
 
     useEffect(() => {
@@ -75,45 +116,45 @@ function Dashboard() {
         return () => socket.close();
     }, []);
 
-    useEffect(() => {
-        // Establish WebSocket connection
+    // useEffect(() => {
+    //     // Establish WebSocket connection
 
-        const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
-        // console.log("Trader investments", trader.investments);
-        socket.emit('allStocks');
-        // Subscribe to stock updates
-        socket.on('stockUpdate', allStocksData => {
-            setAllStocks(allStocksData);
-            // console.log("all stocks - ", allStocks)
-            const final = []
-            for (let i = 0; i < 100; i++) {
-                let opensum = 0;
-                let highsum = 0;
-                let lowsum = 0;
-                let closesum = 0;
-                // let volume = 0;
-                let date = allStocksData[0].previousHistory[i].date;
-                allStocksData.forEach(stock => {
-                    opensum += stock.previousHistory[i].open;
-                    highsum += stock.previousHistory[i].high;
-                    lowsum += stock.previousHistory[i].low;
-                    closesum += stock.previousHistory[i].close;
-                })
+    //     const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
+    //     // console.log("Trader investments", trader.investments);
+    //     socket.emit('allStocks');
+    //     // Subscribe to stock updates
+    //     socket.on('stockUpdate', allStocksData => {
+    //         setAllStocks(allStocksData);
+    //         // console.log("all stocks - ", allStocks)
+    //         const final = []
+    //         for (let i = 0; i < 100; i++) {
+    //             let opensum = 0;
+    //             let highsum = 0;
+    //             let lowsum = 0;
+    //             let closesum = 0;
+    //             // let volume = 0;
+    //             let date = allStocksData[0].previousHistory[i].date;
+    //             allStocksData.forEach(stock => {
+    //                 opensum += stock.previousHistory[i].open;
+    //                 highsum += stock.previousHistory[i].high;
+    //                 lowsum += stock.previousHistory[i].low;
+    //                 closesum += stock.previousHistory[i].close;
+    //             })
 
-                final.push({
-                    x: date,
-                    y: [opensum / allStocksData.length, highsum / allStocksData.length, lowsum / allStocksData.length, closesum / allStocksData.length]
-                })
-            }
-            // console.log(final)
-            setChartData(final);
+    //             final.push({
+    //                 x: date,
+    //                 y: [opensum / allStocksData.length, highsum / allStocksData.length, lowsum / allStocksData.length, closesum / allStocksData.length]
+    //             })
+    //         }
+    //         // console.log(final)
+    //         setChartData(final);
 
-        });
+    //     });
 
-        // Cleanup: close WebSocket connection
-        return () => socket.close();
+    //     // Cleanup: close WebSocket connection
+    //     return () => socket.close();
 
-    }, []);
+    // }, []);
 
     useEffect(() => {
         // Establish WebSocket connection
@@ -152,11 +193,46 @@ function Dashboard() {
             stocks.forEach((stock, index) => {
                 total += stock.currentPrice * trader.investments[index].quantity;
                 setCurrent(total);
+
+                if (stock.symbol == "RELIANCE.NS") {
+                    const temp = [];
+                    const timestamps = [];
+                    const previousClose = stock.previousClose;
+                    stock.dailyPrices.forEach((date, index) => {
+                        if (timestamps.length === 0 || timestamps[timestamps.length - 1] + 1 !== date.timestamp) {
+                            for (let i = timestamps.length ? timestamps[timestamps.length - 1] + 1 : 0; i < date.timestamp; i++) {
+                                temp.push({
+                                    x: convertIndexToDateTime(i),
+                                    y: [previousClose, previousClose, previousClose, previousClose]
+                                });
+                                timestamps.push(i);
+                            }
+                        }
+                        temp.push({
+                            x: convertIndexToDateTime(date.timestamp),
+                            y: [date.open, date.high, date.low, date.close]
+                        });
+                        timestamps.push(date.timestamp);
+                    });
+
+                    const currentTimeStamp = calculateTimestampIndex(new Date());
+                    for (let i = timestamps[timestamps.length - 1] + 1; i <= currentTimeStamp; i++) {
+                        temp.push({
+                            x: convertIndexToDateTime(i),
+                            y: [temp[temp.length - 1].y[3], temp[temp.length - 1].y[3], temp[temp.length - 1].y[3], temp[temp.length - 1].y[3]]
+                        });
+                    }
+                    console.log(temp);
+                    setChartData({
+                        companyName: stock.companyName,
+                        data: temp
+                    });
+                }
             })
-
-
-
         }
+
+
+        console.log(stocks);
     }
         , [stocks])
 
@@ -326,14 +402,14 @@ function Dashboard() {
 
 
                             <div className='w-full h-2/3 bg-slate-800'>
-                                <Chart chartData={chartData} />
+                                <DailyChart data={chartData} />
                             </div>
                         </div>
                     </div>}
 
 
 
-            </div>
+            </div >
         </>
     )
 }

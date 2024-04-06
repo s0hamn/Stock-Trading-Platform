@@ -12,6 +12,7 @@ import Profile from './Components/Profile'
 import Chart from './Components/Chart'
 import News from './Components/News'
 import DiscussionForum from './Components/DiscussionForum'
+import Test from './Components/Test'
 function App() {
 
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/charts" element={<Chart />} />
         <Route path="/news" element={<News />} />
         <Route path="/discussionForum" element={<DiscussionForum />} />
+        <Route path="/test" element={<Test />} />
       </Routes>
     </BrowserRouter>
   );
