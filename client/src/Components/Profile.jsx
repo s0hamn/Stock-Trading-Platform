@@ -43,12 +43,14 @@ const Profile = () => {
         try {
             const response = await axios.get('/api/pnl', {
                 params: {
-                    trader: trader,
+                    traderId: trader._id.toString(),
                     fromDate: fromDate,
                     toDate: toDate
                 }
             });
             if (response.status === 200) {
+
+                console.log(response.data);
 
                 response.data.buyTransactions.forEach((data) => {
                     axios.get('/api/getStockInfoById',
@@ -97,8 +99,6 @@ const Profile = () => {
                 setPnlData([]);
                 return;
             }
-            setPnlData(response.data);
-            setIsPnlDataPresent(true);
         } catch (error) {
             console.error('Error fetching P&L data:', error);
             setIsPnlDataPresent(false);
@@ -277,10 +277,10 @@ const Profile = () => {
                                     </div>
                                     <hr />
 
-                                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-3 rounded " onClick={handleDeposit}>
+                                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 my-3 rounded " onClick={handleDeposit}>
                                         Deposit
                                     </button>
-                                    <button class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 my-2 border border-blue-500 hover:border-transparent rounded" onClick={handleWithdraw}>
+                                    <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 my-2 border border-blue-500 hover:border-transparent rounded" onClick={handleWithdraw}>
                                         Withdraw
                                     </button>
                                 </div>
@@ -339,7 +339,9 @@ const Profile = () => {
                                 <div className="w-full">
                                     <div className="text-xl font-semibold mb-2">Realised Profit</div>
                                     <div className="border-b-2 border-gray-300 mb-4"></div>
-                                    <h1 className="text-xl">{pnlData.realisedProfit}</h1>
+                                    <h1 className={`text-xl ${pnlData.realisedProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                        {pnlData.realisedProfit >= 0 ? '+' : '-'}{Math.abs(pnlData.realisedProfit)}
+                                    </h1>
                                 </div>
                                 <div className="w-full">
                                     <div className="text-xl font-semibold mb-2">Total Buy Transactions</div>
@@ -373,10 +375,10 @@ const Profile = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {pnlData.buyTransactions.map((data, index) => (
+                                            {pnlData.buyTransactions.length && pnlData.buyTransactions.map((data, index) => (
                                                 <tr key={index}>
                                                     <td className="px-4 py-2">{data.transaction_date}</td>
-                                                    <td className="px-4 py-2">{data.stock.companyName}</td>
+                                                    <td className="px-4 py-2">{data.stock && data.stock.companyName}</td>
                                                     <td className="px-4 py-2">{data.price}</td>
                                                     <td className="px-4 py-2">{data.quantity}</td>
                                                 </tr>
@@ -397,10 +399,10 @@ const Profile = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {pnlData.sellTransactions.map((data, index) => (
+                                            {pnlData.sellTransactions.length && pnlData.sellTransactions.map((data, index) => (
                                                 <tr key={index}>
                                                     <td className="px-4 py-2">{data.transaction_date}</td>
-                                                    <td className="px-4 py-2">{data.stock.companyName}</td>
+                                                    <td className="px-4 py-2">{data.stock && (data.stock.companyName)}</td>
                                                     <td className="px-4 py-2">{data.price}</td>
                                                     <td className="px-4 py-2">{data.quantity}</td>
                                                     <td className="px-4 py-2">{data.sellerGain}</td>
