@@ -11,6 +11,7 @@ import io from 'socket.io-client';
 import Chart from './Chart'
 import DailyChart from './DailyChart'
 import moment from 'moment';
+import WatchListStock from './WatchListStock'
 const PROXY_URL = import.meta.env.VITE_PROXY_URL;
 
 function Dashboard() {
@@ -133,45 +134,7 @@ function Dashboard() {
         // Cleanup: close WebSocket connection
         return () => socket.close();
     }, []);
-    // useEffect(() => {
-    //     // Establish WebSocket connection
 
-    //     const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
-    //     // console.log("Trader investments", trader.investments);
-    //     socket.emit('allStocks');
-    //     // Subscribe to stock updates
-    //     socket.on('stockUpdate', allStocksData => {
-    //         setAllStocks(allStocksData);
-    //         // console.log("all stocks - ", allStocks)
-    //         const final = []
-    //         for (let i = 0; i < 100; i++) {
-    //             let opensum = 0;
-    //             let highsum = 0;
-    //             let lowsum = 0;
-    //             let closesum = 0;
-    //             // let volume = 0;
-    //             let date = allStocksData[0].previousHistory[i].date;
-    //             allStocksData.forEach(stock => {
-    //                 opensum += stock.previousHistory[i].open;
-    //                 highsum += stock.previousHistory[i].high;
-    //                 lowsum += stock.previousHistory[i].low;
-    //                 closesum += stock.previousHistory[i].close;
-    //             })
-
-    //             final.push({
-    //                 x: date,
-    //                 y: [opensum / allStocksData.length, highsum / allStocksData.length, lowsum / allStocksData.length, closesum / allStocksData.length]
-    //             })
-    //         }
-    //         // console.log(final)
-    //         setChartData(final);
-
-    //     });
-
-    //     // Cleanup: close WebSocket connection
-    //     return () => socket.close();
-
-    // }, []);
 
     useEffect(() => {
         // Establish WebSocket connection
@@ -201,6 +164,21 @@ function Dashboard() {
         }
 
     }, [trader]);
+
+    useEffect(() => {
+        if (trader.watchlist) {
+            const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
+            socket.emit('someStocks', trader.watchlist);
+            socket.on('stockUpdate', updatedStocks => {
+                setWatchlist(updatedStocks);
+            });
+            return () => socket.close();
+        }
+    }, [trader])
+
+    // useEffect(() => {
+    //     console.log(watchlist);
+    // }, [watchlist])
 
     useEffect(() => {
         let total = 0;
@@ -282,7 +260,7 @@ function Dashboard() {
     function displayExecutedOrders(allTransactions) {
         let result = [];
         let count = 0;
-        try{
+        try {
             for (let i = 0; i < allTransactions.length; i++) {
                 const formattedDate = moment(allTransactions[i].transaction_date).format("MMMM D, YYYY");
                 if (trader._id == allTransactions[i].buyer_id) {
@@ -297,7 +275,7 @@ function Dashboard() {
             console.log("Count - ", count)
             return result;
         }
-        catch(err){
+        catch (err) {
             console.log(err);
         }
     }
@@ -307,7 +285,7 @@ function Dashboard() {
         let result = [];
         let count = 0;
         for (let i = 0; i < allStocks.length; i++) {
-            try{
+            try {
                 if (allStocks[i].marketBuyOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].marketBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].marketBuyOrderQueue[j].userId) {
@@ -319,10 +297,10 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
-            try{
+            try {
                 if (allStocks[i].marketSellOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].marketSellOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].marketSellOrderQueue[j].userId) {
@@ -334,10 +312,10 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
-            try{
+            try {
                 if (allStocks[i].limitBuyOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].limitBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitBuyOrderQueue[j].userId) {
@@ -349,10 +327,10 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
-            try{
+            try {
                 if (allStocks[i].limitSellOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].limitSellOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitSellOrderQueue[j].userId) {
@@ -364,7 +342,7 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
         }
@@ -381,7 +359,7 @@ function Dashboard() {
                     <div className="h-full flex justify-center items-center">
                         <Loader />
                     </div> :
-                    <div className="flex h-full">
+                    <div className="flex h-5/6">
                         <div className="flex h-full px-4 py-4 w-1/3 flex-col ">
                             <h2 className="text-lg font-semibold w-full">Portfolio</h2>
                             <div className="h-full w-full overflow-y-scroll">
@@ -413,8 +391,18 @@ function Dashboard() {
                                                 <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
                                             </div>
                                         )
-                                    }) : stocksType == "orders" ? display(allStocks, allTransactions)
-                                        : "Portfolio is empty"}
+                                    }) : stocksType == "watchlist" ?
+
+                                        watchlist.map((stock, index) => {
+                                            return (
+                                                <div key={index} className='px-2'>
+                                                    <WatchListStock stock={stock} userId={trader._id} />
+                                                </div>
+                                            )
+                                        })
+
+                                        : stocksType == "orders" ? display(allStocks, allTransactions)
+                                            : "Portfolio is empty"}
 
                                     <div>
                                         <div className="flex justify-between my-4">

@@ -89,24 +89,6 @@ io.on('connection', socket => {
 
 });
 
-async function sendWatchlist(socket, watchlist) {
-    const stocks = []
-    console.log("Watchlist requested for: ", watchlist)
-    try {
-        watchlist.forEach(stockid => {
-            const stock = Stock.findOne({ _id: stockid });
-            // console.log(stock);
-            stocks.push(stock);
-        });
-        console.log(stocks);
-        socket.emit("watchlistStocks", stocks);
-    } catch (error) {
-        // console.log("Error", error);
-        socket.emit('watchlistStocks', { message: 'Internal server error' });
-
-    }
-}
-
 async function sendStockChart(socket, symbol) {
     try {
         const stock = await Stock.findOne({
@@ -224,6 +206,42 @@ function calculateTimestampIndex(date) {
     // Calculate the index based on 5-minute intervals
     return Math.floor(totalMinutes / 5);
 }
+
+async function updateDailyPrices(stock, price, quantity) {
+    const currentTimeStamp = calculateTimestampIndex(new Date());
+    const lastDailyPrice = stock.dailyPrices[stock.dailyPrices.length - 1];
+
+    //timestamp is 0 when time is 9 to 9:05 am and 1 when time is 9:05 to 9:10 am and so onn
+    if (lastDailyPrice && currentTimeStamp === lastDailyPrice.timestamp) {
+        // console.log("Inside if")
+        const lastDailyPriceIndex = stock.dailyPrices.length - 1;
+
+        await Stock.findByIdAndUpdate(stock._id, {
+            $set: {
+                [`dailyPrices.${lastDailyPriceIndex}.close`]: price,
+                [`dailyPrices.${lastDailyPriceIndex}.high`]: Math.max(price, stock.dailyPrices[lastDailyPriceIndex].high),
+                [`dailyPrices.${lastDailyPriceIndex}.low`]: Math.min(price, stock.dailyPrices[lastDailyPriceIndex].low),
+                [`dailyPrices.${lastDailyPriceIndex}.volume`]: stock.dailyPrices[lastDailyPriceIndex].volume + quantity
+            }
+        });
+
+    } else {
+        await Stock.findByIdAndUpdate(stock._id, {
+            $push: {
+                dailyPrices: {
+                    timestamp: currentTimeStamp,
+                    open: price,
+                    high: price,
+                    low: price,
+                    close: price,
+                    volume: quantity
+                }
+            }
+        });
+
+    }
+}
+
 
 async function executeOrder(symbol, orderType, orderCategory) {
 
@@ -491,6 +509,8 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                 price: stock.currentPrice
             });
 
+
+
             marketBuyOrderQueue.shift();
             limitSellOrderQueue.shift();
 
@@ -500,42 +520,11 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                     currentPrice: limitSellOrder.price
                 }
             });
-
+            updateDailyPrices(stock, limitSellOrder.price, marketBuyOrder.quantity);
             // setting the daily price
             //comparing current time with the timestamp of the last element in the dailyPrices array which is updated every 5 mins
 
-            const currentTimeStamp = calculateTimestampIndex(new Date());
-            const lastDailyPrice = stock.dailyPrices[stock.dailyPrices.length - 1];
 
-            //timestamp is 0 when time is 9 to 9:05 am and 1 when time is 9:05 to 9:10 am and so onn
-            if (lastDailyPrice && currentTimeStamp === lastDailyPrice.timestamp) {
-                // console.log("Inside if")
-                const lastDailyPriceIndex = stock.dailyPrices.length - 1;
-
-                await Stock.findByIdAndUpdate(stock._id, {
-                    $set: {
-                        [`dailyPrices.${lastDailyPriceIndex}.close`]: limitSellOrder.price,
-                        [`dailyPrices.${lastDailyPriceIndex}.high`]: Math.max(limitSellOrder.price, stock.dailyPrices[lastDailyPriceIndex].high),
-                        [`dailyPrices.${lastDailyPriceIndex}.low`]: Math.min(limitSellOrder.price, stock.dailyPrices[lastDailyPriceIndex].low),
-                        [`dailyPrices.${lastDailyPriceIndex}.volume`]: stock.dailyPrices[lastDailyPriceIndex].volume + marketBuyOrder.quantity
-                    }
-                });
-
-            } else {
-                await Stock.findByIdAndUpdate(stock._id, {
-                    $push: {
-                        dailyPrices: {
-                            timestamp: currentTimeStamp,
-                            open: limitSellOrder.price,
-                            high: limitSellOrder.price,
-                            low: limitSellOrder.price,
-                            close: limitSellOrder.price,
-                            volume: marketBuyOrder.quantity
-                        }
-                    }
-                });
-
-            }
 
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
@@ -582,6 +571,8 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             marketBuyOrderQueue.shift();
             limitSellOrderQueue[0].quantity = quantity;
 
+            updateDailyPrices(stock, limitSellOrder.price, marketBuyOrder.quantity);
+
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
 
@@ -625,7 +616,7 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             limitSellOrderQueue.shift();
 
             marketBuyOrderQueue[0].quantity = marketBuyOrder.quantity - limitSellOrder.quantity
-
+            updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
@@ -811,7 +802,7 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
 
             marketSellOrderQueue.shift();
             limitBuyOrderQueue.shift();
-
+            updateDailyPrices(stock, limitBuyOrder.price, marketSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
 
@@ -856,7 +847,7 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
 
             marketSellOrderQueue.shift();
             limitBuyOrderQueue[0].quantity = quantity;
-
+            updateDailyPrices(stock, limitBuyOrder.price, marketSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
 
@@ -904,7 +895,7 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             limitBuyOrderQueue.shift();
 
             marketSellOrderQueue[0].quantity = marketSellOrder.quantity - limitBuyOrder.quantity // Update the sell order quantity
-
+            updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
             updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price); // Update seller's investments
 
@@ -964,7 +955,7 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
 
             limitBuyOrderQueue.shift();
             marketSellOrderQueue.shift();
-
+            updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
 
@@ -1008,7 +999,7 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
 
             limitBuyOrderQueue.shift();
             marketSellOrderQueue[0].quantity = quantity;
-
+            updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
 
@@ -1053,7 +1044,7 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             marketSellOrderQueue.shift();
 
             limitBuyOrderQueue[0].quantity = limitBuyOrder.quantity - marketSellOrder.quantity
-
+            updateDailyPrices(stock, limitBuyOrder.price, marketSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
 
@@ -1106,6 +1097,7 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 limitBuyOrderQueue.shift();
                 limitSellOrderQueue.shift();
 
+                updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
 
@@ -1149,7 +1141,7 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
 
                 limitBuyOrderQueue.shift();
                 limitSellOrderQueue[0].quantity = quantity;
-
+                updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
             } else {
@@ -1194,6 +1186,7 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
 
                 limitBuyOrderQueue[0].quantity = limitBuyOrder.quantity - limitSellOrder.quantity
 
+                updateDailyPrices(stock, limitBuyOrder.price, limitSellOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
                 updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
 
@@ -1254,7 +1247,7 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
 
             limitSellOrderQueue.shift();
             marketBuyOrderQueue.shift();
-
+            updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
@@ -1298,7 +1291,7 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
 
             limitSellOrderQueue.shift();
             marketBuyOrderQueue[0].quantity = quantity;
-
+            updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
@@ -1345,7 +1338,7 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             marketBuyOrderQueue.shift();
 
             limitSellOrderQueue[0].quantity = limitSellOrder.quantity - marketBuyOrder.quantity
-
+            updateDailyPrices(stock, limitSellOrder.price, marketBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);  // Update buyer's investments
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price); // Update seller's investments
 
@@ -1398,7 +1391,7 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
 
                 limitSellOrderQueue.shift();
                 limitBuyOrderQueue.shift();
-
+                updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
@@ -1443,7 +1436,7 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
 
                 limitSellOrderQueue.shift();
                 limitBuyOrderQueue[0].quantity = quantity;
-
+                updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
@@ -1489,7 +1482,7 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 limitBuyOrderQueue.shift();
 
                 limitSellOrderQueue[0].quantity = limitSellOrder.quantity - limitBuyOrder.quantity
-
+                updateDailyPrices(stock, limitSellOrder.price, limitBuyOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitSellOrder.price);  // Update buyer's investments
                 updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitSellOrder.price); // Update seller's investments
 
@@ -1715,7 +1708,7 @@ app.post('/addComment/:postId', async (req, res) => {
 
 app.post('/addToWatchlist', async (req, res) => {
     try {
-        const stockId = req.body.stockId;
+        const symbol = req.body.symbol;
         const userId = req.body.userId;
 
         const trader = await TraderModel.findById(userId);
@@ -1725,12 +1718,12 @@ app.post('/addToWatchlist', async (req, res) => {
         }
 
         for (let i = 0; i < trader.watchlist.length; i++) {
-            if (trader.watchlist[i].equals(stockId)) {
+            if (trader.watchlist[i].equals(symbol)) {
                 return res.status(400).send("Stock already exists in watchlist");
             }
         }
 
-        trader.watchlist.push(stockId);
+        trader.watchlist.push({ symbol: symbol });
         await trader.save();
 
         return res.status(200).json({ message: "Stock added to watchlist successfully" });
