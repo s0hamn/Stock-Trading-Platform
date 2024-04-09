@@ -1856,6 +1856,23 @@ app.put('/updateWithdraw', async (req, res) => {
     }
 })
 
+app.get('/news', async (req, res) => {
+    try {
+        // console.log('Fetching news from newsapi.org');
+        const apiKey = '5ba48d6cf4794f01991b0114521a6cb0';
+        const response = await axios.get(`https://newsapi.org/v2/everything?q=stock&q=NSE&q=BSE&sortBy=publishedAt&apiKey=${apiKey}`);
+        if(response.data.articles.length === 0 || response.status !== 200){
+            return res.status(404).json({ error: 'No news found' });
+        }
+        // console.log('got response from news api');
+        res.status(200).json(response.data.articles);
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        res.status(500).json({ error: 'Error fetching news. Please try again later.' });
+    }
+});
+
+
 app.post('/verifyLogin', async (req, res) => {
     // console.log("Inside Dashboard");
     try {
