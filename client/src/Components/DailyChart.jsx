@@ -146,14 +146,15 @@ const ApexChart = ({ data }) => {
 
     return (
         <div>
+
+            <div>
+                <label htmlFor="chartType" style={{ color: 'white' }}>Chart Type: </label>
+                <select id="chartType" value={chartType} onChange={(e) => handleChartTypeChange(e.target.value)} style={{ color: 'black' }}>
+                    <option value="compact">Compact</option>
+                    <option value="enlarged">Enlarged</option>
+                </select>
+            </div>
             {!loader ? <>
-                <div>
-                    <label htmlFor="chartType" style={{ color: 'white' }}>Chart Type: </label>
-                    <select id="chartType" value={chartType} onChange={(e) => handleChartTypeChange(e.target.value)} style={{ color: 'black' }}>
-                        <option value="compact">Compact</option>
-                        <option value="enlarged">Enlarged</option>
-                    </select>
-                </div>
                 <div id="chart">
                     <ReactApexChart options={chartData.options} series={chartData.series} type="candlestick" height={350} />
                 </div></> : <div className='h-96 flex justify-center items-center' ><Loader /></div>}

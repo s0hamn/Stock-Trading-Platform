@@ -6,7 +6,7 @@ import Modal from 'react-modal';
 import Preloader from './Preloader';
 
 
-function StockCard({ stock, index, stocks, profit, profitClass, userId }) {
+function StockCard({ stock, index, stocks, profit, profitClass, userId, setChartSymbol }) {
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -45,7 +45,7 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId }) {
 
     return (
         <>
-            <div className={` relative ${isHovered ? "opacity-85" : ""}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} >
+            <div onClick={() => { setChartSymbol(stock.symbol) }} className={` relative cursor-pointer`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} >
                 <div >
                     <div className={`flex justify-between text-xs mb-2 mt-3`}>
                         <p className='text-slate-400'>Qty. <span className='text-black mr-2'>{stock.quantity}</span>

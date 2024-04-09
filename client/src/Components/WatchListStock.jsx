@@ -6,7 +6,7 @@ import Preloader from './Preloader';
 import BuyPopup from './BuyPopup';
 
 
-function WatchListStock({ stock, userId }) {
+function WatchListStock({ stock, userId, setChartSymbol }) {
 
     const colorClass = stock.currentPrice - stock.previousClose > 0 ? "text-green-500" : "text-red-500";
 
@@ -46,7 +46,7 @@ function WatchListStock({ stock, userId }) {
     }
     return (
         <>
-            <div className={` relative ${isHovered ? "opacity-85" : ""}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} >
+            <div onClick={() => { setChartSymbol(stock.symbol) }} className={`cursor-pointer relative ${isHovered ? "opacity-85" : ""}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} >
                 <div >
 
                     <div className="flex justify-between mt-2">

@@ -33,7 +33,7 @@ function Dashboard() {
         data: []
     });
     const [allTransactions, setAllTransactions] = useState([]);
-    const [chartForSymbol, setChartForSymbol] = useState('RELIANCE.NS');
+    const [chartSymbol, setChartSymbol] = useState('RELIANCE.NS');
     function convertIndexToDateTime(index) {
         // Calculate the total minutes from the start time (9:00 AM) using the index
         const totalMinutes = index * 5;
@@ -189,7 +189,7 @@ function Dashboard() {
                 total += stock.currentPrice * trader.investments[index].quantity;
                 setCurrent(total);
 
-                if (stock.symbol == "RELIANCE.NS") {
+                if (stock.symbol == chartSymbol) {
                     const temp = [];
                     const timestamps = [];
                     const previousClose = stock.previousClose;
@@ -229,7 +229,7 @@ function Dashboard() {
 
         console.log(stocks);
     }
-        , [stocks])
+        , [stocks, chartSymbol])
 
 
 
@@ -240,10 +240,10 @@ function Dashboard() {
                     <div className="text-sm font-medium text-center text-gray-500  border-gray-200 dark:text-gray-400 dark:border-gray-700 mb-2">
                         <ul className="flex flex-wrap -mb-px">
                             <button onClick={() => setOrderStatus('pending')} className="me-2 flex-1">
-                                <a href="#" className={`inline-block p-4 ${orderStatus == 'pending' ? "text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`}>Pending</a>
+                                <a href="#" className={`inline-block p-4 ${orderStatus == 'pending' ? "text-red-600 border-b-2 border-red-600 rounded-t-lg active dark:text-red-600 dark:border-red-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`}>Pending</a>
                             </button>
                             <button onClick={() => setOrderStatus('executed')} className="me-2 flex-1">
-                                <a href="#" className={`inline-block p-4 ${orderStatus == 'executed' ? "text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`} aria-current="page">Executed</a>
+                                <a href="#" className={`inline-block p-4 ${orderStatus == 'executed' ? "text-lime-600 border-b-2 border-lime-600 rounded-t-lg active dark:text-lime-500 dark:border-lime-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`} aria-current="page">Executed</a>
                             </button>
 
 
@@ -388,7 +388,7 @@ function Dashboard() {
 
                                             <div key={index} className='px-2'>
                                                 {/* {console.log(trader._id)} */}
-                                                <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
+                                                <StockCard setChartSymbol={setChartSymbol} stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
                                             </div>
                                         )
                                     }) : stocksType == "watchlist" ?
@@ -396,7 +396,7 @@ function Dashboard() {
                                         watchlist.map((stock, index) => {
                                             return (
                                                 <div key={index} className='px-2'>
-                                                    <WatchListStock stock={stock} userId={trader._id} />
+                                                    <WatchListStock setChartSymbol={setChartSymbol} stock={stock} userId={trader._id} />
                                                 </div>
                                             )
                                         })
