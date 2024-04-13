@@ -264,11 +264,11 @@ function Dashboard() {
             for (let i = 0; i < allTransactions.length; i++) {
                 const formattedDate = moment(allTransactions[i].transaction_date).format("MMMM D, YYYY");
                 if (trader._id == allTransactions[i].buyer_id) {
-                    result.push(<div key={count} className='px-2'><OrderCard symbol={"Symbol"} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Buy"} /></div>)
+                    result.push(<div key={count} className='px-2'><OrderCard symbol={"Symbol"} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Buy"} order_id=''/></div>)
                     count++;
                 }
                 else if (trader._id == allTransactions[i].seller_id) {
-                    result.push(<div key={count} className='px-2'><OrderCard symbol={"Symbol"} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Sell"} /></div>)
+                    result.push(<div key={count} className='px-2'><OrderCard symbol={"Symbol"} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Sell"} order_id='' /></div>)
                     count++;
                 }
             }
@@ -290,7 +290,7 @@ function Dashboard() {
                     for (let j = 0; j < allStocks[i].marketBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].marketBuyOrderQueue[j].userId) {
                             const formattedDate = moment(allStocks[i].marketBuyOrderQueue[j].orderDate).format("MMMM D, YYYY");
-                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].marketBuyOrderQueue[j].quantity} price={100} date={formattedDate} orderType="Market Buy" /></div>)
+                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].marketBuyOrderQueue[j].quantity} price={100} date={formattedDate} orderType="Market Buy" order_id={allStocks[i].marketBuyOrderQueue[j]._id} /></div>)
                             count++;
                         }
                     }
@@ -305,7 +305,7 @@ function Dashboard() {
                     for (let j = 0; j < allStocks[i].marketSellOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].marketSellOrderQueue[j].userId) {
                             const formattedDate = moment(allStocks[i].marketSellOrderQueue[j].orderDate).format("MMMM D, YYYY");
-                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].marketSellOrderQueue[j].quantity} price={100} date={formattedDate} orderType="Market Sell" /></div>)
+                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].marketSellOrderQueue[j].quantity} price={100} date={formattedDate} orderType="Market Sell" order_id={allStocks[i].marketSellOrderQueue[j]._id} /></div>)
                             count++;
                         }
                     }
@@ -320,7 +320,7 @@ function Dashboard() {
                     for (let j = 0; j < allStocks[i].limitBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitBuyOrderQueue[j].userId) {
                             const formattedDate = moment(allStocks[i].limitBuyOrderQueue[j].orderDate).format("MMMM D, YYYY");
-                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].limitBuyOrderQueue[j].quantity} price={allStocks[i].limitBuyOrderQueue[j].price} date={formattedDate} orderType={"Limit Buy"} /></div>)
+                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].limitBuyOrderQueue[j].quantity} price={allStocks[i].limitBuyOrderQueue[j].price} date={formattedDate} orderType={"Limit Buy"} order_id={allStocks[i].limitBuyOrderQueue[j]._id}/></div>)
                             count++;
                         }
                     }
@@ -335,7 +335,8 @@ function Dashboard() {
                     for (let j = 0; j < allStocks[i].limitSellOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitSellOrderQueue[j].userId) {
                             const formattedDate = moment(allStocks[i].limitSellOrderQueue[j].orderDate).format("MMMM D, YYYY");
-                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].limitSellOrderQueue[j].quantity} price={allStocks[i].limitSellOrderQueue[j].price} date={formattedDate} orderType="Limit Sell" /></div>)
+                            // console.log('Order id - ', allStocks[i].limitSellOrderQueue[j]._id)
+                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].limitSellOrderQueue[j].quantity} price={allStocks[i].limitSellOrderQueue[j].price} date={formattedDate} orderType="Limit Sell" order_id={allStocks[i].limitSellOrderQueue[j]._id} /></div>)
                             count++;
                         }
                     }

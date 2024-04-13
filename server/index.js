@@ -1890,6 +1890,75 @@ app.post('/verifyLogin', async (req, res) => {
     }
 });
 
+app.post('/cancelOrder', async (req, res) => {
+    try {
+        const stock_symbol = req.body.symbol;
+        const orderId = req.body.orderId;
+        const orderType = req.body.orderType;
+        const stock = await Stock.findOne({ symbol: stock_symbol });
+        if (!stock) {
+            res.send('fail')
+        }
+        if(orderType == 'Market Buy'){
+            for(let i = 0; i < stock.marketBuyOrderQueue.length; i++){
+                if(stock.marketBuyOrderQueue[i]._id == orderId){
+                    await Stock.findByIdAndUpdate(stock._id, {
+                        $pull: {
+                            marketBuyOrderQueue: { _id: stock.marketBuyOrderQueue[i]._id }
+                        }
+                    })
+                    res.send('success')
+                }
+            }
+        }
+        else if(orderType == 'Market Sell'){
+            for(let i = 0; i < stock.marketSellOrderQueue.length; i++){
+                if(stock.marketSellOrderQueue[i]._id == orderId){
+                    await Stock.findByIdAndUpdate(stock._id, {
+                        $pull: {
+                            marketSellOrderQueue: { _id: stock.marketSellOrderQueue[i]._id}
+                        }
+                    })
+                    res.send('success')
+                }
+            }
+        }
+        else if(orderType == 'Limit Buy'){
+            for(let i = 0; i < stock.limitBuyOrderQueue.length; i++){
+                if(stock.limitBuyOrderQueue[i]._id == orderId){
+                    await Stock.findByIdAndUpdate(stock._id, {
+                        $pull: {
+                            limitBuyOrderQueue: {_id: stock.limitBuyOrderQueue[i]._id}
+                        }
+                    })
+                    res.send('success');
+                }
+            }
+        }
+        else if(orderType == 'Limit Sell'){
+            console.log('Inside Limit Sell');
+            for(let i = 0; i < stock.limitSellOrderQueue.length; i++){
+                if(stock.limitSellOrderQueue[i]._id == orderId){
+                    await Stock.findByIdAndUpdate(stock._id, {
+                        $pull: {
+                            limitSellOrderQueue: { _id: stock.limitSellOrderQueue[i]._id }
+                        }
+                    });
+                    res.send('success');
+                }
+            }
+        }
+        else{
+            res.send('fail')
+        }
+        res.send('success')
+
+    } catch (error) {
+        console.log(error);
+        res.send('fail')
+    }
+})
+
 app.post('/placeOrder', async (req, res) => {
 
     try {
