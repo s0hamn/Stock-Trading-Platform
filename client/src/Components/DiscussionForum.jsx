@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Preloader from './Preloader';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
@@ -76,40 +75,33 @@ const DiscussionForum = () => {
     }, []);
 
 
+    const fetchPosts = async () => {
+        try {
+            const response = await axios.get('/api/posts');
+            setPosts(response.data);
+            handleFilter(selectedCompany);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+        }
+    };
+
+
+    const fetchComments = async () => {
+        try {
+            const response = await axios.get(`/api/comments`);
+            setComments(response.data);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            setComments([]);
+        }
+    };
+
+
     useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const response = await axios.get('/api/posts');
-                setPosts(response.data);
-                setFilteredPosts(response.data);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching posts:', error);
-            }
-        };
-
-        const fetchComments = async () => {
-            try {
-                const response = await axios.get(`/api/comments`);
-                setComments(response.data);
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-                setComments([]);
-            }
-        };
-
         // Execute fetchPosts and fetchComments initially
         fetchPosts();
         fetchComments();
-
-        // Execute fetchPosts and fetchComments every 2 seconds
-        const interval = setInterval(() => {
-            fetchPosts();
-            fetchComments();
-        }, 2000);
-
-        // Cleanup the interval to prevent memory leaks
-        return () => clearInterval(interval);
     }, []);
 
 
@@ -118,12 +110,13 @@ const DiscussionForum = () => {
     const handleFilter = (companyName) => {
         setSelectedCompany(companyName);
         if (companyName === '') {
-            setFilteredPosts(posts);
+            setFilteredPosts(posts); // Reset filter, show all posts
         } else {
             const filtered = posts.filter(post => post.stockName === companyName);
-            setFilteredPosts(filtered);
+            setFilteredPosts(filtered); // Apply filter based on selected company
         }
     };
+
 
 
     // Function to add a new comment to a post
@@ -201,11 +194,16 @@ const DiscussionForum = () => {
                                 ))}
                             </select>
                             <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md" onClick={() => handleFilter('')}>Clear Filter</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md" onClick={() => {
+                                fetchPosts();
+                                fetchComments();
+                            }}>Refresh Posts</button>
                         </div>
                     </div>
 
                     {/* Posts and comments section */}
-                    <div className="mt-20 overflow-y-scroll bg-gray-200 mb-20">
+                    <div className="mt-20 overflow-y-scroll bg-gray-200 pb-16">
                         {filteredPosts.map(post => (
                             <div key={post._id} className="m-12 bg-white shadow-md overflow-y-scroll">
 
@@ -237,8 +235,8 @@ const DiscussionForum = () => {
                                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2 " onClick={() => toggleComments(post._id)}>
                                         {selectedPostIdForShowingComments === post._id ? 'Hide Comments' : 'Show Comments'}
                                     </button>
-                                    
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2" onClick={() => {setShowAddCommentModal(true); setIdForAddingComment(post._id)}}>Add Comment</button>
+
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2" onClick={() => { setShowAddCommentModal(true); setIdForAddingComment(post._id) }}>Add Comment</button>
                                     {post.userId === trader._id && (
                                         <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md m-2" onClick={() => deletePost(post._id)}>Delete Post</button>
                                     )}
@@ -301,7 +299,7 @@ const DiscussionForum = () => {
 
 
                     {/* Add new post button and modal */}
-                    <div className="fixed bottom-0 left-0 right-0 bg-gray-100 z-10 w-full flex justify-center p-6 shadow-md">
+                    <div className="fixed bottom-0 left-0 right-0 bg-gray-100 z-10 w-full flex justify-center p-3 shadow-md">
                         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md m-auto" onClick={() => setShowPopup(true)}>Add New Post</button>
                         <Modal
                             isOpen={showPopup}

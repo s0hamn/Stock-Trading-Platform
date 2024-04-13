@@ -94,12 +94,12 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
     });
   }
 
-  const addToWatchlist = (stockId, userId) => {
+  const addToWatchlist = (symbol, userId) => {
 
-    console.log("Adding stock to watchlist with stockId:", stockId, "and userId:", userId);
+    console.log("Adding stock to watchlist with stockId:", symbol, "and userId:", userId);
 
     axios.post('/api/addToWatchlist', {
-      stockId: stockId,
+      symbol: symbol,
       userId: userId
     }).then(res => {
       console.log(res.data);
@@ -121,7 +121,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   return (
 
-    <div className={ ` bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2 h-80`}
+    <div className={` bg-white rounded-lg shadow-md p-6 ${isHovered ? 'scale-105' : ''} transition-transform duration-300 ease-in-out m-2 h-80`}
       onMouseEnter={() => {
         setIsHovered(true);
         console.log('Mouse entered');
@@ -173,7 +173,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
         <button
           className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded mt-2"
-          onClick={() => addToWatchlist(id, userId)}
+          onClick={() => addToWatchlist(symbol, userId)}
         >
           Watchlist
         </button>

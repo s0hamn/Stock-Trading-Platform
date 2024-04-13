@@ -36,8 +36,7 @@ const TraderSchema = new mongoose.Schema({
     },
     watchlist: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Stock'
+            symbol: { type: String, required: true },
         }
     ],
     investments: [

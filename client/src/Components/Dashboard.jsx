@@ -11,6 +11,7 @@ import io from 'socket.io-client';
 import Chart from './Chart'
 import DailyChart from './DailyChart'
 import moment from 'moment';
+import WatchListStock from './WatchListStock'
 const PROXY_URL = import.meta.env.VITE_PROXY_URL;
 
 function Dashboard() {
@@ -32,7 +33,7 @@ function Dashboard() {
         data: []
     });
     const [allTransactions, setAllTransactions] = useState([]);
-    const [chartForSymbol, setChartForSymbol] = useState('RELIANCE.NS');
+    const [chartSymbol, setChartSymbol] = useState('RELIANCE.NS');
     function convertIndexToDateTime(index) {
         // Calculate the total minutes from the start time (9:00 AM) using the index
         const totalMinutes = index * 5;
@@ -133,45 +134,7 @@ function Dashboard() {
         // Cleanup: close WebSocket connection
         return () => socket.close();
     }, []);
-    // useEffect(() => {
-    //     // Establish WebSocket connection
 
-    //     const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
-    //     // console.log("Trader investments", trader.investments);
-    //     socket.emit('allStocks');
-    //     // Subscribe to stock updates
-    //     socket.on('stockUpdate', allStocksData => {
-    //         setAllStocks(allStocksData);
-    //         // console.log("all stocks - ", allStocks)
-    //         const final = []
-    //         for (let i = 0; i < 100; i++) {
-    //             let opensum = 0;
-    //             let highsum = 0;
-    //             let lowsum = 0;
-    //             let closesum = 0;
-    //             // let volume = 0;
-    //             let date = allStocksData[0].previousHistory[i].date;
-    //             allStocksData.forEach(stock => {
-    //                 opensum += stock.previousHistory[i].open;
-    //                 highsum += stock.previousHistory[i].high;
-    //                 lowsum += stock.previousHistory[i].low;
-    //                 closesum += stock.previousHistory[i].close;
-    //             })
-
-    //             final.push({
-    //                 x: date,
-    //                 y: [opensum / allStocksData.length, highsum / allStocksData.length, lowsum / allStocksData.length, closesum / allStocksData.length]
-    //             })
-    //         }
-    //         // console.log(final)
-    //         setChartData(final);
-
-    //     });
-
-    //     // Cleanup: close WebSocket connection
-    //     return () => socket.close();
-
-    // }, []);
 
     useEffect(() => {
         // Establish WebSocket connection
@@ -203,6 +166,21 @@ function Dashboard() {
     }, [trader]);
 
     useEffect(() => {
+        if (trader.watchlist) {
+            const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
+            socket.emit('someStocks', trader.watchlist);
+            socket.on('stockUpdate', updatedStocks => {
+                setWatchlist(updatedStocks);
+            });
+            return () => socket.close();
+        }
+    }, [trader])
+
+    // useEffect(() => {
+    //     console.log(watchlist);
+    // }, [watchlist])
+
+    useEffect(() => {
         let total = 0;
         if (stocks.length > 0) {
 
@@ -211,7 +189,7 @@ function Dashboard() {
                 total += stock.currentPrice * trader.investments[index].quantity;
                 setCurrent(total);
 
-                if (stock.symbol == "RELIANCE.NS") {
+                if (stock.symbol == chartSymbol) {
                     const temp = [];
                     const timestamps = [];
                     const previousClose = stock.previousClose;
@@ -251,7 +229,7 @@ function Dashboard() {
 
         console.log(stocks);
     }
-        , [stocks])
+        , [stocks, chartSymbol])
 
 
 
@@ -262,10 +240,10 @@ function Dashboard() {
                     <div className="text-sm font-medium text-center text-gray-500  border-gray-200 dark:text-gray-400 dark:border-gray-700 mb-2">
                         <ul className="flex flex-wrap -mb-px">
                             <button onClick={() => setOrderStatus('pending')} className="me-2 flex-1">
-                                <a href="#" className={`inline-block p-4 ${orderStatus == 'pending' ? "text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`}>Pending</a>
+                                <a href="#" className={`inline-block p-4 ${orderStatus == 'pending' ? "text-red-600 border-b-2 border-red-600 rounded-t-lg active dark:text-red-600 dark:border-red-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`}>Pending</a>
                             </button>
                             <button onClick={() => setOrderStatus('executed')} className="me-2 flex-1">
-                                <a href="#" className={`inline-block p-4 ${orderStatus == 'executed' ? "text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`} aria-current="page">Executed</a>
+                                <a href="#" className={`inline-block p-4 ${orderStatus == 'executed' ? "text-lime-600 border-b-2 border-lime-600 rounded-t-lg active dark:text-lime-500 dark:border-lime-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`} aria-current="page">Executed</a>
                             </button>
 
 
@@ -282,7 +260,7 @@ function Dashboard() {
     function displayExecutedOrders(allTransactions) {
         let result = [];
         let count = 0;
-        try{
+        try {
             for (let i = 0; i < allTransactions.length; i++) {
                 const formattedDate = moment(allTransactions[i].transaction_date).format("MMMM D, YYYY");
                 if (trader._id == allTransactions[i].buyer_id) {
@@ -297,7 +275,7 @@ function Dashboard() {
             console.log("Count - ", count)
             return result;
         }
-        catch(err){
+        catch (err) {
             console.log(err);
         }
     }
@@ -307,7 +285,7 @@ function Dashboard() {
         let result = [];
         let count = 0;
         for (let i = 0; i < allStocks.length; i++) {
-            try{
+            try {
                 if (allStocks[i].marketBuyOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].marketBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].marketBuyOrderQueue[j].userId) {
@@ -319,10 +297,10 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
-            try{
+            try {
                 if (allStocks[i].marketSellOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].marketSellOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].marketSellOrderQueue[j].userId) {
@@ -334,10 +312,10 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
-            try{
+            try {
                 if (allStocks[i].limitBuyOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].limitBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitBuyOrderQueue[j].userId) {
@@ -349,10 +327,10 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
-            try{
+            try {
                 if (allStocks[i].limitSellOrderQueue.length != 0) {
                     for (let j = 0; j < allStocks[i].limitSellOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitSellOrderQueue[j].userId) {
@@ -364,7 +342,7 @@ function Dashboard() {
 
                 }
             }
-            catch(err){
+            catch (err) {
                 console.log(err);
             }
         }
@@ -381,7 +359,7 @@ function Dashboard() {
                     <div className="h-full flex justify-center items-center">
                         <Loader />
                     </div> :
-                    <div className="flex h-full">
+                    <div className="flex h-5/6">
                         <div className="flex h-full px-4 py-4 w-1/3 flex-col ">
                             <h2 className="text-lg font-semibold w-full">Portfolio</h2>
                             <div className="h-full w-full overflow-y-scroll">
@@ -410,11 +388,21 @@ function Dashboard() {
 
                                             <div key={index} className='px-2'>
                                                 {/* {console.log(trader._id)} */}
-                                                <StockCard stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
+                                                <StockCard setChartSymbol={setChartSymbol} stock={stock} index={index} stocks={stocks} profit={profit} profitClass={profitClass} userId={trader._id} />
                                             </div>
                                         )
-                                    }) : stocksType == "orders" ? display(allStocks, allTransactions)
-                                        : "Portfolio is empty"}
+                                    }) : stocksType == "watchlist" ?
+
+                                        watchlist.map((stock, index) => {
+                                            return (
+                                                <div key={index} className='px-2'>
+                                                    <WatchListStock setChartSymbol={setChartSymbol} stock={stock} userId={trader._id} />
+                                                </div>
+                                            )
+                                        })
+
+                                        : stocksType == "orders" ? display(allStocks, allTransactions)
+                                            : "Portfolio is empty"}
 
                                     <div>
                                         <div className="flex justify-between my-4">

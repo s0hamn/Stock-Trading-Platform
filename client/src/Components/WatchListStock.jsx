@@ -1,12 +1,14 @@
 import React from 'react'
 import { useState } from 'react';
-import BuyPopup from './BuyPopup';
-import axios from 'axios';
 import Modal from 'react-modal';
+import axios from 'axios';
 import Preloader from './Preloader';
+import BuyPopup from './BuyPopup';
 
 
-function StockCard({ stock, index, stocks, profit, profitClass, userId, setChartSymbol }) {
+function WatchListStock({ stock, userId, setChartSymbol }) {
+
+    const colorClass = stock.currentPrice - stock.previousClose > 0 ? "text-green-500" : "text-red-500";
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -42,25 +44,19 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId, setChart
             console.error('Error analysing stock:', err);
         });
     }
-
     return (
         <>
-            <div onClick={() => { setChartSymbol(stock.symbol) }} className={` relative cursor-pointer`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} >
+            <div onClick={() => { setChartSymbol(stock.symbol) }} className={`cursor-pointer relative ${isHovered ? "opacity-85" : ""}`} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} >
                 <div >
-                    <div className={`flex justify-between text-xs mb-2 mt-3`}>
-                        <p className='text-slate-400'>Qty. <span className='text-black mr-2'>{stock.quantity}</span>
-                            Avg. <span className='text-black'>{stock.avg.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></p>
-                        <p className={`${profitClass}`}>{profit > 0 ? "+" : ""}{profit.toLocaleString(undefined, { maximumFractionDigits: 2 })}%</p>
-                    </div>
 
-                    <div className="flex justify-between">
-                        <h3>{stocks[index].symbol}</h3>
-                        <p className={`${profitClass}`}>{profit > 0 ? "+" : ""}{(stock.quantity * (stocks[index].currentPrice - stock.avg)).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                    <div className="flex justify-between mt-2">
+                        <h3>{stock.symbol}</h3>
+                        <p className={`${colorClass}`}>{stock.currentPrice.toLocaleString(2)}</p>
                     </div>
 
                     <div className="flex justify-between text-xs mb-3 mt-2" >
-                        <p className='text-slate-400'>Invested <span className='text-black'>{(stock.quantity * stock.avg).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></p>
-                        <p className='text-slate-400'>LTP. <span className='text-black'>{(stocks[index].currentPrice).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span> <span>({profit > 0 ? "+" : ""}{((stocks[index].currentPrice - stock.avg) / stock.avg).toLocaleString(undefined, { maximumFractionDigits: 2 })}%)</span></p>
+                        <p className='text-slate-400'>NSE </p>
+                        <p className='text-slate-400'>{stock.currentPrice - stock.previousClose > 0 ? "+" : ""}{(stock.currentPrice - stock.previousClose).toLocaleString(2)} ({stock.currentPrice - stock.previousClose > 0 ? "+" : ""}{(((stock.currentPrice - stock.previousClose) / stock.previousClose) * 100).toLocaleString(2)}%)</p>
                     </div>
                 </div>
 
@@ -68,9 +64,9 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId, setChart
                     <div className='absolute top-0 right-1/3 w-full flex justify-end gap-2'>
 
                         <BuyPopup
-                            orderCategory="Sell"
-                            symbol={stocks[index].symbol}
-                            currentPrice={stocks[index].currentPrice}
+                            orderCategory="Buy"
+                            symbol={stock.symbol}
+                            currentPrice={stock.currentPrice}
                             userId={userId}
                         />
 
@@ -80,7 +76,7 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId, setChart
                             position="right center"
                             onClick={() => {
                                 setModalIsOpen(true);
-                                analyseStock(stocks[index]._id, userId);
+                                analyseStock(stock._id, userId);
                             }}
 
                         >
@@ -215,9 +211,8 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId, setChart
                     </div> : ""}
             </div >
 
-            <hr />
-        </>
+            <hr /></>
     )
 }
 
-export default StockCard
+export default WatchListStock
