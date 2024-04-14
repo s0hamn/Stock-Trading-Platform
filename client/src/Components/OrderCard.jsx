@@ -27,7 +27,11 @@ const OrderCard = ({symbol, quantity, price, date, orderType, order_id }) => {
                 {orderType == "Limit Buy" || orderType == "Limit Sell" || orderType == "Buy" || orderType == "Sell"? <p className="mt-2 text-gray-500">Price - {price}</p>: null}
                 <p className="mt-2 text-gray-500">Date - {date}</p>
                 <p className="mt-2 text-gray-500">Type - {orderType}</p>
-                <button onClick={() => cancleOrder({symbol}, {orderType}, {order_id})}className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Cancel</button>
+                {order_id !== "" && (
+                <button onClick={() => cancelOrder(order_id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Cancel
+                </button>
+            )}
             </div>
         </div>
     </div>

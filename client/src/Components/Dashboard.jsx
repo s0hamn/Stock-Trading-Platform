@@ -263,12 +263,19 @@ function Dashboard() {
         try {
             for (let i = 0; i < allTransactions.length; i++) {
                 const formattedDate = moment(allTransactions[i].transaction_date).format("MMMM D, YYYY");
+                let symbol;
+                for(let i = 0; i < allStocks.length; i++){
+                    if(allStocks[i]._id == allTransactions[i].stock_id){
+                        symbol = allStocks[i].symbol;
+                        break;
+                    }
+                }
                 if (trader._id == allTransactions[i].buyer_id) {
-                    result.push(<div key={count} className='px-2'><OrderCard symbol={"Symbol"} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Buy"} order_id=''/></div>)
+                    result.push(<div key={count} className='px-2'><OrderCard symbol={symbol} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Buy"} order_id=''/></div>)
                     count++;
                 }
                 else if (trader._id == allTransactions[i].seller_id) {
-                    result.push(<div key={count} className='px-2'><OrderCard symbol={"Symbol"} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Sell"} order_id='' /></div>)
+                    result.push(<div key={count} className='px-2'><OrderCard symbol={symbol} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Sell"} order_id='' /></div>)
                     count++;
                 }
             }
