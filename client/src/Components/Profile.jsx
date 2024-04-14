@@ -148,7 +148,11 @@ const Profile = () => {
         withdrawAmount = Number(withdrawAmount);
         let verifyPass = comparePassword(enteredPassword, trader.password);
         if (verifyPass) {
-            alert("Password correct");
+            // alert("Password correct");
+            if(withdrawAmount > trader.funds){
+                alert("Insufficient funds");
+                return;
+            }
             try {
                 axios.put('/api/updateWithdraw', {
                     jwtoken: cookies.get('jwtoken'),

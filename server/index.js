@@ -1718,7 +1718,7 @@ app.post('/addToWatchlist', async (req, res) => {
         }
 
         for (let i = 0; i < trader.watchlist.length; i++) {
-            if (trader.watchlist[i].equals(symbol)) {
+            if (trader.watchlist[i]['symbol'] == symbol) {
                 return res.status(400).send("Stock already exists in watchlist");
             }
         }
@@ -1895,6 +1895,7 @@ app.post('/cancelOrder', async (req, res) => {
         const stock_symbol = req.body.symbol;
         const orderId = req.body.orderId;
         const orderType = req.body.orderType;
+        console.log('Inside cancel order', stock_symbol, orderId, orderType)
         const stock = await Stock.findOne({ symbol: stock_symbol });
         if (!stock) {
             res.send('fail')
@@ -1938,7 +1939,8 @@ app.post('/cancelOrder', async (req, res) => {
         else if(orderType == 'Limit Sell'){
             console.log('Inside Limit Sell');
             for(let i = 0; i < stock.limitSellOrderQueue.length; i++){
-                if(stock.limitSellOrderQueue[i]._id == orderId){
+                console.log('ith and orderid - ', stock.limitSellOrderQueue[i]['_id'], orderId)
+                if(stock.limitSellOrderQueue[i]['_id'] == orderId){
                     await Stock.findByIdAndUpdate(stock._id, {
                         $pull: {
                             limitSellOrderQueue: { _id: stock.limitSellOrderQueue[i]._id }
@@ -1951,7 +1953,7 @@ app.post('/cancelOrder', async (req, res) => {
         else{
             res.send('fail')
         }
-        res.send('success')
+        console.log('I am here outside');
 
     } catch (error) {
         console.log(error);
