@@ -1,6 +1,8 @@
 import React from 'react'
 import Navbar from './Navbar';
 import MainImage from '../media/stockmarket.png';
+import Card1Image from '../media/card1Image.jpeg';
+import Card2Image from '../media/card2Image.png';
 import { useNavigate } from 'react-router-dom';
 const PROXY_URL = import.meta.env.VITE_PROXY_URL;
 
@@ -54,7 +56,7 @@ function MainPage() {
                     className="flex flex-col m-auto mt-12 mb-12 rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 md:max-w-xl md:flex-row">
                     <img
                         className="h-96 w-full rounded-t-lg object-cover md:h-auto md:w-48 md:rounded-none md:rounded-l-lg"
-                        src="https://tecdn.b-cdn.net/wp-content/uploads/2020/06/vertical.jpg"
+                        src={Card1Image}
                         alt="" />
                     <div className="flex flex-col justify-start p-6">
                         <h5
@@ -62,8 +64,7 @@ function MainPage() {
                             Card title
                         </h5>
                         <p className="mb-4 text-base text-neutral-600 dark:text-neutral-200">
-                            This is a wider card with supporting text below as a natural lead-in
-                            to additional content. This content is a little bit longer.
+                            The stock market is a financial marketplace where investors buy and sell shares of publicly traded companies, enabling businesses to raise capital and investors to potentially earn returns on their investments through buying low and selling high
                         </p>
                         <p className="text-xs text-neutral-500 dark:text-neutral-300">
                             Last updated 3 mins ago
@@ -83,8 +84,7 @@ function MainPage() {
                             Card title
                         </h5>
                         <p className="mb-4 text-base text-neutral-600 dark:text-neutral-200">
-                            This is a wider card with supporting text below as a natural lead-in
-                            to additional content. This content is a little bit longer.
+                            Stock trading involves the buying and selling of shares or equities in publicly traded companies, aiming to profit from fluctuations in their prices over time
                         </p>
                         <p className="text-xs text-neutral-500 dark:text-neutral-300">
                             Last updated 3 mins ago
@@ -92,7 +92,7 @@ function MainPage() {
                     </div>
                     <img
                         className="h-96 w-full rounded-t-lg object-cover md:h-auto md:w-48 md:rounded-none md:rounded-l-lg"
-                        src="https://tecdn.b-cdn.net/wp-content/uploads/2020/06/vertical.jpg"
+                        src={Card2Image}
                         alt="" />
                 </div>
 

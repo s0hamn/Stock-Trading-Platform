@@ -78,7 +78,7 @@ const Login = () => {
 
                         <button
                             type="submit"
-                            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-300 transform-gpu active:scale-95"
                         >
                             Login
                         </button>

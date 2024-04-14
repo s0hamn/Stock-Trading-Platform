@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Loader from './Loader';
-// import Preloader from './Preloader';
 import grayImage from '../media/grayImage.png'
 
 

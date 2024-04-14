@@ -29,7 +29,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
     const [newPost, setNewPost] = useState({
         title: '',
         content: '',
-        stockName: ''
+        stockName: 'Tata Steel Ltd.'
     });
 
     const handleChange = (e) => {
@@ -43,6 +43,10 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
     };
 
     const handleSubmit = async (e) => {
+        if(newPost.title === '' || newPost.content === '' || newPost.stockName === ''){
+            alert('Please fill all the fields');
+            return;
+        }
         e.preventDefault();
         try {
             const formData = {};
@@ -62,7 +66,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
                     setNewPost({
                         title: '',
                         content: '',
-                        stockName: ''
+                        stockName: 'Tata Steel Ltd.'
                     });
                     setShowPopup(false);
                 }
@@ -72,7 +76,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
                     setNewPost({
                         title: '',
                         content: '',
-                        stockName: ''
+                        stockName: 'Tata Steel Ltd.'
                     });
                 }
 
@@ -132,7 +136,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
 
                         <button
                             type="submit"
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md mb-2"
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md mb-2 transition-all duration-300 transform-gpu active:scale-95"
                         >
                             Submit Post
                         </button>

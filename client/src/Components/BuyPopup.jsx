@@ -251,7 +251,10 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
             position="right center"
             open={popupOpen}
             onOpen={() => setPopupOpen(true)}
-            onClose={() => setPopupOpen(false)}
+            onClose={() => {
+                setPopupOpen(false);
+                setIsHovered(false);
+            }}
         >
 
             {close => (
@@ -440,14 +443,14 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
                             <div className="flex justify-center gap-11 m-4">
                                 <button
                                     type="submit"
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 transition-all duration-300 transform-gpu active:scale-95"
                                     onSubmit={handleSubmit}
                                 >
                                     Place
                                 </button>
                                 <button
                                     type="button"
-                                    className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                                    className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-all duration-300 transform-gpu active:scale-95"
                                     onClick={() => {
                                         close(); // Close the popup
                                         // setIsHovered(false); // Set isHovered to false

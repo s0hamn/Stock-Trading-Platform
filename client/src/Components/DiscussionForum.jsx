@@ -109,7 +109,7 @@ const DiscussionForum = () => {
     // Function to handle post filtering based on company name
     const handleFilter = (companyName) => {
         setSelectedCompany(companyName);
-        if (companyName === '') {
+        if (companyName === "") {
             setFilteredPosts(posts); // Reset filter, show all posts
         } else {
             const filtered = posts.filter(post => post.stockName === companyName);
@@ -121,6 +121,10 @@ const DiscussionForum = () => {
 
     // Function to add a new comment to a post
     const addCommentHandler = async (postId) => {
+        if (addComment === '') {
+            alert("Comment cannot be empty");
+            return;
+        }
         try {
             const response = await axios.post(`/api/addComment/${postId}`, { content: addComment, userId: trader._id });
             if (response.status === 200) {
@@ -193,12 +197,13 @@ const DiscussionForum = () => {
                                     <option key={index} value={name}>{name}</option>
                                 ))}
                             </select>
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md" onClick={() => handleFilter('')}>Clear Filter</button>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all duration-300 transform-gpu active:scale-95" onClick={() => handleFilter('')}>Clear Filter</button>
 
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md" onClick={() => {
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all duration-300 transform-gpu active:scale-95" onClick={() => {
                                 fetchPosts();
                                 fetchComments();
                             }}>Refresh Posts</button>
+
                         </div>
                     </div>
 
@@ -232,13 +237,13 @@ const DiscussionForum = () => {
 
                                 {/* Dropdown to toggle comments */}
                                 <div className="flex  items-start ml-4">
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2 " onClick={() => toggleComments(post._id)}>
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2 transition-all duration-300 transform-gpu active:scale-95" onClick={() => toggleComments(post._id)}>
                                         {selectedPostIdForShowingComments === post._id ? 'Hide Comments' : 'Show Comments'}
                                     </button>
 
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2" onClick={() => { setShowAddCommentModal(true); setIdForAddingComment(post._id) }}>Add Comment</button>
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md m-2 transition-all duration-300 transform-gpu active:scale-95" onClick={() => { setShowAddCommentModal(true); setIdForAddingComment(post._id) }}>Add Comment</button>
                                     {post.userId === trader._id && (
-                                        <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md m-2" onClick={() => deletePost(post._id)}>Delete Post</button>
+                                        <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md m-2 transition-all duration-300 transform-gpu active:scale-95" onClick={() => deletePost(post._id)}>Delete Post</button>
                                     )}
                                 </div>
 
@@ -278,14 +283,14 @@ const DiscussionForum = () => {
                                         />
                                         <button
                                             onClick={(e) => addCommentHandler(post._id)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all duration-300 transform-gpu active:scale-95"
                                         >
                                             Submit
                                         </button>
 
                                         <button
                                             onClick={() => setShowAddCommentModal(false)}
-                                            className="bg-gray-500 hover:bg-gray-800 text-white px-4 py-2 rounded-md"
+                                            className="bg-gray-500 hover:bg-gray-800 text-white px-4 py-2 rounded-md transition-all duration-300 transform-gpu active:scale-95"
                                         >
                                             Cancel
                                         </button>
@@ -300,7 +305,7 @@ const DiscussionForum = () => {
 
                     {/* Add new post button and modal */}
                     <div className="fixed bottom-0 left-0 right-0 bg-gray-100 z-10 w-full flex justify-center p-3 shadow-md">
-                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md m-auto" onClick={() => setShowPopup(true)}>Add New Post</button>
+                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md m-auto transition-all duration-300 transform-gpu active:scale-95" onClick={() => setShowPopup(true)}>Add New Post</button>
                         <Modal
                             isOpen={showPopup}
                             onRequestClose={() => setShowPopup(false)}
