@@ -392,6 +392,12 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
 
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         }
         else if (marketBuyOrder.quantity < marketSellOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
@@ -431,6 +437,13 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
+
         } else { // marketBuyOrder.quantity > marketSellOrder.quantity
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -467,7 +480,15 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
 
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
         }
+
+
 
     }
 
@@ -529,6 +550,12 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         }
         else if (marketBuyOrder.quantity < limitSellOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
@@ -576,6 +603,12 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         } else { // marketBuyOrder.quantity > limitSellOrder.quantity
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -619,6 +652,12 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
             updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
         }
 
@@ -678,6 +717,12 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         } else if (marketSellOrder.quantity < marketBuyOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -715,6 +760,12 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
 
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, stock.currentPrice);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, stock.currentPrice);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
         } else {
             await Stock.findByIdAndUpdate(stock._id, {
@@ -754,6 +805,12 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
 
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, stock.currentPrice);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
 
         }
@@ -806,6 +863,12 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         } else if (marketSellOrder.quantity < limitBuyOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -850,6 +913,12 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             updateDailyPrices(stock, limitBuyOrder.price, marketSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
         }
         else {
@@ -898,6 +967,12 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
             updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
             updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price); // Update seller's investments
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
 
         }
@@ -959,6 +1034,12 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         } else if (limitBuyOrder.quantity < marketSellOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -1002,6 +1083,12 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
             updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
         } else { // limitBuyOrder.quantity
             await Stock.findByIdAndUpdate(stock._id, {
@@ -1047,6 +1134,12 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
             updateDailyPrices(stock, limitBuyOrder.price, marketSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
             updateSellerInvestments(sellerId, symbol, marketSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
         }
     }
@@ -1101,6 +1194,12 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
 
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        lastTradedOn: Date.now()
+                    }
+                });
+
             } else if (limitBuyOrder.quantity < limitSellOrder.quantity) {
                 await Stock.findByIdAndUpdate(stock._id, {
                     $pull: {
@@ -1144,6 +1243,12 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 updateDailyPrices(stock, limitBuyOrder.price, limitBuyOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitBuyOrder.price);
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        lastTradedOn: Date.now()
+                    }
+                });
             } else {
                 await Stock.findByIdAndUpdate(stock._id, {
                     $pull: {
@@ -1189,6 +1294,12 @@ async function executeLimitBuyOrder(symbol, limitBuyOrderQueue, limitSellOrderQu
                 updateDailyPrices(stock, limitBuyOrder.price, limitSellOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitBuyOrder.price);  // Update buyer's investments
                 updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitBuyOrder.price); // Update seller's investments
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        lastTradedOn: Date.now()
+                    }
+                });
 
 
             }
@@ -1251,6 +1362,12 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
+
         } else if (limitSellOrder.quantity < marketBuyOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -1294,6 +1411,12 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
             updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
         } else {
             await Stock.findByIdAndUpdate(stock._id, {
@@ -1341,6 +1464,12 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
             updateDailyPrices(stock, limitSellOrder.price, marketBuyOrder.quantity);
             updateBuyerInvestments(buyerId, symbol, marketBuyOrder.quantity, limitSellOrder.price);  // Update buyer's investments
             updateSellerInvestments(sellerId, symbol, marketBuyOrder.quantity, limitSellOrder.price); // Update seller's investments
+
+            await Stock.findByIdAndUpdate(stock._id, {
+                $set: {
+                    lastTradedOn: Date.now()
+                }
+            });
 
 
         }
@@ -1394,6 +1523,11 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 updateDailyPrices(stock, limitSellOrder.price, limitSellOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        lastTradedOn: Date.now()
+                    }
+                });
 
             } else if (limitSellOrder.quantity < limitBuyOrder.quantity) {
                 await Stock.findByIdAndUpdate(stock._id, {
@@ -1440,6 +1574,12 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 updateBuyerInvestments(buyerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
                 updateSellerInvestments(sellerId, symbol, limitSellOrder.quantity, limitSellOrder.price);
 
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        lastTradedOn: Date.now()
+                    }
+                });
+
             } else {
 
                 await Stock.findByIdAndUpdate(stock._id, {
@@ -1485,6 +1625,12 @@ async function executeLimitSellOrder(symbol, limitBuyOrderQueue, limitSellOrderQ
                 updateDailyPrices(stock, limitSellOrder.price, limitBuyOrder.quantity);
                 updateBuyerInvestments(buyerId, symbol, limitBuyOrder.quantity, limitSellOrder.price);  // Update buyer's investments
                 updateSellerInvestments(sellerId, symbol, limitBuyOrder.quantity, limitSellOrder.price); // Update seller's investments
+
+                await Stock.findByIdAndUpdate(stock._id, {
+                    $set: {
+                        lastTradedOn: Date.now()
+                    }
+                });
 
             }
         }
@@ -1739,6 +1885,17 @@ app.post('/addToWatchlist', async (req, res) => {
 app.post('/login', async (req, res) => {
     // console.log(req.body);
 
+    // const randomStock = await Stock.findOne({ symbol: 'RELIANCE.NS' });
+
+    // if (randomStock.lastTradedOn != Date.now()) {
+    //     //clear the daily prices array of all the stocks
+    //     await Stock.updateMany({}, {
+    //         $set: {
+    //             dailyPrices: []
+    //         }
+    //     });
+    // }
+
     const trader = await TraderModel.findOne({
         email: req.body.email
     });
@@ -1861,7 +2018,7 @@ app.get('/news', async (req, res) => {
         // console.log('Fetching news from newsapi.org');
         const apiKey = '5ba48d6cf4794f01991b0114521a6cb0';
         const response = await axios.get(`https://newsapi.org/v2/everything?q=stock&q=NSE&q=BSE&sortBy=publishedAt&apiKey=${apiKey}`);
-        if(response.data.articles.length === 0 || response.status !== 200){
+        if (response.data.articles.length === 0 || response.status !== 200) {
             return res.status(404).json({ error: 'No news found' });
         }
         // console.log('got response from news api');
@@ -1900,9 +2057,9 @@ app.post('/cancelOrder', async (req, res) => {
         if (!stock) {
             res.send('fail')
         }
-        if(orderType == 'Market Buy'){
-            for(let i = 0; i < stock.marketBuyOrderQueue.length; i++){
-                if(stock.marketBuyOrderQueue[i]._id == orderId){
+        if (orderType == 'Market Buy') {
+            for (let i = 0; i < stock.marketBuyOrderQueue.length; i++) {
+                if (stock.marketBuyOrderQueue[i]._id == orderId) {
                     await Stock.findByIdAndUpdate(stock._id, {
                         $pull: {
                             marketBuyOrderQueue: { _id: stock.marketBuyOrderQueue[i]._id }
@@ -1912,35 +2069,35 @@ app.post('/cancelOrder', async (req, res) => {
                 }
             }
         }
-        else if(orderType == 'Market Sell'){
-            for(let i = 0; i < stock.marketSellOrderQueue.length; i++){
-                if(stock.marketSellOrderQueue[i]._id == orderId){
+        else if (orderType == 'Market Sell') {
+            for (let i = 0; i < stock.marketSellOrderQueue.length; i++) {
+                if (stock.marketSellOrderQueue[i]._id == orderId) {
                     await Stock.findByIdAndUpdate(stock._id, {
                         $pull: {
-                            marketSellOrderQueue: { _id: stock.marketSellOrderQueue[i]._id}
+                            marketSellOrderQueue: { _id: stock.marketSellOrderQueue[i]._id }
                         }
                     })
                     res.send('success')
                 }
             }
         }
-        else if(orderType == 'Limit Buy'){
-            for(let i = 0; i < stock.limitBuyOrderQueue.length; i++){
-                if(stock.limitBuyOrderQueue[i]._id == orderId){
+        else if (orderType == 'Limit Buy') {
+            for (let i = 0; i < stock.limitBuyOrderQueue.length; i++) {
+                if (stock.limitBuyOrderQueue[i]._id == orderId) {
                     await Stock.findByIdAndUpdate(stock._id, {
                         $pull: {
-                            limitBuyOrderQueue: {_id: stock.limitBuyOrderQueue[i]._id}
+                            limitBuyOrderQueue: { _id: stock.limitBuyOrderQueue[i]._id }
                         }
                     })
                     res.send('success');
                 }
             }
         }
-        else if(orderType == 'Limit Sell'){
+        else if (orderType == 'Limit Sell') {
             console.log('Inside Limit Sell');
-            for(let i = 0; i < stock.limitSellOrderQueue.length; i++){
+            for (let i = 0; i < stock.limitSellOrderQueue.length; i++) {
                 console.log('ith and orderid - ', stock.limitSellOrderQueue[i]['_id'], orderId)
-                if(stock.limitSellOrderQueue[i]['_id'] == orderId){
+                if (stock.limitSellOrderQueue[i]['_id'] == orderId) {
                     await Stock.findByIdAndUpdate(stock._id, {
                         $pull: {
                             limitSellOrderQueue: { _id: stock.limitSellOrderQueue[i]._id }
@@ -1950,7 +2107,7 @@ app.post('/cancelOrder', async (req, res) => {
                 }
             }
         }
-        else{
+        else {
             res.send('fail')
         }
         console.log('I am here outside');

@@ -60,6 +60,8 @@ const stockSchema = new mongoose.Schema({
             stopLoss: { type: Number, min: 0 }
         }
     ],
+
+    lastTradedOn: { type: Date, default: Date.now }
 });
 
 
