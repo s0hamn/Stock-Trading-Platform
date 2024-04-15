@@ -61,7 +61,7 @@ function MainPage() {
                     <div className="flex flex-col justify-start p-6">
                         <h5
                             className="mb-2 text-xl font-medium text-neutral-800 dark:text-neutral-50">
-                            Card title
+                            Stock Market
                         </h5>
                         <p className="mb-4 text-base text-neutral-600 dark:text-neutral-200">
                             The stock market is a financial marketplace where investors buy and sell shares of publicly traded companies, enabling businesses to raise capital and investors to potentially earn returns on their investments through buying low and selling high
@@ -81,7 +81,7 @@ function MainPage() {
                     <div className="flex flex-col justify-start p-6">
                         <h5
                             className="mb-2 text-xl font-medium text-neutral-800 dark:text-neutral-50">
-                            Card title
+                            What is stock trading ?
                         </h5>
                         <p className="mb-4 text-base text-neutral-600 dark:text-neutral-200">
                             Stock trading involves the buying and selling of shares or equities in publicly traded companies, aiming to profit from fluctuations in their prices over time

@@ -382,7 +382,7 @@ const Profile = () => {
                                             {pnlData.buyTransactions.length && pnlData.buyTransactions.map((data, index) => (
                                                 <tr key={index}>
                                                     <td className="px-4 py-2">{data.transaction_date}</td>
-                                                    <td className="px-4 py-2">{data.stock && data.stock.companyName}</td>
+                                                    <td className="px-4 py-2">{data.stock.companyName}</td>
                                                     <td className="px-4 py-2">{data.price}</td>
                                                     <td className="px-4 py-2">{data.quantity}</td>
                                                 </tr>
@@ -406,10 +406,10 @@ const Profile = () => {
                                             {pnlData.sellTransactions.length && pnlData.sellTransactions.map((data, index) => (
                                                 <tr key={index}>
                                                     <td className="px-4 py-2">{data.transaction_date}</td>
-                                                    <td className="px-4 py-2">{data.stock && (data.stock.companyName)}</td>
+                                                    <td className="px-4 py-2">{data.stock.companyName}</td>
                                                     <td className="px-4 py-2">{data.price}</td>
                                                     <td className="px-4 py-2">{data.quantity}</td>
-                                                    <td className="px-4 py-2">{data.sellerGain}</td>
+                                                    <td className="px-4 py-2">{data.sellerGain.toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
