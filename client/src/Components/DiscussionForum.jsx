@@ -130,6 +130,7 @@ const DiscussionForum = () => {
             if (response.status === 200) {
                 setShowAddCommentModal(false);
                 alert("Comment added successfully");
+                fetchComments();
             }
             else {
                 alert("Error adding comment");
