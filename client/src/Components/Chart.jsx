@@ -58,14 +58,14 @@ const ApexChart = ({ symbol }) => {
                 type: 'datetime',
                 labels: {
                     style: {
-                        colors: "white"
+                        colors: "black"
                     }
                 }
             },
             yaxis: {
                 labels: {
                     style: {
-                        colors: "white"
+                        colors: "black"
                     }
                 },
                 tooltip: {
@@ -84,7 +84,7 @@ const ApexChart = ({ symbol }) => {
                             return val.toFixed(2); // format y-axis value
                         },
                         style: {
-                            color: '#ffffff' // set tooltip text color
+                            color: 'black' // set tooltip text color
                         }
                     }
                 }
@@ -93,7 +93,7 @@ const ApexChart = ({ symbol }) => {
                 text: data.companyName,
                 align: 'left',
                 style: {
-                    color: "white",
+                    color: "black",
                     fontWeight: "200"
                 }
             },
@@ -101,14 +101,14 @@ const ApexChart = ({ symbol }) => {
                 type: 'datetime',
                 labels: {
                     style: {
-                        colors: "white"
+                        colors: "black"
                     }
                 }
             },
             yaxis: {
                 labels: {
                     style: {
-                        colors: "white"
+                        colors: "black"
                     }
                 },
             }
@@ -120,7 +120,7 @@ const ApexChart = ({ symbol }) => {
     return (
         <div>
             <div>
-                <label htmlFor="chartType" style={{ color: 'white' }}>Chart Type: </label>
+                <label htmlFor="chartType" style={{ color: 'black' }}>Chart Type: </label>
                 <select id="chartType" value={chartType} onChange={(e) => handleChartTypeChange(e.target.value)} style={{ color: 'black' }}>
                     <option value="candlestick">Candlestick Chart</option>
                     <option value="line">Line Chart</option>

@@ -206,7 +206,10 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
           }}
           contentLabel="Analyse Stock Modal"
         >
-
+          <h2 className="text-2xl font-semibold mb-4">Analyse Stock {companyName}</h2>
+                  {/* Chart Component */}
+                  
+          <Chart symbol={symbol} />
           {analyseStockData ? (
             <>
               <div className="fixed z-10 inset-0 overflow-y-scroll h-full m-auto w-full flex flex-col items-center justify-center px-4">
@@ -215,10 +218,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
                 
 
                 <div className="bg-white rounded-lg overflow-y-scroll shadow-xl transform transition-all w-3/4 p-6">
-                  <h2 className="text-2xl font-semibold mb-4">Analyse Stock {companyName}</h2>
-                  {/* Chart Component */}
                   
-                  <Chart symbol={symbol} />
                   
 
                   <button
