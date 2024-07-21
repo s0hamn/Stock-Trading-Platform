@@ -18,10 +18,73 @@ const yahooFinance = require('yahoo-finance2').default;
 const Transaction = require('./models/Transaction');
 const Post = require('./models/Post');
 const Comment = require('./models/Comment');
+const cron = require('node-cron');
+const moment = require('moment-timezone');
+
 
 // const executeOrder = require('executeOrder')
 
 const MONGODB_URI = process.env.MONGODB_URI
+
+cron.schedule('0 12 * * *', () => {
+    console.log('Running cron job to update previous day prices at 17:30 PM IST');
+    updatePreviousDayPrices();
+}, {
+    timezone: 'UTC'
+});
+
+async function updatePreviousDayPrices() {
+    try {
+        console.log('Updating previous day prices...');
+        const stocks = await Stock.find();
+        stocks.forEach(async (stock) => {
+            stock.previousClose = stock.currentPrice;
+            stock.dailyPrices = [];
+            stock.limitBuyOrderQueue = [];
+            stock.limitSellOrderQueue = [];
+            stock.marketBuyOrderQueue = [];
+            stock.marketSellOrderQueue = [];
+            await stock.save();
+        });
+    } catch (error) {
+        console.error('Error updating previous day prices:', error);
+    }
+}
+
+cron.schedule('*/4 * * * *', () => {
+    console.log('Running cron job to keep server alive every 4 minutes');
+    keepServerAlive();
+});
+
+async function keepServerAlive() {
+    try {
+        // Replace the URL with your server's URL and endpoint
+        const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/api/keepAlive');
+        console.log('Self ping successful:', response.data);
+    } catch (error) {
+        console.error('Self ping failed:', error.message);
+    }
+}
+
+app.get('/api/keepAlive', (req, res) => {
+    try{
+        res.status(200).send('Server is alive!');
+    }
+    catch(err){
+        res.status(500).send('Server is not alive!');
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
 
 
 
