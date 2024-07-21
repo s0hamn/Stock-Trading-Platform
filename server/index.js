@@ -66,7 +66,7 @@ async function keepServerAlive() {
     }
 }
 
-app.get('/api/keepAlive', (req, res) => {
+app.get('/keepAlive', (req, res) => {
     try{
         res.status(200).send('Server is alive!');
     }
