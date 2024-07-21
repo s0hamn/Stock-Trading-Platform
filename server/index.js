@@ -61,10 +61,8 @@ async function keepServerAlive() {
         // Replace the URL with your server's URL and endpoint
         const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/api/keepAlive');
         console.log('Self ping successful:', response.data);
-        ressponse.status(200).send('Server is alive!');
     } catch (error) {
         console.error('Self ping failed:', error.message);
-        response.status(500).send('Server is not alive!');
     }
 }
 
