@@ -128,7 +128,7 @@ async function updatePreviousDayPrices() {
     }
 }
 
-cron.schedule('*/4 * * * *', () => {
+cron.schedule('*/14 * * * *', () => {
     console.log('Running cron job to keep server alive every 4 minutes');
     keepServerAlive();
 });
