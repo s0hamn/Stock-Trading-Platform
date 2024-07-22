@@ -24,7 +24,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(process.env.VITE_PROXY_URL + '/login', {
+        axios.post('https://stock-trading-platform-o3zp.onrender.com/login', {
             email: form.email,
             password: form.password,
         })
