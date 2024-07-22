@@ -80,7 +80,7 @@ function Dashboard() {
 
     useEffect(() => {
         try {
-            axios.post(process.env.VITE_PROXY_URL + '/verifyLogin', {
+            axios.post('' + import.meta.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data == "No User Signed In") {

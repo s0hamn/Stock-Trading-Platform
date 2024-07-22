@@ -57,7 +57,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
 
             console.log('form data:', formData);
 
-            await axios.post(process.env.VITE_PROXY_URL + '/addPost', {
+            await axios.post('' + import.meta.env.VITE_PROXY_URL + '/addPost', {
                 formData
             }).then(response => {
                 if (response.status === 200) {

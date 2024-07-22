@@ -15,7 +15,7 @@ const Navbar = () => {
 
     useEffect(() => {
         try {
-            axios.post(process.env.VITE_PROXY_URL + '/verifyLogin', {
+            axios.post('' + import.meta.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data == "No User Signed In" || res.data == "User not found") {
@@ -42,7 +42,7 @@ const Navbar = () => {
     const handleLogout = () => {
         try {
             console.log('i m client');
-            axios.get(process.env.VITE_PROXY_URL + '/logout', { withCredentials: true });
+            axios.get('' + import.meta.env.VITE_PROXY_URL + '/logout', { withCredentials: true });
             navigate('/login');
         } catch (error) {
             console.error('Logout Error:', error);

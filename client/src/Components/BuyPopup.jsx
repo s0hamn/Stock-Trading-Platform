@@ -127,7 +127,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
 
         // send order to backend
 
-        await axios.post(process.env.VITE_PROXY_URL + '/placeOrder', {
+        await axios.post('' + import.meta.env.VITE_PROXY_URL + '/placeOrder', {
 
             symbol: symbol,
             orderData: formData,

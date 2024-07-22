@@ -26,7 +26,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
     const checkUserHoldings = async () => {
       try {
         console.log('Checking user holdings...');
-        axios.get(process.env.VITE_PROXY_URL + '/checkIfUserHolding', {
+        axios.get('' + import.meta.env.VITE_PROXY_URL + '/checkIfUserHolding', {
           params: {
             userId: userId,
             symbol: symbol
@@ -77,7 +77,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   const analyseStock = (stockId, userId) => {
     console.log("inside analyse stock event\n")
-    axios.get(process.env.VITE_PROXY_URL + '/analyseStock', {
+    axios.get('' + import.meta.env.VITE_PROXY_URL + '/analyseStock', {
       params: {
         stockId: stockId,
         userId: userId
@@ -101,7 +101,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
     console.log("Adding stock to watchlist with stockId:", symbol, "and userId:", userId);
 
-    axios.post(process.env.VITE_PROXY_URL + '/addToWatchlist', {
+    axios.post('' + import.meta.env.VITE_PROXY_URL + '/addToWatchlist', {
       symbol: symbol,
       userId: userId
     }).then(res => {

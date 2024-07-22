@@ -21,7 +21,7 @@ const Profile = () => {
 
     useEffect(() => {
         try {
-            axios.post(process.env.VITE_PROXY_URL + '/verifyLogin', {
+            axios.post('' + import.meta.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data === "No trader Signed In" || res.data === "trader not found") {
@@ -41,7 +41,7 @@ const Profile = () => {
     const generateReport = async () => {
 
         try {
-            const response = await axios.get(process.env.VITE_PROXY_URL + '/pnl', {
+            const response = await axios.get('' + import.meta.env.VITE_PROXY_URL + '/pnl', {
                 params: {
                     traderId: trader._id.toString(),
                     fromDate: fromDate,
@@ -53,7 +53,7 @@ const Profile = () => {
                 console.log(response.data);
 
                 response.data.buyTransactions.forEach((data) => {
-                    axios.get(process.env.VITE_PROXY_URL + '/getStockInfoById',
+                    axios.get('' + import.meta.env.VITE_PROXY_URL + '/getStockInfoById',
                         {
                             params:
                             {
@@ -72,7 +72,7 @@ const Profile = () => {
                 });
 
                 response.data.sellTransactions.forEach((data) => {
-                    axios.get(process.env.VITE_PROXY_URL + '/getStockInfoById',
+                    axios.get('' + import.meta.env.VITE_PROXY_URL + '/getStockInfoById',
                         {
                             params:
                             {
@@ -120,7 +120,7 @@ const Profile = () => {
         if (verifyPass) {
             alert("Password correct");
             try {
-                axios.put(process.env.VITE_PROXY_URL + '/updateDeposit', {
+                axios.put('' + import.meta.env.VITE_PROXY_URL + '/updateDeposit', {
                     jwtoken: cookies.get('jwtoken'),
                     deposit: depositAmount
                 }).then(res => {
@@ -154,7 +154,7 @@ const Profile = () => {
                 return;
             }
             try {
-                axios.put(process.env.VITE_PROXY_URL + '/updateWithdraw', {
+                axios.put('' + import.meta.env.VITE_PROXY_URL + '/updateWithdraw', {
                     jwtoken: cookies.get('jwtoken'),
                     withdraw: withdrawAmount
                 }).then(res => {

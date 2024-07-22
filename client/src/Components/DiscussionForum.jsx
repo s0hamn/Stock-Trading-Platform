@@ -58,7 +58,7 @@ const DiscussionForum = () => {
     useEffect(() => {
         // Verify login
         try {
-            axios.post(process.env.VITE_PROXY_URL + '/verifyLogin', {
+            axios.post('' + import.meta.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 // console.log(res.data);
@@ -77,7 +77,7 @@ const DiscussionForum = () => {
 
     const fetchPosts = async () => {
         try {
-            const response = await axios.get(process.env.VITE_PROXY_URL + '/posts');
+            const response = await axios.get('' + import.meta.env.VITE_PROXY_URL + '/posts');
             setPosts(response.data);
             handleFilter(selectedCompany);
             setLoading(false);

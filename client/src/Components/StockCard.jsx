@@ -24,7 +24,7 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId, setChart
 
     const analyseStock = (stockId, userId) => {
         console.log("inside analyse stock event\n")
-        axios.get(process.env.VITE_PROXY_URL + '/analyseStock', {
+        axios.get('' + import.meta.env.VITE_PROXY_URL + '/analyseStock', {
             params: {
                 stockId: stockId,
                 userId: userId

@@ -6,7 +6,7 @@ async function cancleOrder(symbol, orderType, order_id) {
   console.log("function Order id - ", order_id['order_id'])
   console.log('symbol - ', symbol['symbol'])
   console.log('orderType - ', orderType['orderType'])
-  await axios.post(process.env.VITE_PROXY_URL + '/cancelOrder', { symbol: symbol['symbol'], orderType: orderType['orderType'], orderId: order_id['order_id'] }).then(res => {
+  await axios.post('' + import.meta.env.VITE_PROXY_URL + '/cancelOrder', { symbol: symbol['symbol'], orderType: orderType['orderType'], orderId: order_id['order_id'] }).then(res => {
     if (res.data == "fail") {
       alert("canellation failed")
     }

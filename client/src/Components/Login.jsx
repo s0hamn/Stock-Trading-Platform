@@ -22,13 +22,13 @@ const Login = () => {
     const cookies = new Cookies();
 
     useEffect(() => {
-        console.log(process.env.VITE_PROXY_URL);
+        console.log('' + import.meta.env.VITE_PROXY_URL);
     }, []);
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(process.env.VITE_PROXY_URL + '/login', {
+        axios.post('' + import.meta.env.VITE_PROXY_URL + '/login', {
             email: form.email,
             password: form.password,
         })
