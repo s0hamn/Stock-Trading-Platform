@@ -49,7 +49,7 @@ app.use(cookies());
 
 app.use(cors(
     {
-        origin: true,
+        origin: '*',
         credentials: true
     }
 ));
