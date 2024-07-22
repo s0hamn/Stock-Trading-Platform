@@ -43,7 +43,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
     };
 
     const handleSubmit = async (e) => {
-        if(newPost.title === '' || newPost.content === '' || newPost.stockName === ''){
+        if (newPost.title === '' || newPost.content === '' || newPost.stockName === '') {
             alert('Please fill all the fields');
             return;
         }
@@ -57,7 +57,7 @@ const AddNewPost = ({ userId, showPopup, setShowPopup }) => {
 
             console.log('form data:', formData);
 
-            await axios.post('/api/addPost', {
+            await axios.post(process.env.VITE_PROXY_URL + '/addPost', {
                 formData
             }).then(response => {
                 if (response.status === 200) {

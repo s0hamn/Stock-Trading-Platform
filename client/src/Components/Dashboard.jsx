@@ -80,7 +80,7 @@ function Dashboard() {
 
     useEffect(() => {
         try {
-            axios.post('/api/verifyLogin', {
+            axios.post(process.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data == "No User Signed In") {
@@ -264,14 +264,14 @@ function Dashboard() {
             for (let i = 0; i < allTransactions.length; i++) {
                 const formattedDate = moment(allTransactions[i].transaction_date).format("MMMM D, YYYY");
                 let symbol;
-                for(let i = 0; i < allStocks.length; i++){
-                    if(allStocks[i]._id == allTransactions[i].stock_id){
+                for (let i = 0; i < allStocks.length; i++) {
+                    if (allStocks[i]._id == allTransactions[i].stock_id) {
                         symbol = allStocks[i].symbol;
                         break;
                     }
                 }
                 if (trader._id == allTransactions[i].buyer_id) {
-                    result.push(<div key={count} className='px-2'><OrderCard symbol={symbol} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Buy"} order_id=''/></div>)
+                    result.push(<div key={count} className='px-2'><OrderCard symbol={symbol} quantity={allTransactions[i].quantity} price={allTransactions[i].price} date={formattedDate} orderType={"Buy"} order_id='' /></div>)
                     count++;
                 }
                 else if (trader._id == allTransactions[i].seller_id) {
@@ -327,7 +327,7 @@ function Dashboard() {
                     for (let j = 0; j < allStocks[i].limitBuyOrderQueue.length; j++) {
                         if (trader._id == allStocks[i].limitBuyOrderQueue[j].userId) {
                             const formattedDate = moment(allStocks[i].limitBuyOrderQueue[j].orderDate).format("MMMM D, YYYY");
-                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].limitBuyOrderQueue[j].quantity} price={allStocks[i].limitBuyOrderQueue[j].price} date={formattedDate} orderType={"Limit Buy"} order_id={allStocks[i].limitBuyOrderQueue[j]._id}/></div>)
+                            result.push(<div key={count} className='px-2'><OrderCard symbol={allStocks[i].symbol} quantity={allStocks[i].limitBuyOrderQueue[j].quantity} price={allStocks[i].limitBuyOrderQueue[j].price} date={formattedDate} orderType={"Limit Buy"} order_id={allStocks[i].limitBuyOrderQueue[j]._id} /></div>)
                             count++;
                         }
                     }

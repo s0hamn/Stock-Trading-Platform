@@ -15,12 +15,12 @@ const Navbar = () => {
 
     useEffect(() => {
         try {
-            axios.post('/api/verifyLogin', {
+            axios.post(process.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data == "No User Signed In" || res.data == "User not found") {
                     setTrader(false);
-                } 
+                }
                 else {
                     setTrader(res.data);
                 }
@@ -42,7 +42,7 @@ const Navbar = () => {
     const handleLogout = () => {
         try {
             console.log('i m client');
-            axios.get('/api/logout', { withCredentials: true });
+            axios.get(process.env.VITE_PROXY_URL + '/logout', { withCredentials: true });
             navigate('/login');
         } catch (error) {
             console.error('Logout Error:', error);
@@ -60,11 +60,11 @@ const Navbar = () => {
             </div>
             <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto mr-6">
                 <div className="text-sm lg:flex-grow flex justify-end items-center">
-                    { trader &&
+                    {trader &&
                         <>
-                        <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
-                        <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
-                        <Link to="/discussionForum" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Discussion</Link>
+                            <Link to="/dashboard" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Dashboard</Link>
+                            <Link to="/stocks" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Stocks</Link>
+                            <Link to="/discussionForum" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Discussion</Link>
                         </>
                     }
 
@@ -75,13 +75,13 @@ const Navbar = () => {
                         Logout
                     </button>) : (<Link to="/login" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4" >Login</Link>)}
 
-                    
+
                 </div>
             </div>
-            {trader && 
-            <div className="profile cursor-pointer" onClick={handleProfileClick}>
-                <img src={profileImg} alt="profile" className='h-10 w-10' />
-            </div>}
+            {trader &&
+                <div className="profile cursor-pointer" onClick={handleProfileClick}>
+                    <img src={profileImg} alt="profile" className='h-10 w-10' />
+                </div>}
 
 
         </nav>

@@ -24,7 +24,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('/api/login', {
+        axios.post(process.env.VITE_PROXY_URL + '/login', {
             email: form.email,
             password: form.password,
         })

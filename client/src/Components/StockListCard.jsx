@@ -26,7 +26,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
     const checkUserHoldings = async () => {
       try {
         console.log('Checking user holdings...');
-        axios.get('/api/checkIfUserHolding', {
+        axios.get(process.env.VITE_PROXY_URL + '/checkIfUserHolding', {
           params: {
             userId: userId,
             symbol: symbol
@@ -77,7 +77,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
   const analyseStock = (stockId, userId) => {
     console.log("inside analyse stock event\n")
-    axios.get('/api/analyseStock', {
+    axios.get(process.env.VITE_PROXY_URL + '/analyseStock', {
       params: {
         stockId: stockId,
         userId: userId
@@ -101,7 +101,7 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
 
     console.log("Adding stock to watchlist with stockId:", symbol, "and userId:", userId);
 
-    axios.post('/api/addToWatchlist', {
+    axios.post(process.env.VITE_PROXY_URL + '/addToWatchlist', {
       symbol: symbol,
       userId: userId
     }).then(res => {
@@ -207,19 +207,19 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
           contentLabel="Analyse Stock Modal"
         >
           <h2 className="text-2xl font-semibold mb-4">Analyse Stock {companyName}</h2>
-                  {/* Chart Component */}
-                  
+          {/* Chart Component */}
+
           <Chart symbol={symbol} />
           {analyseStockData ? (
             <>
               <div className="fixed z-10 inset-0 overflow-y-scroll h-full m-auto w-full flex flex-col items-center justify-center px-4">
                 <div className="absolute inset-0 bg-gray-500 opacity-75" aria-hidden="true"></div>
 
-                
+
 
                 <div className="bg-white rounded-lg overflow-y-scroll shadow-xl transform transition-all w-3/4 p-6">
-                  
-                  
+
+
 
                   <button
                     onClick={() => {

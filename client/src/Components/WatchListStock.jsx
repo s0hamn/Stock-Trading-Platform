@@ -26,7 +26,7 @@ function WatchListStock({ stock, userId, setChartSymbol }) {
 
     const analyseStock = (stockId, userId) => {
         console.log("inside analyse stock event\n")
-        axios.get('/api/analyseStock', {
+        axios.get(process.env.VITE_PROXY_URL + '/analyseStock', {
             params: {
                 stockId: stockId,
                 userId: userId

@@ -47,7 +47,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
 
                 const trader = res.data.trader;
 
-                if(formData.quantity*formData.priceLimit > trader.funds){
+                if (formData.quantity * formData.priceLimit > trader.funds) {
                     alert("you dont have sufficient funds");
                     setIsHovered(false);
                     return;
@@ -72,7 +72,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
                 console.error("order placing failed. internal server error.");
                 alert('order placing failed, try again later');
             })
-            
+
         }
         else {
             const response = await axios.get(`/api/getTrader`, {
@@ -127,7 +127,7 @@ const BuyPopup = ({ symbol, currentPrice, userId, orderCategory, isHovered, setI
 
         // send order to backend
 
-        await axios.post('/api/placeOrder', {
+        await axios.post(process.env.VITE_PROXY_URL + '/placeOrder', {
 
             symbol: symbol,
             orderData: formData,

@@ -28,7 +28,7 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(form);
-        axios.post('/api/register', {
+        axios.post(process.env.VITE_PROXY_URL + '/register', {
             name: form.name,
             email: form.email,
             password: form.password,
@@ -56,7 +56,7 @@ const Register = () => {
 
     const handleOTPSubmit = (e) => {
         e.preventDefault();
-        axios.post('/api/verifyOTP', {
+        axios.post(process.env.VITE_PROXY_URL + '/verifyOTP', {
             name: form.name,
             email: form.email,
             password: form.password,
