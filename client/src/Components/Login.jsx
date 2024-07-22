@@ -25,12 +25,11 @@ const Login = () => {
     const handleSubmit = (e) => {
         console.log(form);
         e.preventDefault();
-        axios.post('/api/login', {
+        axios.post('/login', {
             email: form.email,
             password: form.password,
         })
             .then((res) => {
-                console.log(res);
                 if (res.data.result === "Success") {
                     alert("Login Successful");
                     // console.log(res.data.token);
