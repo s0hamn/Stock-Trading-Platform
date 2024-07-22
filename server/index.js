@@ -110,12 +110,10 @@ cron.schedule('0 12 * * *', async () => {
         if(response.status === 200){
             console.log(response.data);
         }
-
     }
     catch(error){
         console.error('Error updating previous day prices:', error);
     }
-
 }, {
     timezone: 'UTC'
 });
@@ -125,6 +123,30 @@ app.get('/updatePreviousDayPrices', async (req, res) => {
         console.log('Updating previous day prices...');
         const stocks = await Stock.find();
         for (const stock of stocks) {
+            let highestPrice = stock.currentPrice;
+            let lowestPrice = stock.currentPrice;
+            let totalVolume = 0;
+
+            if (stock.dailyPrices.length > 0) {
+                highestPrice = stock.dailyPrices.reduce((max, dp) => dp.high > max ? dp.high : max, stock.dailyPrices[0].high);
+                lowestPrice = stock.dailyPrices.reduce((min, dp) => dp.low < min ? dp.low : min, stock.dailyPrices[0].low);
+                totalVolume = stock.dailyPrices.reduce((total, dp) => total + dp.volume, 0);
+            }
+
+            const openPrice = stock.previousClose;
+            const closePrice = stock.currentPrice;
+            const date = new Date();
+
+            const priceHistoryObject = {
+                open: openPrice,
+                high: highestPrice,
+                low: lowestPrice,
+                close: closePrice,
+                volume: totalVolume,
+                date: date
+            };
+
+            stock.previousHistory.push(priceHistoryObject);
             stock.previousClose = stock.currentPrice;
             stock.dailyPrices = [];
             stock.limitBuyOrderQueue = [];
@@ -133,11 +155,12 @@ app.get('/updatePreviousDayPrices', async (req, res) => {
             stock.marketSellOrderQueue = [];
             await stock.save();
         }
+
         console.log('Previous day prices updated successfully.');
-        res.status(200).send('updated daily prices');
+        res.status(200).send('Updated daily prices');
     } catch (error) {
         console.error('Error updating previous day prices:', error);
-        res.status(500).send('updated daily prices');
+        res.status(500).send('Error updating daily prices');
     }
 });
 
