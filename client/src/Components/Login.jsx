@@ -24,7 +24,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('/login', {
+        axios.post('/api/login', {
             email: form.email,
             password: form.password,
         })
