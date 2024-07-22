@@ -114,7 +114,7 @@ async function updatePreviousDayPrices() {
     try {
         console.log('Updating previous day prices...');
         const stocks = await Stock.find();
-        stocks.forEach(async (stock) => {
+        for (const stock of stocks) {
             stock.previousClose = stock.currentPrice;
             stock.dailyPrices = [];
             stock.limitBuyOrderQueue = [];
@@ -122,13 +122,14 @@ async function updatePreviousDayPrices() {
             stock.marketBuyOrderQueue = [];
             stock.marketSellOrderQueue = [];
             await stock.save();
-        });
+        }
+        console.log('Previous day prices updated successfully.');
     } catch (error) {
         console.error('Error updating previous day prices:', error);
     }
 }
 
-cron.schedule('*/4 * * * *', () => {
+cron.schedule('*/14 * * * *', () => {
     console.log('Running cron job to keep server alive every 4 minutes');
     keepServerAlive();
 });
