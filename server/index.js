@@ -180,10 +180,10 @@ async function keepServerAlive() {
 }
 
 app.get('/keepAlive', async (req, res) => {
-    try{
+    try {
         res.status(200).send('Server is alive!');
     }
-    catch(err){
+    catch (err) {
         res.status(500).send('Server is not alive!');
     }
 });
@@ -1994,6 +1994,8 @@ app.post('/login', async (req, res) => {
     //         }
     //     });
     // }
+
+    console.log("Request login with email: ", req.body.email);
 
     const trader = await TraderModel.findOne({
         email: req.body.email
