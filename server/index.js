@@ -136,7 +136,7 @@ cron.schedule('*/4 * * * *', () => {
 async function keepServerAlive() {
     try {
         // Replace the URL with your server's URL and endpoint
-        const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/api/keepAlive');
+        const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/keepAlive');
         console.log('Self ping successful:', response.data);
     } catch (error) {
         console.error('Self ping failed:', error.message);
