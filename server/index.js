@@ -104,14 +104,14 @@ io.on('connection', socket => {
 
 
 cron.schedule('0 12 * * *', async () => {
-    try{
+    try {
         console.log('Running cron job to update previous day prices at 17:30 PM IST');
         const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/updatePreviousDayPrices');
-        if(response.status === 200){
+        if (response.status === 200) {
             console.log(response.data);
         }
     }
-    catch(error){
+    catch (error) {
         console.error('Error updating previous day prices:', error);
     }
 }, {
