@@ -29,6 +29,7 @@ const Login = () => {
             password: form.password,
         })
             .then((res) => {
+                console.log("HEREEEEEEEEEEEE")
                 console.log(res);
                 if (res.data.result === "Success") {
                     alert("Login Successful");
