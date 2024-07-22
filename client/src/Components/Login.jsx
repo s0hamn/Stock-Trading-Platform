@@ -23,6 +23,7 @@ const Login = () => {
 
 
     const handleSubmit = (e) => {
+        console.log(form);
         e.preventDefault();
         axios.post('/api/login', {
             email: form.email,
