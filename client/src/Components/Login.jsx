@@ -29,8 +29,7 @@ const Login = () => {
             password: form.password,
         })
             .then((res) => {
-                console.log("HEREEEEEEEEEEEE")
-                console.log(res);
+                console.log("RESPONSE", res);
                 if (res.data.result === "Success") {
                     alert("Login Successful");
                     // console.log(res.data.token);
@@ -44,7 +43,7 @@ const Login = () => {
 
             })
             .catch((err) => {
-                console.log(err);
+                console.log("ERROR", err);
             });
     };
 
