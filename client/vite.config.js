@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-// const PROXY_URL = import.meta.env.VITE_PROXY_URL
-// https://vitejs.dev/config/
+import { VitePWA } from 'vite-plugin-pwa';
 
 
 export default ({ mode }) => {
@@ -10,7 +9,7 @@ export default ({ mode }) => {
   // import.meta.env.YinYang -> process.env.YinYang
 
   return defineConfig({
-    plugins: [react()],
+    plugins: [VitePWA(manifestForPlugin), react()],
     server: {
       proxy: {
         '/api': {
