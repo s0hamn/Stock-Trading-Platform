@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -21,10 +21,14 @@ const Login = () => {
     // axios.defaults.withCredentials = true;
     const cookies = new Cookies();
 
+    useEffect(() => {
+        console.log(process.env.VITE_PROXY_URL);
+    }, []);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('https://stock-trading-platform-o3zp.onrender.com/login', {
+        axios.post(process.env.VITE_PROXY_URL + '/login', {
             email: form.email,
             password: form.password,
         })
