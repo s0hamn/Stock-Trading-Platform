@@ -103,14 +103,24 @@ io.on('connection', socket => {
 });
 
 
-cron.schedule('0 12 * * *', () => {
-    console.log('Running cron job to update previous day prices at 17:30 PM IST');
-    updatePreviousDayPrices();
+cron.schedule('0 12 * * *', async () => {
+    try{
+        console.log('Running cron job to update previous day prices at 17:30 PM IST');
+        const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/updatePreviousDayPrices');
+        if(response.status === 200){
+            console.log(response.data);
+        }
+
+    }
+    catch(error){
+        console.error('Error updating previous day prices:', error);
+    }
+
 }, {
     timezone: 'UTC'
 });
 
-async function updatePreviousDayPrices() {
+app.get('/updatePreviousDayPrices', async (req, res) => {
     try {
         console.log('Updating previous day prices...');
         const stocks = await Stock.find();
@@ -124,10 +134,12 @@ async function updatePreviousDayPrices() {
             await stock.save();
         }
         console.log('Previous day prices updated successfully.');
+        res.status(200).send('updated daily prices');
     } catch (error) {
         console.error('Error updating previous day prices:', error);
+        res.status(500).send('updated daily prices');
     }
-}
+});
 
 cron.schedule('*/14 * * * *', () => {
     console.log('Running cron job to keep server alive every 4 minutes');
