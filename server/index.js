@@ -2007,8 +2007,7 @@ app.post('/login', async (req, res) => {
         const token = await trader.generateAuthToken();
         // console.log("Token", token);
         res.cookie("jwtoken", token, {
-            expires: new Date(Date.now() + 3600000),
-            httpOnly: true
+            expires: new Date(Date.now() + 3600000)
         });
 
         if (!compare) {
