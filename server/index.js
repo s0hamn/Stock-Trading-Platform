@@ -2134,7 +2134,7 @@ app.get('/news', async (req, res) => {
 app.post('/verifyLogin', async (req, res) => {
     // console.log("Inside Dashboard");
     try {
-        const token = req.cookies.jwtoken;
+        const token = req.body.jwtoken;
         const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
         const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
         if (!trader) {
