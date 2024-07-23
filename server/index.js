@@ -104,14 +104,14 @@ io.on('connection', socket => {
 
 
 cron.schedule('0 12 * * *', async () => {
-    try{
+    try {
         console.log('Running cron job to update previous day prices at 17:30 PM IST');
         const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/updatePreviousDayPrices');
-        if(response.status === 200){
+        if (response.status === 200) {
             console.log(response.data);
         }
     }
-    catch(error){
+    catch (error) {
         console.error('Error updating previous day prices:', error);
     }
 }, {
@@ -2006,15 +2006,16 @@ app.post('/login', async (req, res) => {
 
         const token = await trader.generateAuthToken();
         // console.log("Token", token);
-        res.cookie("jwtoken", token, {
-            expires: new Date(Date.now() + 3600000),
-            httpOnly: true
-        });
+
 
         if (!compare) {
             res.json({ result: "Wrong password" });
         }
         else {
+            res.cookie("jwtoken", token, {
+                expires: new Date(Date.now() + 3600000),
+                httpOnly: true
+            });
             res.send({ result: 'Success', token: token });
         }
 
@@ -2088,7 +2089,7 @@ app.put('/updateDeposit', async (req, res) => {
 
 app.put('/updateWithdraw', async (req, res) => {
     try {
-        const token = req.cookies.jwtoken;
+        const token = req.body.jwtoken;
         const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
         const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
         if (!trader) {

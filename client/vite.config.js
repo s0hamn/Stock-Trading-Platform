@@ -16,8 +16,8 @@ export default ({ mode }) => {
       proxy: {
         '/api': {
           // Change this to your API server URL
-          // target: process.env.VITE_PROXY_URL, 
-          target: 'http://localhost:3001',
+          target: process.env.VITE_PROXY_URL,
+          // target: 'http://localhost:3001',
           // target: 'https://stock-trading-platform-o3zp.onrender.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
