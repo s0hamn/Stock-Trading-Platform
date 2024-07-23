@@ -2007,7 +2007,6 @@ app.post('/login', async (req, res) => {
         const token = await trader.generateAuthToken();
         // console.log("Token", token);
 
-
         if (!compare) {
             res.json({ result: "Wrong password" });
         }
