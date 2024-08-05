@@ -1,13 +1,14 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-// const PROXY_URL = import.meta.env.VITE_PROXY_URL
-// https://vitejs.dev/config/
 
 
 export default ({ mode }) => {
-  Object.assign(process.env, loadEnv(mode, process.cwd()))
+  // Load environment variables
+  const env = loadEnv(mode, process.cwd());
+  console.log('Loaded environment variables:', env);
 
-  // import.meta.env.YinYang -> process.env.YinYang
+  // Assign environment variables to process.env
+  Object.assign(process.env, env);
 
   return defineConfig({
     plugins: [react()],
@@ -15,8 +16,8 @@ export default ({ mode }) => {
       proxy: {
         '/api': {
           // Change this to your API server URL
-          // target: process.env.VITE_PROXY_URL, 
-          target: 'http://localhost:3001',
+          target: process.env.VITE_PROXY_URL,
+          // target: 'http://localhost:3001',
           // target: 'https://stock-trading-platform-o3zp.onrender.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),

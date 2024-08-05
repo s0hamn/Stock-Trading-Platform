@@ -42,7 +42,7 @@ const ListOfStocks = () => {
 
     useEffect(() => {
         // Fetch stocks from backend
-        axios.get('/api/getAllStocks')
+        axios.get('' + import.meta.env.VITE_PROXY_URL + '/getAllStocks')
             .then(res => {
                 setStocks(res.data);
                 setFilteredStocks(res.data); // Initially display all stocks
@@ -54,7 +54,7 @@ const ListOfStocks = () => {
 
         // Verify login
         try {
-            axios.post('/api/verifyLogin', {
+            axios.post('' + import.meta.env.VITE_PROXY_URL + '/verifyLogin', {
                 jwtoken: cookies.get('jwtoken'),
             }).then(res => {
                 if (res.data === "No User Signed In" || res.data === "User not found") {

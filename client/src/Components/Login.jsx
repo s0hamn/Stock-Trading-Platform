@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -21,19 +21,23 @@ const Login = () => {
     // axios.defaults.withCredentials = true;
     const cookies = new Cookies();
 
+    useEffect(() => {
+        console.log('' + import.meta.env.VITE_PROXY_URL);
+    }, []);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('/api/login', {
+        axios.post('' + import.meta.env.VITE_PROXY_URL + '/login', {
             email: form.email,
             password: form.password,
         })
             .then((res) => {
-                console.log(res);
+                console.log("RESPONSE", res);
                 if (res.data.result === "Success") {
                     alert("Login Successful");
                     // console.log(res.data.token);
-                    // cookies.set('jwtoken', res.data.token, { path: '/' });
+                    cookies.set('jwtoken', res.data.token, { path: '/' });
                     // console.log(cookies.get('jwtoken'));
                     navigate('/dashboard');
                 }
@@ -43,7 +47,7 @@ const Login = () => {
 
             })
             .catch((err) => {
-                console.log(err);
+                console.log("ERROR", err);
             });
     };
 

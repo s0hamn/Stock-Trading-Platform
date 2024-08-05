@@ -12,8 +12,8 @@ const News = () => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const response = await axios.get('/api/news');
-                if(response.status !== 200) {
+                const response = await axios.get('' + import.meta.env.VITE_PROXY_URL + '/news');
+                if (response.status !== 200) {
                     alert('Error fetching news. Please try again later.');
                     return;
                 }
