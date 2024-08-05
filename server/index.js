@@ -47,12 +47,25 @@ const io = socketIo(server);
 
 app.use(cookies());
 
-app.use(cors(
-    {
-        origin: true,
-        credentials: true
-    }
-));
+
+
+// app.use(cors(
+//     {
+//         origin: true,
+//         credentials: true
+//     }
+// ));
+app.use(cors({
+    origin: (origin, callback) => {
+        callback(null, true);
+    },
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+}));
+
 app.use(express.json());
 
 io.on('connection', socket => {
