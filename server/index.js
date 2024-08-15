@@ -28,20 +28,20 @@ const MONGODB_URI = process.env.MONGODB_URI
 
 
 
-
-
-
-
-
-
-
-
-
-
 var request = require('request');
 
 const app = express();
 const server = http.createServer(app);
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         callback(null, true);
+//     },
+//     credentials: true,
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+//     allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
+//     preflightContinue: false,
+//     optionsSuccessStatus: 204
+// }));
 const io = socketIo(server);
 
 
@@ -49,22 +49,12 @@ app.use(cookies());
 
 
 
-// app.use(cors(
-//     {
-//         origin: true,
-//         credentials: true
-//     }
-// ));
-app.use(cors({
-    origin: (origin, callback) => {
-        callback(null, true);
-    },
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type,Authorization,X-Requested-With',
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-}));
+app.use(cors(
+    {
+        origin: true,
+        credentials: true
+    }
+));
 
 app.use(express.json());
 
