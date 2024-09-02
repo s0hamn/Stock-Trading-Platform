@@ -207,129 +207,118 @@ const StockListCard = ({ id, symbol, companyName, sector, currentPrice, marketCa
           contentLabel="Analyse Stock Modal"
         >
           <h2 className="text-2xl font-semibold mb-4">Analyse Stock {companyName}</h2>
-          {/* Chart Component */}
 
-          <Chart symbol={symbol} />
-          {analyseStockData ? (
-            <>
-              <div className="fixed z-10 inset-0 overflow-y-scroll h-full m-auto w-full flex flex-col items-center justify-center px-4">
-                <div className="absolute inset-0 bg-gray-500 opacity-75" aria-hidden="true"></div>
+          <div className="flex flex-col space-y-6">
+            {/* Chart Component */}
+            <div className="w-full">
+              <Chart symbol={symbol} />
+            </div>
 
-
-
-                <div className="bg-white rounded-lg overflow-y-scroll shadow-xl transform transition-all w-3/4 p-6">
-
-
-
-                  <button
-                    onClick={() => {
-                      setModalIsOpen(false);
-                      setIsHovered(false);
-                      setAnalyseStockData(null);
-                    }}
-                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-all duration-300 transform-gpu active:scale-95"
+            {analyseStockData ? (
+              <div className="bg-white rounded-lg shadow-xl p-6">
+                <button
+                  onClick={() => {
+                    setModalIsOpen(false);
+                    setIsHovered(false);
+                    setAnalyseStockData(null);
+                  }}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-all duration-300 transform-gpu active:scale-95"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
 
-                  <div className="popup-content">
-                    {/* Income Statements */}
-                    <div className="mb-8">
-                      <h2 className="text-lg font-semibold mb-2">Income Statements</h2>
-                      <ul className="space-y-4">
-                        {/* Income Statements Content */}
-                        {analyseStockData.incomeStatements?.map((incomeStatement, index) => (
-                          <li key={index} className="border-b pb-4">
-                            <p className="font-medium mb-2">Income Statement {index + 1}:</p>
-                            <div className="grid grid-cols-2 gap-x-4 text-sm">
-                              <div>
-                                <p className="m-1">End Date: {incomeStatement.endDate}</p>
-                                <p className="m-1">Total Revenue: {incomeStatement.totalRevenue}</p>
-                                <p className="m-1">Cost of Revenue: {incomeStatement.costOfRevenue}</p>
-                                <p className="m-1">Gross Profit: {incomeStatement.grossProfit}</p>
-                                <p className="m-1">Research and Development: {incomeStatement.researchDevelopment}</p>
-                                <p className="m-1">Selling, General and Administrative: {incomeStatement.sellingGeneralAdministrative}</p>
-                              </div>
-                              <div>
-                                <p className="m-1">Total Operating Expenses: {incomeStatement.totalOperatingExpenses}</p>
-                                <p className="m-1">Operating Income: {incomeStatement.operatingIncome}</p>
-                                <p className="m-1">Total Other Income/Expense Net: {incomeStatement.totalOtherIncomeExpenseNet}</p>
-                                <p className="m-1">EBIT: {incomeStatement.ebit}</p>
-                                <p className="m-1">Interest Expense: {incomeStatement.interestExpense}</p>
-                                <p className="m-1">Income Before Tax: {incomeStatement.incomeBeforeTax}</p>
-                              </div>
+                <div className="popup-content space-y-8">
+                  {/* Income Statements */}
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">Income Statements</h2>
+                    <ul className="space-y-4">
+                      {analyseStockData.incomeStatements?.map((incomeStatement, index) => (
+                        <li key={index} className="border-b pb-4">
+                          <p className="font-medium mb-2">Income Statement {index + 1}:</p>
+                          <div className="grid grid-cols-2 gap-x-4 text-sm">
+                            <div>
+                              <p className="m-1">End Date: {incomeStatement.endDate}</p>
+                              <p className="m-1">Total Revenue: {incomeStatement.totalRevenue}</p>
+                              <p className="m-1">Cost of Revenue: {incomeStatement.costOfRevenue}</p>
+                              <p className="m-1">Gross Profit: {incomeStatement.grossProfit}</p>
+                              <p className="m-1">Research and Development: {incomeStatement.researchDevelopment}</p>
+                              <p className="m-1">Selling, General and Administrative: {incomeStatement.sellingGeneralAdministrative}</p>
                             </div>
-                          </li>
+                            <div>
+                              <p className="m-1">Total Operating Expenses: {incomeStatement.totalOperatingExpenses}</p>
+                              <p className="m-1">Operating Income: {incomeStatement.operatingIncome}</p>
+                              <p className="m-1">Total Other Income/Expense Net: {incomeStatement.totalOtherIncomeExpenseNet}</p>
+                              <p className="m-1">EBIT: {incomeStatement.ebit}</p>
+                              <p className="m-1">Interest Expense: {incomeStatement.interestExpense}</p>
+                              <p className="m-1">Income Before Tax: {incomeStatement.incomeBeforeTax}</p>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Major Holders Breakdown */}
+                  <div className="border-b pb-4">
+                    <h2 className="text-lg font-semibold mb-2">Major Holders Breakdown</h2>
+                    <div className="space-y-2 text-sm">
+                      <p className="m-1">Insiders Percent Held: {analyseStockData.majorHoldersBreakdown?.insidersPercentHeld}</p>
+                      <p className="m-1">Institutions Percent Held: {analyseStockData.majorHoldersBreakdown?.institutionsPercentHeld}</p>
+                      <p className="m-1">Institutions Float Percent Held: {analyseStockData.majorHoldersBreakdown?.institutionsFloatPercentHeld}</p>
+                      <p className="m-1">Institutions Count: {analyseStockData.majorHoldersBreakdown?.institutionsCount}</p>
+                    </div>
+                  </div>
+
+                  {/* Industry Trend */}
+                  <div className="border-b pb-4">
+                    <h2 className="text-lg font-semibold mb-2">Industry Trend</h2>
+                    <div className="space-y-2">
+                      <p className="m-1">Symbol: {analyseStockData.industryTrend?.symbol}</p>
+                      <p className="m-1">Estimates:</p>
+                      <ul className="list-disc list-inside text-sm">
+                        {analyseStockData.industryTrend?.estimates?.map((estimate, index) => (
+                          <li key={index} className="m-1">Estimate {index + 1}: {estimate}</li>
                         ))}
                       </ul>
                     </div>
+                  </div>
 
-                    {/* Major Holders Breakdown */}
-                    <div className="mb-8 border-b pb-4">
-                      <h2 className="text-lg font-semibold mb-2">Major Holders Breakdown</h2>
-                      {/* Major Holders Breakdown Content */}
-                      <div className="space-y-2 text-sm">
-                        <p className="m-1">Insiders Percent Held: {analyseStockData.majorHoldersBreakdown?.insidersPercentHeld}</p>
-                        <p className="m-1">Institutions Percent Held: {analyseStockData.majorHoldersBreakdown?.institutionsPercentHeld}</p>
-                        <p className="m-1">Institutions Float Percent Held: {analyseStockData.majorHoldersBreakdown?.institutionsFloatPercentHeld}</p>
-                        <p className="m-1">Institutions Count: {analyseStockData.majorHoldersBreakdown?.institutionsCount}</p>
-                      </div>
-                    </div>
-
-                    {/* Industry Trend */}
-                    <div className="mb-8 border-b pb-4">
-                      <h2 className="text-lg font-semibold mb-2">Industry Trend</h2>
-                      {/* Industry Trend Content */}
-                      <div className="space-y-2">
-                        <p className="m-1">Symbol: {analyseStockData.industryTrend?.symbol}</p>
-                        <p className="m-1">Estimates:</p>
-                        <ul className="list-disc list-inside text-sm">
-                          {analyseStockData.industryTrend?.estimates?.map((estimate, index) => (
-                            <li key={index} className="m-1">Estimate {index + 1}: {estimate}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* Index Trend */}
-                    <div>
-                      <h2 className="text-lg font-semibold mb-2">Index Trend</h2>
-                      {/* Index Trend Content */}
-                      <div className="space-y-2 text-sm">
-                        <p className="m-1">Symbol: {analyseStockData.indexTrend?.symbol}</p>
-                        <p className="m-1">PE Ratio: {analyseStockData.indexTrend?.peRatio}</p>
-                        <p className="m-1">PEG Ratio: {analyseStockData.indexTrend?.pegRatio}</p>
-                        <p className="m-1">Estimates:</p>
-                        <ul className="list-disc list-inside">
-                          {analyseStockData.indexTrend?.estimates?.map((estimate, index) => (
-                            <li key={index} className="m-1">Period: {estimate.period}, Growth: {estimate.growth}</li>
-                          ))}
-                        </ul>
-                      </div>
-
+                  {/* Index Trend */}
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">Index Trend</h2>
+                    <div className="space-y-2 text-sm">
+                      <p className="m-1">Symbol: {analyseStockData.indexTrend?.symbol}</p>
+                      <p className="m-1">PE Ratio: {analyseStockData.indexTrend?.peRatio}</p>
+                      <p className="m-1">PEG Ratio: {analyseStockData.indexTrend?.pegRatio}</p>
+                      <p className="m-1">Estimates:</p>
+                      <ul className="list-disc list-inside">
+                        {analyseStockData.indexTrend?.estimates?.map((estimate, index) => (
+                          <li key={index} className="m-1">Period: {estimate.period}, Growth: {estimate.growth}</li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>
               </div>
-
-            </>) : (
-            <Preloader />
-          )
-          }
+            ) : (
+              <Preloader />
+            )}
+          </div>
         </Modal>
+
 
 
 

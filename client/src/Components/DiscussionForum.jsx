@@ -33,6 +33,7 @@ const DiscussionForum = () => {
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
+    const[filterApplied, setFilterApplied] = useState(false);
     const [selectedPostIdForShowingComments, setSelectedPostIdForShowingComments] = useState('');
     // const [newPost, setNewPost] = useState('');
     const [selectedCompany, setSelectedCompany] = useState('');
@@ -79,7 +80,7 @@ const DiscussionForum = () => {
         try {
             const response = await axios.get('' + import.meta.env.VITE_PROXY_URL + '/posts');
             setPosts(response.data);
-            handleFilter(selectedCompany);
+            setFilteredPosts(response.data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching posts:', error);
@@ -109,11 +110,12 @@ const DiscussionForum = () => {
     // Function to handle post filtering based on company name
     const handleFilter = (companyName) => {
         setSelectedCompany(companyName);
-        if (companyName === "") {
-            setFilteredPosts(posts); // Reset filter, show all posts
-        } else {
+        if(companyName !== ''){
             const filtered = posts.filter(post => post.stockName === companyName);
             setFilteredPosts(filtered); // Apply filter based on selected company
+        }
+        else{
+            setFilteredPosts(posts); // Clear filter
         }
     };
 
@@ -186,19 +188,22 @@ const DiscussionForum = () => {
             ) : (
                 <div className="container mb-0 w-full h-full pt-4"> {/* Add padding-top to create space for the fixed filter */}
                     {/* Fixed filter div */}
-                    <div className="fixed top-20 left-0 right-0 bg-gray-100 z-10 h-15">
+                    <div className="fixed top-20 left-0 right-0 bg-white z-10 h-15">
                         <div className="flex justify-center items-center p-6 gap-5">
                             <select
                                 className="px-4 py-2 border border-gray-200 rounded-md mr-4"
                                 value={selectedCompany}
-                                onChange={(e) => handleFilter(e.target.value)}
-                            >
+                                onChange={(e) => {handleFilter(e.target.value);
+                                setFilterApplied(true);}}
+                            >   
                                 <option value="">-- Filter by Company --</option>
                                 {stockNames.map((name, index) => (
                                     <option key={index} value={name}>{name}</option>
                                 ))}
                             </select>
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all duration-300  active:scale-95" onClick={() => handleFilter('')}>Clear Filter</button>
+                            <button className={`${
+                                filterApplied ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-400 cursor-not-allowed'
+                                } text-white px-4 py-2 rounded-md transition-all duration-300 active:scale-95`} onClick={() => handleFilter('')}>Clear Filter</button>
 
                             <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all duration-300  active:scale-95" onClick={() => {
                                 fetchPosts();
@@ -209,7 +214,7 @@ const DiscussionForum = () => {
                     </div>
 
                     {/* Posts and comments section */}
-                    <div className="mt-20 overflow-y-scroll bg-gray-200 pb-16">
+                    <div className="mt-20 overflow-y-scroll bg-white pb-16">
                         {filteredPosts.map(post => (
                             <div key={post._id} className="m-12 bg-white shadow-md overflow-y-scroll">
 
