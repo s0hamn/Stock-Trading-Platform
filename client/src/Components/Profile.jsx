@@ -41,7 +41,7 @@ const Profile = () => {
     const generateReport = async () => {
 
         try {
-            const response = await axios.get('' + import.meta.env.VITE_PROXY_URL + '/pnl', {
+            const response = await axios.get('api/pnl', {
                 params: {
                     traderId: trader._id.toString(),
                     fromDate: fromDate,
@@ -52,44 +52,40 @@ const Profile = () => {
 
                 console.log(response.data);
 
-                response.data.buyTransactions.forEach((data) => {
-                    axios.get('' + import.meta.env.VITE_PROXY_URL + '/getStockInfoById',
-                        {
-                            params:
-                            {
-                                stockId: data.stock_id
-                            }
-                        }
-                    ).then(res => {
+                const buyTransactions = await Promise.all(response.data.buyTransactions.map(async (data) => {
+                    try {
+                        const res = await axios.get('api/getStockInfoById', {
+                            params: { stockId: data.stock_id }
+                        });
                         data.stock = res.data;
-                    }).catch(err => {
+                    } catch (err) {
                         console.error('Error fetching stock info:', err);
                         setIsPnlDataPresent(false);
                         alert('Error fetching stock info. Please try again later.');
                         setPnlData([]);
-                        return;
-                    })
-                });
-
-                response.data.sellTransactions.forEach((data) => {
-                    axios.get('' + import.meta.env.VITE_PROXY_URL + '/getStockInfoById',
-                        {
-                            params:
-                            {
-                                stockId: data.stock_id
-                            }
-                        }
-                    ).then(res => {
+                        throw err;
+                    }
+                    return data;
+                }));
+    
+                const sellTransactions = await Promise.all(response.data.sellTransactions.map(async (data) => {
+                    try {
+                        const res = await axios.get('api/getStockInfoById', {
+                            params: { stockId: data.stock_id }
+                        });
                         data.stock = res.data;
-                    }).catch(err => {
+                    } catch (err) {
                         console.error('Error fetching stock info:', err);
                         setIsPnlDataPresent(false);
                         alert('Error fetching stock info. Please try again later.');
                         setPnlData([]);
-                        return;
-                    })
-                });
-
+                        throw err;
+                    }
+                    return data;
+                }));
+    
+                response.data.buyTransactions = buyTransactions;
+                response.data.sellTransactions = sellTransactions;
                 setIsPnlDataPresent(true);
                 setPnlData(response.data);
             }
@@ -120,7 +116,7 @@ const Profile = () => {
         if (verifyPass) {
             alert("Password correct");
             try {
-                axios.put('' + import.meta.env.VITE_PROXY_URL + '/updateDeposit', {
+                axios.put('api/updateDeposit', {
                     jwtoken: cookies.get('jwtoken'),
                     deposit: depositAmount
                 }).then(res => {

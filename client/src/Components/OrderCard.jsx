@@ -19,22 +19,46 @@ async function cancleOrder(symbol, orderType, order_id) {
 const OrderCard = ({ symbol, quantity, price, date, orderType, order_id }) => {
   // console.log("here - order id - ", order_id)
   return (
-    <div className="max-w-md mx-auto bg-white  shadow-md overflow-hidden m-2">
-      <div className="md:flex">
-        <div className="p-8">
-          <p className="mt-2 text-gray-500">{symbol}</p>
-          <p className="mt-2 text-gray-500">Quantity - {quantity}</p>
-          {orderType == "Limit Buy" || orderType == "Limit Sell" || orderType == "Buy" || orderType == "Sell" ? <p className="mt-2 text-gray-500">Price - {price}</p> : null}
-          <p className="mt-2 text-gray-500">Date - {date}</p>
-          <p className="mt-2 text-gray-500">Type - {orderType}</p>
-          {order_id !== "" && (
-            <button onClick={() => cancelOrder(order_id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Cancel
-            </button>
-          )}
-        </div>
+    <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden m-4">
+  <div className="md:flex items-center">
+    <div className="w-full p-6">
+      <div className="flex justify-between items-center mb-4">
+        <p className={`text-2xl font-semibold ${orderType.includes("Buy") ? "text-green-500" : "text-red-500"}`}>
+          {symbol}
+        </p>
+        <p className="text-gray-500 text-sm">{date}</p>
       </div>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <p className="text-gray-700">Quantity</p>
+          <p className="text-xl font-medium">{quantity}</p>
+        </div>
+        {(orderType === "Limit Buy" || orderType === "Limit Sell" || orderType === "Buy" || orderType === "Sell") && (
+          <div>
+            <p className="text-gray-700">Price</p>
+            <p className="text-xl font-medium">{price}</p>
+          </div>
+        )}
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-gray-700">Type</p>
+        <p className="text-lg font-medium">{orderType}</p>
+      </div>
+      {order_id !== "" && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => cancelOrder(order_id)}
+            className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-full transition duration-300"
+          >
+            Cancel Order
+          </button>
+        </div>
+      )}
     </div>
+  </div>
+</div>
+
+
   );
 }
 

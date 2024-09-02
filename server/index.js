@@ -106,20 +106,20 @@ io.on('connection', socket => {
 });
 
 
-cron.schedule('0 12 * * *', async () => {
-    try {
-        console.log('Running cron job to update previous day prices at 17:30 PM IST');
-        const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/updatePreviousDayPrices');
-        if (response.status === 200) {
-            console.log(response.data);
-        }
-    }
-    catch (error) {
-        console.error('Error updating previous day prices:', error);
-    }
-}, {
-    timezone: 'UTC'
-});
+// cron.schedule('0 12 * * *', async () => {
+//     try {
+//         console.log('Running cron job to update previous day prices at 17:30 PM IST');
+//         const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/updatePreviousDayPrices');
+//         if (response.status === 200) {
+//             console.log(response.data);
+//         }
+//     }
+//     catch (error) {
+//         console.error('Error updating previous day prices:', error);
+//     }
+// }, {
+//     timezone: 'UTC'
+// });
 
 app.get('/updatePreviousDayPrices', async (req, res) => {
     try {
@@ -175,7 +175,9 @@ cron.schedule('*/14 * * * *', () => {
 async function keepServerAlive() {
     try {
         // Replace the URL with your server's URL and endpoint
-        const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/keepAlive');
+        // const response = await axios.get('https://stock-trading-platform-o3zp.onrender.com/keepAlive');
+        const response = await axios.get('https://localhost:3001/keepAlive');
+
         console.log('Self ping successful:', response.data);
     } catch (error) {
         console.error('Self ping failed:', error.message);
@@ -500,6 +502,8 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                 }
             });
 
+            updateDailyPrices(stock, stock.currentPrice, marketBuyOrder.quantity);
+
         }
         else if (marketBuyOrder.quantity < marketSellOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
@@ -545,6 +549,8 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                 }
             });
 
+            updateDailyPrices(stock, stock.currentPrice, marketBuyOrder.quantity);
+
 
         } else { // marketBuyOrder.quantity > marketSellOrder.quantity
             await Stock.findByIdAndUpdate(stock._id, {
@@ -588,6 +594,8 @@ async function executeMarketBuyOrder(symbol, marketBuyOrderQueue, marketSellOrde
                     lastTradedOn: Date.now()
                 }
             });
+
+            updateDailyPrices(stock, stock.currentPrice, marketSellOrder.quantity);
         }
 
 
@@ -825,6 +833,8 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
                 }
             });
 
+            updateDailyPrices(stock, stock.currentPrice, marketSellOrder.quantity);
+
         } else if (marketSellOrder.quantity < marketBuyOrder.quantity) {
             await Stock.findByIdAndUpdate(stock._id, {
                 $pull: {
@@ -868,6 +878,8 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
                     lastTradedOn: Date.now()
                 }
             });
+
+            updateDailyPrices(stock, stock.currentPrice, marketSellOrder.quantity);
 
         } else {
             await Stock.findByIdAndUpdate(stock._id, {
@@ -913,6 +925,8 @@ async function executeMarketSellOrder(symbol, marketBuyOrderQueue, marketSellOrd
                     lastTradedOn: Date.now()
                 }
             });
+
+            updateDailyPrices(stock, stock.currentPrice, marketBuyOrder.quantity);
 
 
         }
@@ -2068,7 +2082,7 @@ app.post('/verifyOTP', async (req, res) => {
 });
 app.put('/updateDeposit', async (req, res) => {
     try {
-        const token = req.cookies.jwtoken;
+        const token = req.body.jwtoken;
         const verifyToken = jwt.verify(token, "THISISSECRETKEYFORTRADERJSJSONWEBTOKENAUTHENTICATION");
         const trader = await TraderModel.findOne({ _id: verifyToken._id, "tokens.token": token });
         if (!trader) {

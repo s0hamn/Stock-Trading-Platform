@@ -142,7 +142,7 @@ function Dashboard() {
         if (trader.investments) {
 
             const socket = io(PROXY_URL, { transports: ['websocket', 'polling', 'flashsocket'] });
-            // console.log("Trader investments", trader.investments);
+            console.log("Trader investments", trader.investments);
             socket.emit('someStocks', trader.investments);
             // Subscribe to stock updates
             socket.on('stockUpdate', updatedStocks => {
@@ -237,7 +237,7 @@ function Dashboard() {
         return (
             <div className='flex flex-col h-screen' >
                 <div className=" flex flex-col w-full pr-4 ">
-                    <div className="text-sm font-medium text-center text-gray-500  border-gray-200 dark:text-gray-400 dark:border-gray-700 mb-2">
+                    <div className="text-sm font-medium text-center text-black  border-gray-200 dark:text-black dark:border-gray-700 mb-2">
                         <ul className="flex flex-wrap -mb-px">
                             <button onClick={() => setOrderStatus('pending')} className="me-2 flex-1">
                                 <a href="#" className={`inline-block p-4 ${orderStatus == 'pending' ? "text-red-600 border-b-2 border-red-600 rounded-t-lg active dark:text-red-600 dark:border-red-500" : "border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"}`}>Pending</a>

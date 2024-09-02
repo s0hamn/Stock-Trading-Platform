@@ -4,6 +4,7 @@ import BuyPopup from './BuyPopup';
 import axios from 'axios';
 import Modal from 'react-modal';
 import Preloader from './Preloader';
+import { Chart } from 'chart.js';
 
 
 function StockCard({ stock, index, stocks, profit, profitClass, userId, setChartSymbol }) {
@@ -96,6 +97,9 @@ function StockCard({ stock, index, stocks, profit, profitClass, userId, setChart
                             }}
                             contentLabel="Analyse Stock Modal"
                         >
+                           <Chart symbol={stock.symbol} />
+                            
+
 
                             {analyseStockData ? (
                                 <div className="fixed z-10 inset-0 overflow-y-scroll h-5/6 m-auto w-full">
